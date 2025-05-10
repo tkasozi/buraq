@@ -64,7 +64,7 @@ jobs:
       - name: Create release archive
         uses: thedoctor0/zip-release@master
         with:
-          filename: ${{ secrets.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+          filename: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
           directory: ${{ github.workspace }}/Output
 
       - name: Upload release asset

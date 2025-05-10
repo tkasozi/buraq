@@ -61,7 +61,8 @@ Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins\platforms\*.dll"; DestDir: "{a
 Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Core.dll "; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Gui.dll "; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Widgets.dll "; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Sql.dll "; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Sql.dll "; DestDir: "{app}"; Flags: ignoreversion D:\a\ITools\ITools
+Source: "D:\a\ITools\ITools\*.db"; DestDir: "{app}"; Flags: ignoreversion
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

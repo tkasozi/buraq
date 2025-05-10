@@ -42,22 +42,12 @@ jobs:
       - name: Find application executable
         id: find-exe
         run: |
-          Get-ChildItem -Path "${{ github.workspace }}/cmake-build-release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+          Get-ChildItem -Path "${{ github.workspace }}/cmake-build-release/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
         shell: powershell
 
       - name: Read application executable name
         id: app-name
         run: echo "APP_NAME=$(cat app_exe_name.txt)" >> $GITHUB_ENV
-
-      - name: Logging
-        run: |
-          echo $APP_NAME
-          
-          Get-ChildItem D:\a\ITools\ITools\cmake-build-release\
-
-          Get-ChildItem D:\a\ITools\ITools\cmake-build-release\Release
-
-        shell: powershell
 
       - name: Generate installer with Inno Setup
         run: |
@@ -71,8 +61,20 @@ jobs:
       - name: Create release archive
         uses: thedoctor0/zip-release@master
         with:
-          filename: ${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+          filename: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
           directory: ${{ github.workspace }}/Output
+
+      - name: Logging
+        run: |
+          echo $APP_NAME
+          
+          Get-ChildItem
+          
+          Get-ChildItem D:\a\ITools\ITools\cmake-build-release\
+
+          Get-ChildItem D:\a\ITools\ITools\cmake-build-release\Release
+
+        shell: powershell
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1

@@ -34,10 +34,8 @@ jobs:
           #  "--unattended"
           # )
 
-          # $arg_string = "-d --root C:\Qt\6 --a"
+          # $arg_string = "-d --root C:\Qt\6 --accept-messages --accept-licenses"
           # Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList $arg_string, in
-
-          Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList "--accept-messages --accept-licenses", in
 
           Get-ChildItem C:\
 

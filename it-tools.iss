@@ -47,12 +47,21 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Dirs]
-Name: "cmake-build-release\plugins";
+Name: "plugins\sqldrivers";
+Name: "plugins\platforms";
 
 [Files]
 Source: "cmake-build-release\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "cmake-build-release\resources\*.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; Source: "cmake-build-release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "cmake-build-release\resources\*.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins\sqldrivers\*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins\platforms\*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins\sqldrivers\*.dll"; DestDir: "{app}\plugins\sqldrivers"; Flags: ignoreversion
+Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins\platforms\*.dll"; DestDir: "{app}\plugins\platforms"; Flags: ignoreversion
+Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Core.dll "; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Gui.dll "; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Widgets.dll "; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Sql.dll "; DestDir: "{app}"; Flags: ignoreversion
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

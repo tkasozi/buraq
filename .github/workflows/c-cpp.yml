@@ -63,9 +63,11 @@ jobs:
 
       - name: Logging
         run: |
-          echo "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins"
+          Get-ChildItem
           
-          echo "D:\a\ITools\Qt\6.8.3\msvc2022_64\qml"
+          Get-ChildItem "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins"
+          
+          Get-ChildItem "D:\a\ITools\Qt\6.8.3\msvc2022_64\qml"
 
         shell: powershell
 

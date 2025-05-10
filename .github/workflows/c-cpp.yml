@@ -36,6 +36,11 @@ jobs:
 
           $arg_string = "-d --install-prefix `"$qt_install_path`" --modules qtbase,qtdeclarative,qttools --accept-licenses --unattended"
           Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList $arg_string, in
+
+          Get-ChildItem C:\
+
+          Get-ChildItem C:\Qt
+          
         shell: powershell
         
       - name: Configure CMake

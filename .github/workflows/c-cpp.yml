@@ -35,15 +35,15 @@ jobs:
           # pw: ${{ secrets.QT_PW }}
           
       - name: Configure CMake
-        run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6"
+        run: cmake -B ${{ github.workspace }}/cmake-build-release -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6"
 
       - name: Build project
-        run: cmake --build ${{ github.workspace }}/build --config Release --parallel ${{ env.PROCESSOR_NUMBER }}
+        run: cmake --build ${{ github.workspace }}/cmake-build-release --config Release --parallel ${{ env.PROCESSOR_NUMBER }}
 
       - name: Find application executable
         id: find-exe
         run: |
-          Get-ChildItem -Path "${{ github.workspace }}/build/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+          Get-ChildItem -Path "${{ github.workspace }}/cmake-build-release/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
         shell: powershell
 
       - name: Read application executable name
@@ -55,15 +55,15 @@ jobs:
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ${{ github.workspace }}/it-tools.iss
         env:
           APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
-          OUTPUT_DIR: ${{ github.workspace }}/build/installer
-          APP_BINARY: ${{ github.workspace }}/build/Release/${{ env.APP_NAME }}
+          OUTPUT_DIR: ${{ github.workspace }}/cmake-build-release/installer
+          APP_BINARY: ${{ github.workspace }}/cmake-build-release/${{ env.APP_NAME }}
         shell: powershell
 
       - name: Create release archive
         uses: thedoctor0/zip-release@master
         with:
           filename: ${{ github.event.release.tag_name }}-${{ runner.os }}.zip
-          directory: ${{ github.workspace }}/build/installer
+          directory: ${{ github.workspace }}/cmake-build-release/installer
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1

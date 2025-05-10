@@ -16,7 +16,15 @@ jobs:
 
       - name: Set up MSVC environment
         uses: microsoft/setup-msbuild@v2
+
       
+      - name: Download Inno Setup
+        run: |
+          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
+          Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
+        shell: powershell
+
+        
       - name: Install Qt 6
         run: |
           # Download the Qt Online Installer
@@ -40,12 +48,6 @@ jobs:
       - name: Read application executable name
         id: app-name
         run: echo "APP_NAME=$(cat app_exe_name.txt)" >> $GITHUB_ENV
-
-      - name: Download Inno Setup
-        run: |
-          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/isdl.exe" -OutFile "inno_setup.exe"
-          Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
-        shell: powershell
 
       - name: Generate installer with Inno Setup
         run: |

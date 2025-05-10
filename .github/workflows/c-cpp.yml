@@ -39,7 +39,9 @@ jobs:
 
           Get-ChildItem C:\
 
-          Get-ChildItem C:\Qt
+          Get-ChildItem "C:\Program Files"
+
+          Get-ChildItem "Program Files (x86)"
           
         shell: powershell
         

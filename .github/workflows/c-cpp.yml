@@ -61,6 +61,14 @@ jobs:
           APP_BINARY: ${{ github.workspace }}/cmake-build-release/${{ secrets.APP_NAME }}
         shell: powershell
 
+      - name: Logging
+        run: |
+          echo "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins"
+          
+          echo "D:\a\ITools\Qt\6.8.3\msvc2022_64\qml"
+
+        shell: powershell
+
       - name: Create release archive
         uses: thedoctor0/zip-release@master
         with:

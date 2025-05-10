@@ -69,7 +69,8 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           filename: ${{ github.event.release.tag_name }}-${{ runner.os }}.zip
-          directory: ${{ github.workspace }}/Output
+          # directory: ${{ github.workspace }}/Output
+          directory: ${{ env.OUTPUT_DIR }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
@@ -77,6 +78,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+          # asset_path: ${{ github.workspace }}/${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+          asset_path: ${{ env.OUTPUT_DIR }}-${{ runner.os }}.zip
           asset_name: ${{ github.event.release.tag_name }}-${{ runner.os }}.zip
           asset_content_type: application/zip

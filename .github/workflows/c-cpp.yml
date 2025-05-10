@@ -49,21 +49,21 @@ jobs:
         run: |
           Get-ChildItem
           
-          Get-ChildItem "${{ github.workspace }}/cmake-build-release"
-          
-          Get-ChildItem "${{ github.workspace }}/cmake-build-release/Release"
+#          Get-ChildItem "${{ github.workspace }}/cmake-build-release"
+#
+#          Get-ChildItem "${{ github.workspace }}/cmake-build-release/Release"
           
           Get-ChildItem "**********1***************"
           Get-ChildItem "${{ env.QT_ROOT_DIR }}"
           Get-ChildItem "**********1***************"
           
-          Get-ChildItem "***********2**************"
-          Get-ChildItem "${{ env.QT_PLUGIN_PATH }}"
-          Get-ChildItem "***********2**************"
-          
-          Get-ChildItem "***********3**************"
-          Get-ChildItem "${{ env.QML2_IMPORT_PATH }}"
-          Get-ChildItem "***********3**************"
+#          Get-ChildItem "***********2**************"
+#          Get-ChildItem "${{ env.QT_PLUGIN_PATH }}"
+#          Get-ChildItem "***********2**************"
+#
+#          Get-ChildItem "***********3**************"
+#          Get-ChildItem "${{ env.QML2_IMPORT_PATH }}"
+#          Get-ChildItem "***********3**************"
 
         shell: powershell
 

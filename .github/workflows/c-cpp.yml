@@ -29,7 +29,7 @@ jobs:
           # Download the Qt Online Installer
           Invoke-WebRequest -Uri "https://download.qt.io/official_releases/online_installers/qt-online-installer-windows-x64-online.exe" -OutFile "qt_installer.exe"
           # Run the installer with necessary arguments for silent installation
-          Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList "/SILENT" "--install-prefix", "C:/Qt/6", "--modules", "qtbase qtdeclarative qttools"
+          Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList "--install-prefix", "C:/Qt/6", "--modules", "qtbase qtdeclarative qttools" "/SILENT"
         shell: powershell
         
       - name: Configure CMake

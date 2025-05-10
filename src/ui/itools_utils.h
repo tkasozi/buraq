@@ -12,8 +12,8 @@ namespace IToolsNamespace {
 	constexpr const char *POWERSHELL_PATH = "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe";
 
 	enum WindowPixels {
-		WindowNormalWidth = 1600,
-		WindowMinWidth = 1000,
+		WindowNormalWidth = 1200,
+		WindowMinWidth = 800,
 		WindowHeight = 720
 	};
 

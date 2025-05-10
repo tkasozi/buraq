@@ -39,7 +39,7 @@ jobs:
 
       - name: Build project
         run: cmake --build ${{ github.workspace }}/cmake-build-release --config Release --parallel ${{ env.PROCESSOR_NUMBER }}
-
+        
       - name: Find application executable
         id: find-exe
         run: |
@@ -50,6 +50,14 @@ jobs:
         id: app-name
         run: echo "APP_NAME=$(cat app_exe_name.txt)" >> $GITHUB_ENV
 
+      - name: Logging
+        run: |
+          echo "${{ env.APP_NAME }}"
+          
+          Get-ChildItem C:\
+          
+        shell: powershell
+        
       - name: Generate installer with Inno Setup
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ${{ github.workspace }}/it-tools.iss

@@ -40,7 +40,7 @@ jobs:
            #  "--accept-licenses",
            # "--unattended"
           )
-          Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList $arguments in
+          Start-Process -Wait -FilePath "qt_installer.exe"  in
         shell: powershell
         
       - name: Configure CMake

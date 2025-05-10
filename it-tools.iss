@@ -50,7 +50,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "cmake-build-release\plugins";
 
 [Files]
-Source: "cmake-build-release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "cmake-build-release\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "cmake-build-release\resources\*.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "cmake-build-release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 

@@ -23,14 +23,13 @@ jobs:
           Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
           Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
         shell: powershell
-
         
       - name: Install Qt 6
         run: |
           # Download the Qt Online Installer
           Invoke-WebRequest -Uri "https://download.qt.io/official_releases/online_installers/qt-online-installer-windows-x64-online.exe" -OutFile "qt_installer.exe"
           # Run the installer with necessary arguments for silent installation
-          Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList "--platform", "win", "--install-prefix", "C:/Qt/6", "--modules", "qtbase qtdeclarative qttools", "--accept-licenses", "-- unattended"
+          Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList "/SILENT" "--install-prefix", "C:/Qt/6", "--modules", "qtbase qtdeclarative qttools"
         shell: powershell
         
       - name: Configure CMake

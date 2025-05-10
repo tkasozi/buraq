@@ -54,7 +54,7 @@ jobs:
         run: |
           echo "${{ env.APP_NAME }}"
           
-          Get-ChildItem C:\
+          Get-ChildItem D:\a\ITools\ITools\cmake-build-release\
           
         shell: powershell
         

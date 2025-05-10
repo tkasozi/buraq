@@ -70,6 +70,38 @@ file(WRITE ${CMAKE_BINARY_DIR}/0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db "")
 # Add resources
 qt6_add_resources(ITools RESOURCES resources.qrc)
 
+if (CMAKE_BUILD_TYPE MATCHES "Release")
+	get_target_property(QT_BINARY_DIR Qt::Core IMPORTED_LOCATION)
+	get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
+
+	file(GLOB QT_DLLS "${QT_BIN_DIR}/*.dll")
+
+	install(FILES ${QT_DLLS}
+			DESTINATION "${CMAKE_BINARY_DIR}/Release" # Or a dedicated "lib" folder in your release
+			CONFIGURATIONS "Release"
+	)
+
+	# Optional: Copy platform plugin (e.g., qwindows.dll)
+	if (EXISTS "${QT_BIN_DIR}/platforms")
+		file(GLOB QT_PLATFORM_PLUGINS "${QT_BIN_DIR}/platforms/*.dll")
+		install(FILES ${QT_PLATFORM_PLUGINS}
+				DESTINATION "${CMAKE_BINARY_DIR}/Release/platforms"
+				CONFIGURATIONS "Release"
+		)
+	endif()
+
+	# Optional: Copy image format plugins (e.g., qjpeg.dll, qpng.dll)
+	if (EXISTS "${QT_BIN_DIR}/imageformats")
+		file(GLOB QT_IMAGEFORMAT_PLUGINS "${QT_BIN_DIR}/imageformats/*.dll")
+		install(FILES ${QT_IMAGEFORMAT_PLUGINS}
+				DESTINATION "${CMAKE_BINARY_DIR}/Release/imageformats"
+				CONFIGURATIONS "Release"
+		)
+	endif()
+
+	# Add similar logic for other necessary plugin types (e.g., sqldrivers)
+endif()
+
 #if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 #	set(DEBUG_SUFFIX)
 #	if (MSVC AND CMAKE_BUILD_TYPE MATCHES "Debug")

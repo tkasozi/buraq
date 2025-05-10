@@ -1,7 +1,10 @@
 name: Build and Package
 on:
-  release:
-    types: [published]
+ release:
+   types: [published]
+  # push:
+  #   branches:
+  #     - fix-package
 
 env:
   APP_NAME: "ITools"
@@ -44,11 +47,9 @@ jobs:
 
       - name: Logging
         run: |
-          Get-ChildItem
-          
-          Get-ChildItem "${{ github.workspace }}/cmake-build-release"
-          
-          Get-ChildItem "${{ github.workspace }}/cmake-build-release/Release"
+          Get-ChildItem "**********1***************"
+          Get-ChildItem "${{ env.QT_ROOT_DIR }}/bin"
+          Get-ChildItem "**********1***************"
 
         shell: powershell
 

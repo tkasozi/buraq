@@ -65,7 +65,7 @@ jobs:
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ${{ github.workspace }}/it-tools.iss
         env:
           APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
-          OUTPUT_DIR: ${{ github.workspace }}/cmake-build-release/Output
+          OUTPUT_DIR: ${{ github.workspace }}/Output
           APP_BINARY: ${{ github.workspace }}/cmake-build-release/${{ env.APP_NAME }}
         shell: powershell
 
@@ -73,7 +73,7 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           filename: ${{ github.event.release.tag_name }}-${{ runner.os }}.zip
-          directory: ${{ github.workspace }}/cmake-build-release/Output
+          directory: ${{ github.workspace }}/Output
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1

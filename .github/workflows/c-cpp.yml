@@ -17,7 +17,6 @@ jobs:
       - name: Set up MSVC environment
         uses: microsoft/setup-msbuild@v2
 
-      
       - name: Download Inno Setup
         run: |
           Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
@@ -27,12 +26,13 @@ jobs:
       - name: Install Qt 6 Silently
         run: |
           Invoke-WebRequest -Uri "https://download.qt.io/official_releases/online_installers/qt-online-installer-windows-x64-online.exe" -OutFile "qt_installer.exe"
-          $qt_install_path = "C:\Qt\6" # Define your desired install path
+          $qt_install_path = "C:\Qt\6"
           $arguments = @(
             "--install-prefix", "$qt_install_path",
             "--modules", "qtbase qtdeclarative qttools",
-            "--accept-licenses",
-            "--unattended"
+            "--accept-licenses"
+#               ,
+#            "--unattended"
           )
           Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList $arguments
         shell: powershell
@@ -55,7 +55,7 @@ jobs:
 
       - name: Generate installer with Inno Setup
         run: |
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ${{ github.workspace }}/installer.iss
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ${{ github.workspace }}/it-tools.iss
         env:
           APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/build/installer

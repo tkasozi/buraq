@@ -1,9 +1,9 @@
 name: Build and Package
 on:
   push:
-    branches: [ "github-workflow" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "github-workflow" ]
+    branches: [ "main" ]
   release:
     types: [published]
 

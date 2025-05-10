@@ -3,8 +3,8 @@ on:
   release:
     types: [published]
 
-# env:
-#   APP_NAME: "ITools"
+env:
+  APP_NAME: "ITools"
   
 permissions:
   contents: write
@@ -58,13 +58,13 @@ jobs:
         env:
           APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
-          APP_BINARY: ${{ github.workspace }}/cmake-build-release/${{ env.APP_NAME }}
+          APP_BINARY: ${{ github.workspace }}/cmake-build-release/${{ secrets.APP_NAME }}
         shell: powershell
 
       - name: Create release archive
         uses: thedoctor0/zip-release@master
         with:
-          filename: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+          filename: ${{ secrets.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
           directory: ${{ github.workspace }}/Output
 
       - name: Upload release asset

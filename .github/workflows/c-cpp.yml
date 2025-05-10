@@ -43,7 +43,7 @@ jobs:
       - name: Find application executable
         id: find-exe
         run: |
-          Get-ChildItem -Path "${{ github.workspace }}/cmake-build-release/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+          Get-ChildItem -Path "${{ github.workspace }}/cmake-build-release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
         shell: powershell
 
       - name: Read application executable name

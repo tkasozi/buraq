@@ -34,14 +34,14 @@ jobs:
           #  "--unattended"
           # )
 
-          $arg_string = "-d --install-prefix `"$qt_install_path`" --modules qtbase,qtdeclarative,qttools --accept-licenses --unattended"
+          $arg_string = "-d --root C:\Qt\6 --install-prefix `"$qt_install_path`" --modules qtbase,qtdeclarative,qttools --accept-licenses --unattended"
           Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList $arg_string, in
 
           Get-ChildItem C:\
 
           Get-ChildItem "C:\Program Files"
 
-          Get-ChildItem "Program Files (x86)"
+          Get-ChildItem "C:\Program Files (x86)"
           
         shell: powershell
         

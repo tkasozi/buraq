@@ -50,17 +50,16 @@ target_link_libraries(ITools
 )
 
 add_dependencies(ITools theme_icons_32x32)
-add_dependencies(ITools theme_icons)
-
 add_custom_target(theme_icons_32x32 ALL COMMAND
 		${CMAKE_COMMAND} -E copy_directory
-		icons/dark/svg
+		${PROJECT_SOURCE_DIR}/icons/dark/svg
 		${CMAKE_BINARY_DIR}/resources/themes/32x32/actions
 )
 
+add_dependencies(ITools theme_icons)
 add_custom_target(theme_icons ALL COMMAND
 		${CMAKE_COMMAND} -E copy_directory
-		icons
+		${PROJECT_SOURCE_DIR}/icons
 		${CMAKE_BINARY_DIR}/resources
 )
 

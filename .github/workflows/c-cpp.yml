@@ -26,6 +26,7 @@ jobs:
         
       - name: Install Qt 6 Silently
         run: |
+          Invoke-WebRequest -Uri "https://download.qt.io/official_releases/online_installers/qt-online-installer-windows-x64-online.exe" -OutFile "qt_installer.exe"
           $qt_install_path = "C:\Qt\6" # Define your desired install path
           $arguments = @(
             "--install-prefix", "$qt_install_path",

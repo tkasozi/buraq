@@ -23,28 +23,17 @@ jobs:
           Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
         shell: powershell
         
-      - name: Install Qt 6 Silently
-        run: |
-          Invoke-WebRequest -Uri "https://download.qt.io/archive/online_installers/4.9/qt-online-installer-windows-x64-4.9.0.exe" -OutFile "qt_installer.exe"
-          $qt_install_path = "C:\Qt\6"
-          # $arguments = @(
-          #   "--install-prefix", "$qt_install_path",
-          #   "--modules", "qtbase qtdeclarative qttools",
-          #   "--accept-licenses",
-          #  "--unattended"
-          # )
-
-          # $arg_string = "-d --root C:\Qt\6 --accept-messages --accept-licenses"
-          # Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList $arg_string, in
-
-          Get-ChildItem C:\
-
-          Get-ChildItem "C:\Program Files"
-
-          Get-ChildItem "C:\Program Files (x86)"
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+          use-official: false 
+          # Should be set when "use-official" is true
+          # email: ${{ secrets.QT_EMAIL }}
+          # pw: ${{ secrets.QT_PW }}
           
-        shell: powershell
-        
       - name: Configure CMake
         run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6"
 

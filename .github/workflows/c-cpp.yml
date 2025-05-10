@@ -35,12 +35,8 @@ jobs:
           # )
           $arguments = @(
             "--install-prefix", "$qt_install_path"
-            # ,
-           #  "--modules", "qtbase qtdeclarative qttools",
-           #  "--accept-licenses",
-           # "--unattended"
           )
-          Start-Process -Wait -FilePath "qt_installer.exe"  in
+          Start-Process -Wait -FilePath "qt_installer.exe" $arguments, in
         shell: powershell
         
       - name: Configure CMake

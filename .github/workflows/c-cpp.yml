@@ -1,21 +1,86 @@
-name: C/C++ CI
-
+name: Build and Package
 on:
-  release:
+  push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  release:
+    types: [published]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  build-and-package:
+    runs-on: windows-latest # Or a specific Windows version
     steps:
-    - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up MSVC environment
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Download Inno Setup
+        run: |
+          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
+          Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
+        shell: powershell
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+          use-official: false
+          # Should be set when "use-official" is true
+          # email: ${{ secrets.QT_EMAIL }}
+          # pw: ${{ secrets.QT_PW }}
+
+      - name: Configure CMake
+        run: cmake -B ${{ github.workspace }}/cmake-build-release -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6"
+
+      - name: Build project
+        run: cmake --build ${{ github.workspace }}/cmake-build-release --config Release --parallel ${{ env.PROCESSOR_NUMBER }}
+
+      - name: Find application executable
+        id: find-exe
+        run: |
+          Get-ChildItem -Path "${{ github.workspace }}/cmake-build-release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+        shell: powershell
+
+      - name: Read application executable name
+        id: app-name
+        run: echo "APP_NAME=$(cat app_exe_name.txt)" >> $GITHUB_ENV
+
+      - name: Logging
+        run: |
+          echo $APP_NAME
+          
+          Get-ChildItem D:\a\ITools\ITools\cmake-build-release\
+
+          Get-ChildItem D:\a\ITools\ITools\cmake-build-release\Release
+
+        shell: powershell
+
+      - name: Generate installer with Inno Setup
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ${{ github.workspace }}/it-tools.iss
+        env:
+          APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
+          OUTPUT_DIR: ${{ github.workspace }}/Output
+          APP_BINARY: ${{ github.workspace }}/cmake-build-release/${{ env.APP_NAME }}
+        shell: powershell
+
+      - name: Create release archive
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: ${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+          directory: ${{ github.workspace }}/Output
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ github.workspace }}/${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+          asset_name: ${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+          asset_content_type: application/zip

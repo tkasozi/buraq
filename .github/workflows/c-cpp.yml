@@ -42,6 +42,16 @@ jobs:
       - name: Build project
         run: cmake --build ${{ github.workspace }}/cmake-build-release --config Release --parallel ${{ env.PROCESSOR_NUMBER }}
 
+      - name: Logging
+        run: |
+          Get-ChildItem
+          
+          Get-ChildItem "${{ github.workspace }}/cmake-build-release"
+          
+          Get-ChildItem "${{ github.workspace }}/cmake-build-release/Release"
+
+        shell: powershell
+
       - name: Find application executable
         id: find-exe
         run: |
@@ -59,16 +69,6 @@ jobs:
           APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
           APP_BINARY: ${{ github.workspace }}/cmake-build-release/${{ secrets.APP_NAME }}
-        shell: powershell
-
-      - name: Logging
-        run: |
-          Get-ChildItem
-          
-          Get-ChildItem "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins"
-          
-          Get-ChildItem "D:\a\ITools\Qt\6.8.3\msvc2022_64\qml"
-
         shell: powershell
 
       - name: Create release archive

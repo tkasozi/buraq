@@ -27,13 +27,20 @@ jobs:
         run: |
           Invoke-WebRequest -Uri "https://download.qt.io/archive/online_installers/4.9/qt-online-installer-windows-x64-4.9.0.exe" -OutFile "qt_installer.exe"
           $qt_install_path = "C:\Qt\6"
+          # $arguments = @(
+          #   "--install-prefix", "$qt_install_path",
+          #   "--modules", "qtbase qtdeclarative qttools",
+          #   "--accept-licenses",
+          #  "--unattended"
+          # )
           $arguments = @(
-            "--install-prefix", "$qt_install_path",
-            "--modules", "qtbase qtdeclarative qttools",
-            "--accept-licenses",
-           "--unattended"
+            "--install-prefix", "$qt_install_path"
+            # ,
+           #  "--modules", "qtbase qtdeclarative qttools",
+           #  "--accept-licenses",
+           # "--unattended"
           )
-          Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList $arguments
+          Start-Process -Wait -FilePath "qt_installer.exe" -ArgumentList $arguments in
         shell: powershell
         
       - name: Configure CMake

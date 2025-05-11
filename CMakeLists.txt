@@ -54,21 +54,68 @@ add_dependencies(ITools theme_icons_32x32)
 add_custom_target(theme_icons_32x32 ALL COMMAND
 		${CMAKE_COMMAND} -E copy_directory
 		${PROJECT_SOURCE_DIR}/icons/dark/svg
-		${CMAKE_BINARY_DIR}/resources/themes/32x32/actions
+		Release/resources/themes/32x32/actions
 )
 
 add_dependencies(ITools theme_icons)
+
 add_custom_target(theme_icons ALL COMMAND
 		${CMAKE_COMMAND} -E copy_directory
 		${PROJECT_SOURCE_DIR}/icons
-		${CMAKE_BINARY_DIR}/resources
+		Release/resources
 )
-
-# create a file name temp.db in the binary dir
-file(WRITE ${CMAKE_BINARY_DIR}/0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db "")
 
 # Add resources
 qt6_add_resources(ITools RESOURCES resources.qrc)
+
+if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
+	# create a file name temp.db in the binary dir
+	file(WRITE "Release/0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db" "")
+
+	foreach (QT_LIB Core Gui Widgets Sql)
+		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION)
+		get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
+#		message(STATUS, "*******************${QT_BIN_DIR}***************")
+
+		message(STATUS, "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
+		if (EXISTS "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
+			add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+					COMMAND ${CMAKE_COMMAND} -E copy
+					"${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll"
+					"$<TARGET_FILE_DIR:${PROJECT_NAME}>")
+		endif ()
+	endforeach (QT_LIB)
+
+	if (EXISTS "${QT_BIN_DIR}/../plugins/platforms/qwindows${DEBUG_SUFFIX}.dll")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E make_directory
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy
+				"${QT_BIN_DIR}/../plugins/platforms/qwindows${DEBUG_SUFFIX}.dll"
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
+	endif ()
+	if (EXISTS "${QT_BIN_DIR}/../plugins/sqldrivers/qsqlite${DEBUG_SUFFIX}.dll")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E make_directory
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/sqldrivers/")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy
+				"${QT_BIN_DIR}/../plugins/sqldrivers/qsqlite${DEBUG_SUFFIX}.dll"
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/sqldrivers/")
+	endif ()
+	if (EXISTS "${QT_BIN_DIR}/../plugins/sqldrivers/qsqlpsql${DEBUG_SUFFIX}.dll")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E make_directory
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/sqldrivers/")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy
+				"${QT_BIN_DIR}/../plugins/sqldrivers/qsqlpsql${DEBUG_SUFFIX}.dll"
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/sqldrivers/")
+	endif ()
+	# Add similar logic for other necessary plugin types (e.g., sqldrivers)
+endif()
+
 
 #if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 #	set(DEBUG_SUFFIX)
@@ -76,7 +123,10 @@ qt6_add_resources(ITools RESOURCES resources.qrc)
 #		set(DEBUG_SUFFIX "d")
 #	endif ()
 #
-#	set(QT_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}")
+#	get_target_property(QT_BINARY_DIR Qt::Core IMPORTED_LOCATION)
+#	get_filename_component(QT_INSTALL_PATH ${QT_BINARY_DIR} DIRECTORY)
+#	message(STATUS, "***** ${QT_BINARY_DIR}")
+#
 #	if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
 #		set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
 #		if (NOT EXISTS "${QT_INSTALL_PATH}/bin")

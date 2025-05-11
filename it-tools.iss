@@ -51,18 +51,13 @@ Name: "plugins\sqldrivers";
 Name: "plugins\platforms";
 
 [Files]
-Source: "cmake-build-release\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-; Source: "cmake-build-release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "cmake-build-release\resources\*.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins\sqldrivers\*.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins\platforms\*.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins\sqldrivers\*.dll"; DestDir: "{app}\plugins\sqldrivers"; Flags: ignoreversion
-Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\plugins\platforms\*.dll"; DestDir: "{app}\plugins\platforms"; Flags: ignoreversion
-Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Core.dll "; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Gui.dll "; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Widgets.dll "; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\ITools\Qt\6.8.3\msvc2022_64\bin\Qt6Sql.dll "; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\a\ITools\ITools\*.db"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Release\*.dll "; DestDir: "{app}"; Flags: ignoreversion
+Source: "Release\*.db "; DestDir: "{app}"; Flags: ignoreversion
+Source: "Release\plugins\sqldrivers\*.dll"; DestDir: "{app}\plugins\sqldrivers"; Flags: ignoreversion
+Source: "Release\plugins\platforms\*.dll"; DestDir: "{app}\plugins\platforms"; Flags: ignoreversion
+Source: "Release\resources\*.ico"; DestDir: "{app}"; Flags: ignoreversion
+
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

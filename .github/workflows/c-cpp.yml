@@ -55,7 +55,7 @@ jobs:
         shell: powershell
 
       - name: Build project
-        run: cmake --build "${{ github.workspace }}/Release" --config Release --parallel ${{ env.PROCESSOR_NUMBER }}
+        run: cmake --build "${{ github.workspace }}" --config Release --parallel ${{ env.PROCESSOR_NUMBER }}
 
       - name: Find application executable
         id: find-exe

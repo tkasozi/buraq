@@ -60,7 +60,7 @@ jobs:
           echo "**********3***************"
           
           echo "***********4**************"
-          Get-ChildItem "Release/plugins/platform"
+          Get-ChildItem "Release/plugins/platforms"
           echo "**********4***************"
 
         shell: powershell

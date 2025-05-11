@@ -51,7 +51,7 @@ Name: "plugins\sqldrivers";
 Name: "plugins\platforms";
 
 [Files]
-Source: "Release\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Release\*.dll "; DestDir: "{app}"; Flags: ignoreversion
 Source: "Release\sqldrivers\*.dll"; DestDir: "{app}\plugins\sqldrivers"; Flags: ignoreversion
 Source: "Release\plugins\platforms\*.dll"; DestDir: "{app}\plugins\platforms"; Flags: ignoreversion

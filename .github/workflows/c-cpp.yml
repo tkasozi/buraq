@@ -1,10 +1,10 @@
 name: Build and Package
 on:
 #  release:
-#    types: [published]
+#   types: [published]
   push:
     branches:
-      - fix-cmake-file
+     - fix-package
 
 env:
   APP_NAME: "ITools"
@@ -47,9 +47,13 @@ jobs:
 
       - name: Logging
         run: |
-          Get-ChildItem "**********1***************"
+          echo "**********1***************"
           Get-ChildItem "${{ env.QT_ROOT_DIR }}/bin"
-          Get-ChildItem "**********1***************"
+          echo "**********1***************"
+
+          echo "**********2***************"
+          Get-ChildItem
+          echo "**********2***************"
 
         shell: powershell
 

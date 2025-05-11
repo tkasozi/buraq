@@ -57,7 +57,7 @@ jobs:
 
           echo "***********3**************"
           Get-ChildItem "Release/plugins/sqldrivers"
-          echo "**********3***************
+          echo "**********3***************"
           
           echo "***********4**************"
           Get-ChildItem "Release/plugins/platform"

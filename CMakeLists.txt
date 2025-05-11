@@ -64,14 +64,14 @@ add_custom_target(theme_icons ALL COMMAND
 		${CMAKE_BINARY_DIR}/resources
 )
 
-# create a file name temp.db in the binary dir
-file(WRITE ${CMAKE_BINARY_DIR}/0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db "")
-
 # Add resources
 qt6_add_resources(ITools RESOURCES resources.qrc)
 
-if (CMAKE_BUILD_TYPE MATCHES "Release")
-	get_target_property(QT_BINARY_DIR Qt::Core IMPORTED_LOCATION)
+if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
+	# create a file name temp.db in the binary dir
+	file(WRITE ${CMAKE_BINARY_DIR}/0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db "")
+
+	get_target_property(QT_BINARY_DIR Qt6::Core IMPORTED_LOCATION)
 	get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
 
 	file(GLOB QT_DLLS "${QT_BIN_DIR}/*.dll")
@@ -81,8 +81,10 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
 			CONFIGURATIONS "Release"
 	)
 
+	message(STATUS, "****${CMAKE_BINARY_DIR}****")
 	# Optional: Copy platform plugin (e.g., qwindows.dll)
 	if (EXISTS "${QT_BIN_DIR}/platforms")
+
 		file(GLOB QT_PLATFORM_PLUGINS "${QT_BIN_DIR}/platforms/*.dll")
 		install(FILES ${QT_PLATFORM_PLUGINS}
 				DESTINATION "${CMAKE_BINARY_DIR}/Release/platforms"
@@ -91,7 +93,7 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
 	endif()
 
 	# Optional: Copy image format plugins (e.g., qjpeg.dll, qpng.dll)
-	if (EXISTS "${QT_BIN_DIR}/imageformats")
+	if (EXISTS "${QT_BIN_DIR}/plugins/imageformats")
 		file(GLOB QT_IMAGEFORMAT_PLUGINS "${QT_BIN_DIR}/imageformats/*.dll")
 		install(FILES ${QT_IMAGEFORMAT_PLUGINS}
 				DESTINATION "${CMAKE_BINARY_DIR}/Release/imageformats"
@@ -102,13 +104,17 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
 	# Add similar logic for other necessary plugin types (e.g., sqldrivers)
 endif()
 
+
 #if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 #	set(DEBUG_SUFFIX)
 #	if (MSVC AND CMAKE_BUILD_TYPE MATCHES "Debug")
 #		set(DEBUG_SUFFIX "d")
 #	endif ()
 #
-#	set(QT_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}")
+#	get_target_property(QT_BINARY_DIR Qt::Core IMPORTED_LOCATION)
+#	get_filename_component(QT_INSTALL_PATH ${QT_BINARY_DIR} DIRECTORY)
+#	message(STATUS, "***** ${QT_BINARY_DIR}")
+#
 #	if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
 #		set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
 #		if (NOT EXISTS "${QT_INSTALL_PATH}/bin")

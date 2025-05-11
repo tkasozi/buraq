@@ -40,10 +40,10 @@ jobs:
           # pw: ${{ secrets.QT_PW }}
 
       - name: Configure CMake
-        run: cmake -B ${{ github.workspace }}/cmake-build-release -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6"
+        run: cmake -B ${{ github.workspace }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6"
 
       - name: Build project
-        run: cmake --build ${{ github.workspace }}/cmake-build-release --config Release --parallel ${{ env.PROCESSOR_NUMBER }}
+        run: cmake --build "${{ github.workspace }}/Release" --config Release --parallel ${{ env.PROCESSOR_NUMBER }}
 
       - name: Logging
         run: |
@@ -60,7 +60,7 @@ jobs:
       - name: Find application executable
         id: find-exe
         run: |
-          Get-ChildItem -Path "${{ github.workspace }}/cmake-build-release/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+          Get-ChildItem -Path "${{ github.workspace }}/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
         shell: powershell
 
       - name: Read application executable name
@@ -73,7 +73,7 @@ jobs:
         env:
           APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
-          APP_BINARY: ${{ github.workspace }}/cmake-build-release/${{ secrets.APP_NAME }}
+          APP_BINARY: ${{ github.workspace }}/Release/${{ secrets.APP_NAME }}
         shell: powershell
 
       - name: Create release archive

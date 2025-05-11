@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_BINARY_DIR, "Release")
 
 find_package(Qt6 COMPONENTS
 		Core
@@ -70,12 +71,12 @@ qt6_add_resources(ITools RESOURCES resources.qrc)
 
 if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
 	# create a file name temp.db in the binary dir
-	file(WRITE ${CMAKE_BINARY_DIR}/0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db "")
+	file(WRITE "${CMAKE_BINARY_DIR}/0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db" "")
 
 	foreach (QT_LIB Core Gui Widgets Sql)
 		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION)
 		get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
-		message(STATUS, "*******************${QT_BIN_DIR}***************")
+#		message(STATUS, "*******************${QT_BIN_DIR}***************")
 
 		message(STATUS, "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
 		if (EXISTS "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")

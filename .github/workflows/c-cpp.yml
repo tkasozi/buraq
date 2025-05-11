@@ -4,7 +4,7 @@ on:
 #    types: [published]
   push:
     branches:
-      - fix-package
+      - fix-cmake-file
 
 env:
   APP_NAME: "ITools"

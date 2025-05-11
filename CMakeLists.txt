@@ -58,6 +58,7 @@ add_custom_target(theme_icons_32x32 ALL COMMAND
 )
 
 add_dependencies(ITools theme_icons)
+
 add_custom_target(theme_icons ALL COMMAND
 		${CMAKE_COMMAND} -E copy_directory
 		${PROJECT_SOURCE_DIR}/icons
@@ -71,36 +72,46 @@ if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
 	# create a file name temp.db in the binary dir
 	file(WRITE ${CMAKE_BINARY_DIR}/0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db "")
 
-	get_target_property(QT_BINARY_DIR Qt6::Core IMPORTED_LOCATION)
-	get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
+	foreach (QT_LIB Core Gui Widgets Sql)
+		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION)
+		get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
 
-	file(GLOB QT_DLLS "${QT_BIN_DIR}/*.dll")
+		set(QT6_LIB, "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
+		if (EXISTS "${QT6_LIB}")
+			add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+					COMMAND ${CMAKE_COMMAND} -E copy
+					"${QT6_LIB}"
+					"$<TARGET_FILE_DIR:${PROJECT_NAME}>")
+		endif ()
+	endforeach (QT_LIB)
 
-	install(FILES ${QT_DLLS}
-			DESTINATION "${CMAKE_BINARY_DIR}/Release" # Or a dedicated "lib" folder in your release
-			CONFIGURATIONS "Release"
-	)
-
-	message(STATUS, "****${CMAKE_BINARY_DIR}****")
-	# Optional: Copy platform plugin (e.g., qwindows.dll)
-	if (EXISTS "${QT_BIN_DIR}/platforms")
-
-		file(GLOB QT_PLATFORM_PLUGINS "${QT_BIN_DIR}/platforms/*.dll")
-		install(FILES ${QT_PLATFORM_PLUGINS}
-				DESTINATION "${CMAKE_BINARY_DIR}/Release/platforms"
-				CONFIGURATIONS "Release"
-		)
-	endif()
-
-	# Optional: Copy image format plugins (e.g., qjpeg.dll, qpng.dll)
-	if (EXISTS "${QT_BIN_DIR}/plugins/imageformats")
-		file(GLOB QT_IMAGEFORMAT_PLUGINS "${QT_BIN_DIR}/imageformats/*.dll")
-		install(FILES ${QT_IMAGEFORMAT_PLUGINS}
-				DESTINATION "${CMAKE_BINARY_DIR}/Release/imageformats"
-				CONFIGURATIONS "Release"
-		)
-	endif()
-
+	if (EXISTS "${QT_BIN_DIR}/../plugins/platforms/qwindows${DEBUG_SUFFIX}.dll")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E make_directory
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy
+				"${QT_BIN_DIR}/../plugins/platforms/qwindows${DEBUG_SUFFIX}.dll"
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
+	endif ()
+	if (EXISTS "${QT_BIN_DIR}/../plugins/sqldrivers/qsqlite${DEBUG_SUFFIX}.dll")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E make_directory
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/sqldrivers/")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy
+				"${QT_BIN_DIR}/../plugins/sqldrivers/qsqlite${DEBUG_SUFFIX}.dll"
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/sqldrivers/")
+	endif ()
+	if (EXISTS "${QT_BIN_DIR}/../plugins/sqldrivers/qsqlpsql${DEBUG_SUFFIX}.dll")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E make_directory
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/sqldrivers/")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy
+				"${QT_BIN_DIR}/../plugins/sqldrivers/qsqlpsql${DEBUG_SUFFIX}.dll"
+				"$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/sqldrivers/")
+	endif ()
 	# Add similar logic for other necessary plugin types (e.g., sqldrivers)
 endif()
 

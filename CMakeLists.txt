@@ -77,12 +77,11 @@ if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
 		get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
 		message(STATUS, "*******************${QT_BIN_DIR}***************")
 
-		set(QT6_LIB, "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
-		message(STATUS, "*******************${QT6_LIB}***************")
-		if (EXISTS "${QT6_LIB}")
+		message(STATUS, "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
+		if (EXISTS "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
 			add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 					COMMAND ${CMAKE_COMMAND} -E copy
-					"${QT6_LIB}"
+					"${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll"
 					"$<TARGET_FILE_DIR:${PROJECT_NAME}>")
 		endif ()
 	endforeach (QT_LIB)

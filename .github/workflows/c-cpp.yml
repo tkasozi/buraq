@@ -55,6 +55,14 @@ jobs:
           Get-ChildItem "Release"
           echo "**********2***************"
 
+          echo "***********3**************"
+          Get-ChildItem "Release/plugins/sqldrivers"
+          echo "**********3***************
+          
+          echo "***********4**************"
+          Get-ChildItem "Release/plugins/platform"
+          echo "**********4***************"
+
         shell: powershell
 
       - name: Find application executable

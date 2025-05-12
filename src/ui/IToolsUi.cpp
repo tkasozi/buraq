@@ -14,6 +14,8 @@
 IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 	setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
+	Config appConfig;
+
 	// This can be updated dynamically.
 	QIcon::setThemeName("dark");
 
@@ -21,8 +23,9 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 	setStyleSheet("background-color: #232323; color: #606060;");
 
 	// setting up default window size
-	resize(IToolsNamespace::WindowNormalWidth, IToolsNamespace::WindowHeight);
-	setMinimumSize(IToolsNamespace::WindowMinWidth, IToolsNamespace::WindowHeight);
+	const WindowConfig& windowConfig = appConfig.getWindow();
+	resize(windowConfig.normalSize, windowConfig.minHeight);
+	setMinimumSize(windowConfig.minWidth, windowConfig.minHeight);
 
 	// Add Tool bar
 	toolBar = new ToolBar(this);
@@ -34,8 +37,8 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 	setStatusBar(statusBar);
 
 	// Setting window title and docking icon
-	setWindowTitle(IToolsNamespace::appVersion);
-	setWindowIcon(QIcon::fromTheme(IToolsNamespace::AppIcons::appLogo));
+	setWindowTitle(appConfig.getTitle());
+	setWindowIcon(appConfig.getAppLogo());
 
 	// Add CentralWidget
 	auto *centralWidget = new QWidget;
@@ -71,7 +74,7 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 	// space between
 //	centralWidgetLayout2->addWidget(new QWidget, 1, 0, 11, 12);
 
-	folderButton = new IconButton(IToolsNamespace::AppIcons::folder);
+	folderButton = new IconButton(appConfig.getAppIcons().folderIcon);
 
 	layoutA->addWidget(folderButton);
 
@@ -85,11 +88,11 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 
 	centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
 
-	auto outputButton = new IconButton(IToolsNamespace::AppIcons::terminal);
+	auto outputButton = new IconButton(appConfig.getAppIcons().terminalIcon);
 	connect(outputButton, &IconButton::clicked, this, &IToolsUi::onShowOutputButtonClicked);
 	layoutB->addWidget(outputButton);
 
-	auto *settingButton = new IconButton(IToolsNamespace::AppIcons::settings);
+	auto *settingButton = new IconButton(appConfig.getAppIcons().settingsIcon);
 	layoutB->addWidget(settingButton);
 
 	// add to central widget

@@ -11,12 +11,16 @@
 
 #include "ToolButton.h"
 #include "ToolBarEventFilter.h"
+#include "../utils/Config.h"
 
 class ToolBar : public QWidget {
 Q_OBJECT
 
 private:
 	void configureLayout();
+
+	Config appConfig;
+
 	// toolbar buttons and versionLabel
 	ToolButton *maxRestoreBtn;
 	ToolButton *minimizeBtn;

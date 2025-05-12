@@ -20,18 +20,26 @@ Q_OBJECT
 private:
 	QString customHoverColor;
 
-private slots:
-
-public:
-	explicit ToolButton(const QString &fileName, QString customHoverColor = nullptr)
-			: customHoverColor(std::move(customHoverColor)) {
-		const QIcon icon = QIcon::fromTheme(fileName);
+	void applyIconStyles(const QIcon &icon) {
 		if (!icon.isNull()) {
 			ToolButton::setIcon(icon);
 		}
 		setFixedWidth(48);
 		setFixedHeight(32);
 		setMouseTracking(true);
+	}
+
+private slots:
+
+public:
+	explicit ToolButton(const QString &fileName, QString customHoverColor = nullptr)
+			: customHoverColor(std::move(customHoverColor)) {
+		applyIconStyles(QIcon::fromTheme(fileName));
+	};
+
+	explicit ToolButton(const QIcon &icon, QString customHoverColor = nullptr)
+			: customHoverColor(std::move(customHoverColor)) {
+		applyIconStyles(icon);
 	};
 
 	void leaveEvent(QEvent *p) override {

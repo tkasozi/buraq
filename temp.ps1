@@ -2,10 +2,10 @@
 #You can add your script code here.
 # For example:
  
-$name="tkasozi & Nihlah"
+$name="tkasozi & Nihlah & sumi"
 Write-Output "This is an example script by $name."
  
-Get-ChildItem
+Get-ChildItem /
  
 # new update.
  

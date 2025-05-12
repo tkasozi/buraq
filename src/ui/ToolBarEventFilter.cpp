@@ -40,7 +40,7 @@ bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e) {
 			return false;
 		case QEvent::MouseMove:
 			if (isMouseBtnPressed) {
-				if (ui->width() != IToolsNamespace::WindowNormalWidth) {
+				if (ui->width() != config.getWindow().normalSize) {
 					toolBar->updateMaxAndRestoreIconButton();
 				}
 
@@ -48,7 +48,7 @@ bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e) {
 
 				QPoint newPos = toolBar->pos() + pos - dragStartPos;
 
-				ui->setGeometry(newPos.x(), newPos.y(), IToolsNamespace::WindowNormalWidth, geo.height());
+				ui->setGeometry(newPos.x(), newPos.y(), config.getWindow().normalSize, geo.height());
 
 				return true;
 			}

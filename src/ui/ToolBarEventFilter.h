@@ -8,6 +8,7 @@
 #include <QMainWindow>
 #include <QMetaObject>
 #include <iostream>
+#include "../utils/Config.h"
 
 class ToolBarEventFilter : public QObject {
 	Q_OBJECT
@@ -20,6 +21,7 @@ public:
 private:
 	QPoint dragStartPos;
 	bool isMouseBtnPressed;
+	Config config;
 };
 
 

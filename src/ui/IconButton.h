@@ -19,6 +19,12 @@ public:
 		setStyleSheet(customStyles + "border: 0px;");
 		this->customStyles = customStyles;
 	}
+	explicit IconButton(const QIcon& icon, const int w = 32, int h = 32, const QString &customStyles = "")
+			: ToolButton(icon) {
+		setFixedSize(w, h);
+		setStyleSheet(customStyles + "border: 0px;");
+		this->customStyles = customStyles;
+	}
 
 	void leaveEvent(QEvent *p) override {
 		setStyleSheet(

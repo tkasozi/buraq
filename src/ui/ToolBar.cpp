@@ -16,7 +16,7 @@ ToolBar::ToolBar(QWidget *parent) {
 	setStyleSheet(IToolsNamespace::Styles::toolBarBackgroundColor);
 
 	// initializing control buttons.
-	this->versionLabel = new QLabel(IToolsNamespace::appVersion);
+	this->versionLabel = new QLabel(appConfig.getVersion());
 	this->minimizeBtn = new ToolButton(IToolsNamespace::AppIcons::minimize);
 	this->closeBtn = new ToolButton(IToolsNamespace::AppIcons::close, "red");
 	// by default, window is minimized.

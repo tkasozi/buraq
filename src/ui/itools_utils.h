@@ -6,16 +6,8 @@
 #define ITOOLS_NAMESPACE
 
 namespace IToolsNamespace {
-	constexpr char appVersion[] = "ITools v1.2.2";
-
 	// Set the executable path to powershell.exe
 	constexpr const char *POWERSHELL_PATH = "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe";
-
-	enum WindowPixels {
-		WindowNormalWidth = 1200,
-		WindowMinWidth = 800,
-		WindowHeight = 720
-	};
 
 	namespace Styles {
 
@@ -42,14 +34,10 @@ namespace IToolsNamespace {
 	}
 
 	namespace AppIcons {
-		const QString appLogo = "workflow";
 		const QString minimize = "minimize_icon";
 		const QString maximize = "maximize_icon";
 		const QString restore = "restore_icon";
 		const QString close = "close_icon";
-		const QString settings = "settings_icon";
-		const QString folder = "script_icon";
-		const QString terminal = "terminal_icon";
 		const QString play = "play_filled_icon";
 		const QString playSelectedScript = "play_filled_icon2";
 		const QString playWholeScript = "play_filled_icon3";

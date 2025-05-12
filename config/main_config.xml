@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<configuration>
+    <Title>ITools</Title>
+    <Version>ITools v0.0.10</Version>
+    <AppLogo>workflow</AppLogo>
+    <window minWidth="800"
+            minHeight="720"
+            normalSize="1200"
+            minimizeIcon="minimize_icon"
+            maximizeIcon="maximize_icon"
+            restoreIcon="restore_icon"
+            closeIcon="close_icon" />
+    <AppIcons>
+        <settings>settings_icon</settings>
+        <folder>script_icon</folder>
+        <terminal>terminal_icon</terminal>
+        <execute>play_filled_icon2</execute>
+        <executeSelected>play_filled_icon2</executeSelected>
+        <addFile>create_new_icon</addFile>
+    </AppIcons>
+</configuration>

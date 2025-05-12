@@ -21,40 +21,12 @@
 // SOFTWARE.
 
 //
-// Created by talik on 2/6/2024.
+// Created by talik on 5/12/2025.
 //
 
-#ifndef ITOOLS_NAMESPACE
-#define ITOOLS_NAMESPACE
+#include "Utils.h"
+#include "Config.h"
 
-namespace IToolsNamespace {
-	// Set the executable path to powershell.exe
-	constexpr const char *POWERSHELL_PATH = "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe";
-
-	namespace Styles {
-
-		const QString commonToolBarStyles =
-				"color: #C2C2C2;"
-				"background-color: none;"
-				"padding: 0px;"
-				"border: none;";
-
-		const QString centralControlToolBar = commonToolBarStyles +
-											  "border-right: 1px solid #383838;";
-
-		const QString toolBarBackgroundColor = commonToolBarStyles +
-											   "height: 32px;"
-											   "border-bottom: 1px solid #383838;";
-
-		const QString toolBarHoverColor =
-				"border: 0px;"
-				"background-color: #383838;";
-
-		const QString statusToolBar = commonToolBarStyles +
-									  "border-top: 1px solid #383838;"
-									  "height: 24px;";
-	}
-
+namespace ItoolsNS {
+	[[maybe_unused]] Config main_config;
 }
-
-#endif // ITOOLS_NAMESPACE

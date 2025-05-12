@@ -45,6 +45,8 @@ add_executable(ITools src/main.cpp
 		src/ui/OutputDisplay.cpp
 		src/utils/Config.h
 		src/utils/Config.cpp
+		src/utils/Utils.cpp
+		src/utils/Utils.h
 )
 target_link_libraries(ITools
 		Qt::Core

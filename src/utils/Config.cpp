@@ -147,6 +147,9 @@ void Config::processAppIconsAttr(const QDomElement& element) {
 		if (attrName == "terminal") {
 			appIcons->terminalIcon = QIcon::fromTheme(qDomElement.text());
 		}
+		if (attrName == "playCode") {
+			appIcons->playCode = QIcon::fromTheme(qDomElement.text());
+		}
 		if (attrName == "execute") {
 			appIcons->executeIcon = QIcon::fromTheme(qDomElement.text());
 		}

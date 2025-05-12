@@ -44,6 +44,7 @@ struct AppIcons {
 	QIcon settingsIcon;
 	QIcon folderIcon;
 	QIcon terminalIcon;
+	QIcon playCode;
 	QIcon executeIcon;
 	QIcon executeSelectedIcon;
 	QIcon addFileIcon;

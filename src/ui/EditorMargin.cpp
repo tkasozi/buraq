@@ -3,7 +3,6 @@
 //
 
 #include <QTextBlock>
-#include <QProcess>
 #include <QString>
 #include <QTextStream>
 
@@ -14,6 +13,7 @@
 #include "IToolsUi.h"
 
 #include "../ProcessThread.h"
+#include "../utils/Utils.h"
 
 EditorMargin::EditorMargin(IToolsUi *ptrParent) : QWidget(ptrParent), ptrParent(ptrParent) {
 	auto layout = new QVBoxLayout;
@@ -25,21 +25,21 @@ EditorMargin::EditorMargin(IToolsUi *ptrParent) : QWidget(ptrParent), ptrParent(
 						 "border: 0px;"
 						 "background-color: #232323;");
 
-	playScript = new IconButton(IToolsNamespace::AppIcons::playWholeScript,
-								playButtonSize, playButtonSize, runBtnStyles);
+	exeScript = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().executeIcon),
+							   playButtonSize, playButtonSize, runBtnStyles);
 
-	playSelectedScript = new IconButton(IToolsNamespace::AppIcons::playSelectedScript,
-										playButtonSize, playButtonSize, runBtnStyles);
+	exeSelectedScript = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().executeSelectedIcon),
+									   playButtonSize, playButtonSize, runBtnStyles);
 
 	// set tooltip for the run buttons
-	playScript->setToolTip("Execute the whole script");
-	playSelectedScript->setToolTip("Execute selected/highlighted script");
+	exeScript->setToolTip("Execute the whole script");
+	exeSelectedScript->setToolTip("Execute selected/highlighted script");
 
-	layout->addWidget(playScript);
-	layout->addWidget(playSelectedScript);
+	layout->addWidget(exeScript);
+	layout->addWidget(exeSelectedScript);
 
-	connect(playScript, &IconButton::clicked, this, &EditorMargin::onExecuteWholeScriptButtonClicked);
-	connect(playSelectedScript, &IconButton::clicked, this, &EditorMargin::onExecuteSelectedScriptButtonClicked);
+	connect(exeScript, &IconButton::clicked, this, &EditorMargin::onExecuteWholeScriptButtonClicked);
+	connect(exeSelectedScript, &IconButton::clicked, this, &EditorMargin::onExecuteSelectedScriptButtonClicked);
 
 	setLayout(layout);
 	setFixedWidth(playButtonSize);

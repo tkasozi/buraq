@@ -17,6 +17,7 @@
 #include "LineNumberArea.h"
 #include "itools_utils.h"
 #include "IToolsUi.h"
+#include "../utils/Utils.h"
 
 #define string_equals(keyText, key) \
 (std::equal(keyText.begin(), keyText.end(), key));
@@ -72,7 +73,7 @@ Editor::Editor(QWidget *parent) : QPlainTextEdit(parent), parent(parent) {
 	setStyleSheet("border: 0; color: #c0c0c0; margin-left: 60px; Editor.test {};");
 	updateLineNumberAreaWidth(0);
 
-	play = QIcon::fromTheme(IToolsNamespace::AppIcons::play);
+	play = QIcon(QIcon(ItoolsNS::main_config.getAppIcons().playCode));
 	play.actualSize(QSize(64, 64));
 }
 

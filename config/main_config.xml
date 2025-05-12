@@ -14,6 +14,7 @@
         <settings>settings_icon</settings>
         <folder>script_icon</folder>
         <terminal>terminal_icon</terminal>
+        <playCode>play_filled_icon</playCode>
         <execute>play_filled_icon2</execute>
         <executeSelected>play_filled_icon2</executeSelected>
         <addFile>create_new_icon</addFile>

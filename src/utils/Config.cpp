@@ -28,8 +28,6 @@
 #include <QFile>
 #include <QDomDocument>
 #include <QDebug>
-#include <QDomElement>
-#include <QDomNodeList>
 
 Config::Config() :
 		windowConfig(new WindowConfig),
@@ -59,30 +57,45 @@ Config::Config() :
 	if (appTitleList.count() > 0) {
 		QDomElement appTitleElement = appTitleList.at(0).toElement();
 		this->title = QString(appTitleElement.text());
+	} else {
+		qDebug() << "Error: Configuration is missing a 'Title'.";
+		exit(-1);
 	}
 
 	QDomNodeList appVersionList = root.elementsByTagName("Version");
 	if (appVersionList.count() > 0) {
 		QDomElement appVersionElement = appVersionList.at(0).toElement();
 		this->version = QString(appVersionElement.text());
+	} else {
+		qDebug() << "Error: Configuration is missing a 'Version'.";
+		exit(-1);
 	}
 
 	QDomNodeList appLogoList = root.elementsByTagName("AppLogo");
 	if (appLogoList.count() > 0) {
 		QDomElement appLogoElement = appLogoList.at(0).toElement();
 		this->appLogo = QIcon::fromTheme(appLogoElement.text());
+	} else {
+		qDebug() << "Error: Configuration is missing a 'AppLogo'.";
+		exit(-1);
 	}
 
 	QDomNodeList windowList = root.elementsByTagName("window");
 	if (windowList.count() > 0) {
 		QDomElement windowElement = windowList.at(0).toElement();
 		this->processWindowAttr(windowElement);
+	} else {
+		qDebug() << "Error: Configuration is missing a 'window'.";
+		exit(-1);
 	}
 
 	QDomNodeList appIconsList = root.elementsByTagName("AppIcons");
 	if (appIconsList.count() > 0) {
 		QDomElement appIconsElement = appIconsList.at(0).toElement();
 		this->processAppIconsAttr(appIconsElement);
+	} else {
+		qDebug() << "Error: Configuration is missing a 'AppIcons'.";
+		exit(-1);
 	}
 
 	qDebug() << "OK!";

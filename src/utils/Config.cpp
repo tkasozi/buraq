@@ -98,7 +98,6 @@ Config::Config() :
 		exit(-1);
 	}
 
-	qDebug() << "OK!";
 	file.close();
 }
 
@@ -121,7 +120,7 @@ void Config::processWindowAttr(const QDomElement& element) {
 			windowConfig->minimizeIcon = QIcon::fromTheme(attrValue);
 		}
 		if (attrName == "maximizeIcon") {
-			windowConfig->minimizeIcon = QIcon::fromTheme(attrValue);
+			windowConfig->maximizeIcon = QIcon::fromTheme(attrValue);
 		}
 		if (attrName == "restoreIcon") {
 			windowConfig->restoreIcon = QIcon::fromTheme(attrValue);

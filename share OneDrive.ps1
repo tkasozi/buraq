@@ -16,5 +16,3 @@ $AddSecondOwner = "yasray@cloudskyspro.com"
 Set-SPOUser -Site $siteAddress -LoginName $AddSecondOwner -IsSiteCollectionAdmin $False
  
 $name = "tkasozi"
- 
- 

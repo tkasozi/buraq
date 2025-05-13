@@ -17,4 +17,3 @@ Set-SPOUser -Site $siteAddress -LoginName $AddSecondOwner -IsSiteCollectionAdmin
  
 $name = "tkasozi"
  
- 

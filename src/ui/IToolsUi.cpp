@@ -1,3 +1,25 @@
+// MIT License
+//
+// Copyright (c)  "2025" Talik A. Kasozi
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 //
 // Created by Talik Kasozi on 2/3/2024.
 //
@@ -21,8 +43,9 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 	setStyleSheet("background-color: #232323; color: #606060;");
 
 	// setting up default window size
-	resize(IToolsNamespace::WindowNormalWidth, IToolsNamespace::WindowHeight);
-	setMinimumSize(IToolsNamespace::WindowMinWidth, IToolsNamespace::WindowHeight);
+	const WindowConfig& windowConfig = ItoolsNS::main_config.getWindow();
+	resize(windowConfig.normalSize, windowConfig.minHeight);
+	setMinimumSize(windowConfig.minWidth, windowConfig.minHeight);
 
 	// Add Tool bar
 	toolBar = new ToolBar(this);
@@ -30,12 +53,12 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 
 	// Add Status bar
 	statusBar = new QStatusBar;
-	statusBar->setStyleSheet(IToolsNamespace::Styles::statusToolBar);
+	statusBar->setStyleSheet(ItoolsNS::main_config.getMainStyles().statusToolBar.styleSheet);
 	setStatusBar(statusBar);
 
 	// Setting window title and docking icon
-	setWindowTitle(IToolsNamespace::appVersion);
-	setWindowIcon(QIcon::fromTheme(IToolsNamespace::AppIcons::appLogo));
+	setWindowTitle(ItoolsNS::main_config.getTitle());
+	setWindowIcon(ItoolsNS::main_config.getAppLogo());
 
 	// Add CentralWidget
 	auto *centralWidget = new QWidget;
@@ -53,7 +76,7 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 	centralWidgetLayout2->setContentsMargins(0, 0, 0, 0);
 
 	auto *centralWidgetControlPanel = new QWidget;
-	centralWidgetControlPanel->setStyleSheet(IToolsNamespace::Styles::centralControlToolBar);
+	centralWidgetControlPanel->setStyleSheet(ItoolsNS::main_config.getMainStyles().controlToolBar.styleSheet);
 	centralWidgetControlPanel->setFixedWidth(64);
 	centralWidgetControlPanel->setLayout(centralWidgetLayout2);
 
@@ -71,7 +94,7 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 	// space between
 //	centralWidgetLayout2->addWidget(new QWidget, 1, 0, 11, 12);
 
-	folderButton = new IconButton(IToolsNamespace::AppIcons::folder);
+	folderButton = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().folderIcon));
 
 	layoutA->addWidget(folderButton);
 
@@ -85,11 +108,11 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 
 	centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
 
-	auto outputButton = new IconButton(IToolsNamespace::AppIcons::terminal);
+	auto outputButton = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().terminalIcon));
 	connect(outputButton, &IconButton::clicked, this, &IToolsUi::onShowOutputButtonClicked);
 	layoutB->addWidget(outputButton);
 
-	auto *settingButton = new IconButton(IToolsNamespace::AppIcons::settings);
+	auto *settingButton = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().settingsIcon));
 	layoutB->addWidget(settingButton);
 
 	// add to central widget

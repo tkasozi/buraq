@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<configuration>
+    <Title>ITools</Title>
+    <Version>ITools v0.0.10</Version>
+    <AppLogo>workflow</AppLogo>
+    <powershellPath>C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe</powershellPath>
+    <window minWidth="800"
+            minHeight="720"
+            normalSize="1200"
+            minimizeIcon="minimize_icon"
+            maximizeIcon="maximize_icon"
+            restoreIcon="restore_icon"
+            closeIcon="close_icon"/>
+    <AppIcons>
+        <settings>settings_icon</settings>
+        <folder>script_icon</folder>
+        <terminal>terminal_icon</terminal>
+        <playCode>play_filled_icon</playCode>
+        <execute>play_filled_icon2</execute>
+        <executeSelected>play_filled_icon2</executeSelected>
+        <addFile>create_new_icon</addFile>
+    </AppIcons>
+    <Styles>
+        <commonStyle>
+            <color>#C2C2C2</color>
+            <backgroundColor>none</backgroundColor>
+            <padding>0px</padding>
+            <border>none</border>
+            <height>32px</height>
+        </commonStyle>
+        <controlToolBar inherits="commonStyle">
+            <borderColor>1px solid #383838</borderColor>
+        </controlToolBar>
+        <toolBar inherits="commonStyle">
+            <borderBottom>1px solid #383838</borderBottom>
+            <height>32px</height>
+        </toolBar>
+        <statusToolBar inherits="commonStyle">
+            <borderTop>1px solid #383838</borderTop>
+            <height>24px</height>
+        </statusToolBar>
+        <toolBarHover>
+            <backgroundColor>#383838</backgroundColor>
+            <border>0px</border>
+        </toolBarHover>
+    </Styles>
+</configuration>

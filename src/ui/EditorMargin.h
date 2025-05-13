@@ -34,8 +34,8 @@ protected:
 private:
 	void onExecuteScriptButtonClicked(QString&) const;
 
-	IconButton *playScript;
-	IconButton *playSelectedScript;
+	IconButton *exeScript;
+	IconButton *exeSelectedScript;
 	IToolsUi *ptrParent;
 };
 

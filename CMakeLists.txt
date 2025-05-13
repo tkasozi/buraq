@@ -12,13 +12,13 @@ find_package(Qt6 COMPONENTS
 		Gui
 		Widgets
 		Sql
+		Xml
 		REQUIRED)
 
 add_executable(ITools src/main.cpp
 		resources.qrc
 		src/ui/IToolsUi.cpp
 		src/ui/IToolsUi.h
-		src/ui/itools_utils.h
 		src/ui/ToolBarEventFilter.cpp
 		src/ui/ToolBarEventFilter.h
 		src/ui/ToolButton.h
@@ -42,12 +42,17 @@ add_executable(ITools src/main.cpp
 		src/ProcessThread.cpp
 		src/ProcessThread.h
 		src/ui/OutputDisplay.cpp
+		src/utils/Config.h
+		src/utils/Config.cpp
+		src/utils/Utils.cpp
+		src/utils/Utils.h
 )
 target_link_libraries(ITools
 		Qt::Core
 		Qt::Gui
 		Qt::Widgets
 		Qt::Sql
+		Qt::Xml
 )
 
 add_dependencies(ITools theme_icons_32x32)

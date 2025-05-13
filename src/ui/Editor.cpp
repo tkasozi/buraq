@@ -15,7 +15,6 @@
 
 #include "Editor.h"
 #include "LineNumberArea.h"
-#include "itools_utils.h"
 #include "IToolsUi.h"
 #include "../utils/Utils.h"
 

@@ -3,6 +3,7 @@
     <Title>ITools</Title>
     <Version>ITools v0.0.10</Version>
     <AppLogo>workflow</AppLogo>
+    <powershellPath>C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe</powershellPath>
     <window minWidth="800"
             minHeight="720"
             normalSize="1200"
@@ -20,21 +21,22 @@
         <addFile>create_new_icon</addFile>
     </AppIcons>
     <Styles>
-        <common>
+        <commonStyle>
             <color>#C2C2C2</color>
             <backgroundColor>none</backgroundColor>
             <padding>0px</padding>
             <border>none</border>
             <height>32px</height>
-        </common>
-        <controlToolBar inherits="common">
+        </commonStyle>
+        <controlToolBar inherits="commonStyle">
             <borderColor>1px solid #383838</borderColor>
         </controlToolBar>
-        <toolBar inherits="common">
+        <toolBar inherits="commonStyle">
             <borderBottom>1px solid #383838</borderBottom>
+            <height>32px</height>
         </toolBar>
-        <statusToolBar inherits="common">
-            <borderBottom>1px solid #383838</borderBottom>
+        <statusToolBar inherits="commonStyle">
+            <borderTop>1px solid #383838</borderTop>
             <height>24px</height>
         </statusToolBar>
         <toolBarHover>

@@ -72,6 +72,15 @@ Config::Config() :
 		exit(-1);
 	}
 
+	QDomNodeList powershellPathList = root.elementsByTagName("powershellPath");
+	if (powershellPathList.count() > 0) {
+		QDomElement powershellPathElement = powershellPathList.at(0).toElement();
+		this->powershellPath = QString(powershellPathElement.text());
+	} else {
+		qDebug() << "Error: Configuration is missing a 'powershellPath'.";
+		exit(-1);
+	}
+
 	QDomNodeList appLogoList = root.elementsByTagName("AppLogo");
 	if (appLogoList.count() > 0) {
 		QDomElement appLogoElement = appLogoList.at(0).toElement();
@@ -111,7 +120,7 @@ Config::Config() :
 	file.close();
 }
 
-void Config::processWindowAttr(const QDomElement& element) {
+void Config::processWindowAttr(const QDomElement &element) {
 	//element.attributes().item(1).nodeValue()
 	for (int i = 0; i < element.attributes().size(); ++i) {
 		QString attrName = element.attributes().item(i).nodeName();
@@ -141,36 +150,106 @@ void Config::processWindowAttr(const QDomElement& element) {
 	}
 }
 
-void Config::processAppIconsAttr(const QDomElement& element) {
+void Config::processAppIconsAttr(const QDomElement &element) {
 	auto appIconsNodes = element.childNodes();
 	for (int i = 0; i < appIconsNodes.size(); ++i) {
 		QDomElement qDomElement = appIconsNodes.item(i).toElement();
-		QString attrName = qDomElement.tagName();
+		QString tagName = qDomElement.tagName();
 
-		if (attrName == "settings") {
+		if (tagName == "settings") {
 			appIcons->settingsIcon = QIcon::fromTheme(qDomElement.text());
 		}
-		if (attrName == "folder") {
+		if (tagName == "folder") {
 			appIcons->folderIcon = QIcon::fromTheme(qDomElement.text());
 		}
-		if (attrName == "terminal") {
+		if (tagName == "terminal") {
 			appIcons->terminalIcon = QIcon::fromTheme(qDomElement.text());
 		}
-		if (attrName == "playCode") {
+		if (tagName == "playCode") {
 			appIcons->playCode = QIcon::fromTheme(qDomElement.text());
 		}
-		if (attrName == "execute") {
+		if (tagName == "execute") {
 			appIcons->executeIcon = QIcon::fromTheme(qDomElement.text());
 		}
-		if (attrName == "executeSelected") {
+		if (tagName == "executeSelected") {
 			appIcons->executeSelectedIcon = QIcon::fromTheme(qDomElement.text());
 		}
-		if (attrName == "addFile") {
+		if (tagName == "addFile") {
 			appIcons->addFileIcon = QIcon::fromTheme(qDomElement.text());
 		}
 	}
 }
 
-void Config::processStyles(const QDomElement& element) {
-//	MainStyles
+void Config::processStyles(const QDomElement &element) {
+	auto styleNodes = element.childNodes();
+	QDomElement qDomCommonNode;
+	for (int i = 0; i < styleNodes.size(); ++i) {
+		auto temp = styleNodes.item(i).toElement();
+		if (temp.tagName() == "commonStyle") {
+			processStyleBlock(temp, mainStyles->commonStyle);
+			break;
+		}
+	}
+
+	for (int i = 0; i < styleNodes.size(); ++i) {
+		auto temp = styleNodes.item(i).toElement();
+		if (temp.tagName() != "commonStyle") {
+			if (temp.tagName() == "controlToolBar") {
+				processStyleBlock(temp, mainStyles->controlToolBar);
+			}
+			if (temp.tagName() == "toolBar") {
+				processStyleBlock(temp, mainStyles->toolBar);
+			}
+			if (temp.tagName() == "statusToolBar") {
+				processStyleBlock(temp, mainStyles->statusToolBar);
+			}
+			if (temp.tagName() == "toolBarHover") {
+				processStyleBlock(temp, mainStyles->toolBarHover);
+			}
+		}
+	}
+}
+
+void Config::processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct) {
+	// includes styles
+	if (element.hasAttribute("inherits") && element.attributes().item(0).nodeValue() == "commonStyle") {
+		aStruct.color = mainStyles->commonStyle.color;
+		aStruct.backgroundColor = mainStyles->commonStyle.backgroundColor;
+		aStruct.padding = mainStyles->commonStyle.padding;
+		aStruct.border = mainStyles->commonStyle.border;
+		aStruct.height = mainStyles->commonStyle.height;
+	}
+
+	auto styleNodes = element.childNodes();
+	for (int i = 0; i < styleNodes.size(); ++i) {
+		auto temp = styleNodes.item(i).toElement();
+		if (temp.tagName() == "backgroundColor") {
+			aStruct.backgroundColor = QString("background-color:" + temp.text() + ";");
+		}
+		if (temp.tagName() == "border") {
+			aStruct.border = QString("border: " + temp.text() + ";");
+		}
+		if (temp.tagName() == "borderBottom") {
+			aStruct.borderBottom = QString("border-bottom:" + temp.text() + ";");
+		}
+		if (temp.tagName() == "borderTop") {
+			aStruct.borderBottom = QString("border-top:" + temp.text() + ";");
+		}
+		if (temp.tagName() == "borderColor") {
+			aStruct.borderColor = QString("border-color:" + temp.text() + ";");
+		}
+		if (temp.tagName() == "padding") {
+			aStruct.padding = QString("padding:" + temp.text() + ";");
+		}
+		if (temp.tagName() == "height") {
+			aStruct.height = QString("height:" + temp.text() + ";");
+		}
+
+		aStruct.styleSheet = aStruct.backgroundColor + aStruct.padding
+							 + aStruct.color
+							 + aStruct.border
+							 + aStruct.height
+							 + aStruct.borderColor
+							 + aStruct.borderBottom;
+	}
 }

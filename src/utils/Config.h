@@ -51,16 +51,13 @@ struct AppIcons {
 };
 
 struct StyleSheetStruct {
+	QString color = QString("");
 	QString backgroundColor = QString("");
 	QString padding = QString("");
 	QString border = QString("");
 	QString height = QString("");
 	QString borderColor = QString("");
-	QString borderBottom = backgroundColor.append(";").append(padding)
-			.append(";").append(border)
-			.append(";").append(height)
-			.append(";").append(borderColor)
-			.append(";").append(borderBottom);
+	QString borderBottom = QString();
 	/**
 	 * String combining all the styleSheet object's properties
 	 *
@@ -69,7 +66,7 @@ struct StyleSheetStruct {
 };
 
 struct MainStyles {
-	StyleSheetStruct commonToolBar;
+	StyleSheetStruct commonStyle;
 	StyleSheetStruct controlToolBar;
 	StyleSheetStruct toolBar;
 	StyleSheetStruct statusToolBar;
@@ -79,7 +76,7 @@ struct MainStyles {
 class Config {
 
 public:
-	explicit Config() ;
+	explicit Config();
 
 	virtual ~Config() {
 		delete windowConfig;
@@ -98,6 +95,10 @@ public:
 		return version;
 	}
 
+	[[nodiscard]] const QString &getPowershellPath() const {
+		return powershellPath;
+	}
+
 	[[nodiscard]] const QIcon &getAppLogo() const {
 		return appLogo;
 	}
@@ -110,19 +111,26 @@ public:
 		return *appIcons;
 	}
 
+	[[nodiscard]] const MainStyles &getMainStyles() const {
+		return *mainStyles;
+	}
+
 private:
 	QString title;
 	QString version;
+	QString powershellPath;
 	QIcon appLogo;
 	WindowConfig *windowConfig;
 	AppIcons *appIcons;
 	MainStyles *mainStyles;
 
-	void processWindowAttr(const QDomElement&);
+	void processWindowAttr(const QDomElement &);
 
 	void processAppIconsAttr(const QDomElement &element);
 
 	void processStyles(const QDomElement &element);
+
+	void processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct);
 };
 
 #endif //ITOOLS_CONFIG_H

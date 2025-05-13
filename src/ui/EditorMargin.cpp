@@ -8,7 +8,6 @@
 
 #include "EditorMargin.h"
 #include "Editor.h"
-#include "itools_utils.h"
 #include "IconButton.h"
 #include "IToolsUi.h"
 
@@ -80,7 +79,7 @@ void EditorMargin::onExecuteScriptButtonClicked(QString &script) const {
 	arguments << script;
 
 	// Create a QProcess object
-	auto *thread = new ProcessThread(IToolsNamespace::POWERSHELL_PATH, arguments);
+	auto *thread = new ProcessThread(ItoolsNS::main_config.getPowershellPath(), arguments);
 
 	connect(thread, &ProcessThread::processStarted, this, &EditorMargin::onProcessStarted);
 	connect(thread, &ProcessThread::processFinished, this, &EditorMargin::updateOutputResult);

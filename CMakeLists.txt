@@ -19,7 +19,6 @@ add_executable(ITools src/main.cpp
 		resources.qrc
 		src/ui/IToolsUi.cpp
 		src/ui/IToolsUi.h
-		src/ui/itools_utils.h
 		src/ui/ToolBarEventFilter.cpp
 		src/ui/ToolBarEventFilter.h
 		src/ui/ToolButton.h

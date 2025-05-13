@@ -30,7 +30,6 @@
 #include "Editor.h"
 #include "CustomDrawer.h"
 #include "EditorMargin.h"
-#include "../utils/Utils.h"
 #include <sstream>
 
 // TODO -- rename variable to be more readable and add documentation

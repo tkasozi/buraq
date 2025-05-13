@@ -32,8 +32,5 @@ int main(int argc, char *argv[]) {
 	IToolsUi ui(nullptr);
 	ui.show();
 
-	QIcon appIcon(":/icons/workflow.ico");
-	QApplication::setWindowIcon(appIcon);
-
 	return QApplication::exec();
 }

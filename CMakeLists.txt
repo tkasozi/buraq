@@ -77,7 +77,7 @@ if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
 	# create a file name temp.db in the binary dir
 	file(WRITE "Release/0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db" "")
 
-	foreach (QT_LIB Core Gui Widgets Sql)
+	foreach (QT_LIB Core Gui Widgets Sql Xml)
 		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION)
 		get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
 #		message(STATUS, "*******************${QT_BIN_DIR}***************")

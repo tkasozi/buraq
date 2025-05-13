@@ -30,6 +30,7 @@
 #include <QDebug>
 
 Config::Config() :
+		mainStyles(new MainStyles),
 		windowConfig(new WindowConfig),
 		appIcons(new AppIcons) {
 
@@ -98,6 +99,15 @@ Config::Config() :
 		exit(-1);
 	}
 
+	QDomNodeList mainStylesList = root.elementsByTagName("Styles");
+	if (mainStylesList.count() > 0) {
+		QDomElement mainStylesElement = mainStylesList.at(0).toElement();
+		this->processStyles(mainStylesElement);
+	} else {
+		qDebug() << "Error: Configuration is missing a 'Styles'.";
+		exit(-1);
+	}
+
 	file.close();
 }
 
@@ -159,4 +169,8 @@ void Config::processAppIconsAttr(const QDomElement& element) {
 			appIcons->addFileIcon = QIcon::fromTheme(qDomElement.text());
 		}
 	}
+}
+
+void Config::processStyles(const QDomElement& element) {
+//	MainStyles
 }

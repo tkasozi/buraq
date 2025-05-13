@@ -9,7 +9,7 @@
             minimizeIcon="minimize_icon"
             maximizeIcon="maximize_icon"
             restoreIcon="restore_icon"
-            closeIcon="close_icon" />
+            closeIcon="close_icon"/>
     <AppIcons>
         <settings>settings_icon</settings>
         <folder>script_icon</folder>
@@ -19,4 +19,27 @@
         <executeSelected>play_filled_icon2</executeSelected>
         <addFile>create_new_icon</addFile>
     </AppIcons>
+    <Styles>
+        <common>
+            <color>#C2C2C2</color>
+            <backgroundColor>none</backgroundColor>
+            <padding>0px</padding>
+            <border>none</border>
+            <height>32px</height>
+        </common>
+        <controlToolBar inherits="common">
+            <borderColor>1px solid #383838</borderColor>
+        </controlToolBar>
+        <toolBar inherits="common">
+            <borderBottom>1px solid #383838</borderBottom>
+        </toolBar>
+        <statusToolBar inherits="common">
+            <borderBottom>1px solid #383838</borderBottom>
+            <height>24px</height>
+        </statusToolBar>
+        <toolBarHover>
+            <backgroundColor>#383838</backgroundColor>
+            <border>0px</border>
+        </toolBarHover>
+    </Styles>
 </configuration>

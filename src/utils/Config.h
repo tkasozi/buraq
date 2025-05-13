@@ -50,6 +50,32 @@ struct AppIcons {
 	QIcon addFileIcon;
 };
 
+struct StyleSheetStruct {
+	QString backgroundColor = QString("");
+	QString padding = QString("");
+	QString border = QString("");
+	QString height = QString("");
+	QString borderColor = QString("");
+	QString borderBottom = backgroundColor.append(";").append(padding)
+			.append(";").append(border)
+			.append(";").append(height)
+			.append(";").append(borderColor)
+			.append(";").append(borderBottom);
+	/**
+	 * String combining all the styleSheet object's properties
+	 *
+	 */
+	QString styleSheet;
+};
+
+struct MainStyles {
+	StyleSheetStruct commonToolBar;
+	StyleSheetStruct controlToolBar;
+	StyleSheetStruct toolBar;
+	StyleSheetStruct statusToolBar;
+	StyleSheetStruct toolBarHover;
+};
+
 class Config {
 
 public:
@@ -60,6 +86,8 @@ public:
 		windowConfig = nullptr;
 		delete appIcons;
 		appIcons = nullptr;
+		delete mainStyles;
+		mainStyles = nullptr;
 	};
 
 	[[nodiscard]] const QString &getTitle() const {
@@ -88,10 +116,13 @@ private:
 	QIcon appLogo;
 	WindowConfig *windowConfig;
 	AppIcons *appIcons;
+	MainStyles *mainStyles;
 
 	void processWindowAttr(const QDomElement&);
 
 	void processAppIconsAttr(const QDomElement &element);
+
+	void processStyles(const QDomElement &element);
 };
 
 #endif //ITOOLS_CONFIG_H

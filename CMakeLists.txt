@@ -59,7 +59,7 @@ add_dependencies(ITools theme_icons_32x32)
 add_custom_target(theme_icons_32x32 ALL COMMAND
 		${CMAKE_COMMAND} -E copy_directory
 		${PROJECT_SOURCE_DIR}/icons/dark/svg
-		Release/resources/themes/32x32/actions
+		resources/themes/32x32/actions
 )
 
 add_dependencies(ITools theme_icons)
@@ -67,7 +67,7 @@ add_dependencies(ITools theme_icons)
 add_custom_target(theme_icons ALL COMMAND
 		${CMAKE_COMMAND} -E copy_directory
 		${PROJECT_SOURCE_DIR}/icons
-		Release/resources
+		resources
 )
 
 # Add resources
@@ -77,7 +77,7 @@ if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
 	# create a file name temp.db in the binary dir
 	file(WRITE "Release/0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db" "")
 
-	foreach (QT_LIB Core Gui Widgets Sql)
+	foreach (QT_LIB Core Gui Widgets Sql Xml)
 		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION)
 		get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
 #		message(STATUS, "*******************${QT_BIN_DIR}***************")

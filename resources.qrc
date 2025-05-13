@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>config/main_config.xml</file>
         <file>styles.qss</file>
-        <file>0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db</file>
         <file>temp.ps1</file>
         <file>icons/dark/index.theme</file>
         <file>icons/dark/png/close_icon.png</file>

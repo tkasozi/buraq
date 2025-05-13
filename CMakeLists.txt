@@ -59,7 +59,7 @@ add_dependencies(ITools theme_icons_32x32)
 add_custom_target(theme_icons_32x32 ALL COMMAND
 		${CMAKE_COMMAND} -E copy_directory
 		${PROJECT_SOURCE_DIR}/icons/dark/svg
-		resources/themes/32x32/actions
+		Release/resources/themes/32x32/actions
 )
 
 add_dependencies(ITools theme_icons)
@@ -67,7 +67,7 @@ add_dependencies(ITools theme_icons)
 add_custom_target(theme_icons ALL COMMAND
 		${CMAKE_COMMAND} -E copy_directory
 		${PROJECT_SOURCE_DIR}/icons
-		resources
+		Release/resources
 )
 
 # Add resources

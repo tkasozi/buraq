@@ -11,6 +11,7 @@
 #include <QDate>
 #include <QSqlQuery>
 #include "FileObject.h"
+#include <fstream>
 
 const auto FILES_SQL = QLatin1String(R"(
     CREATE TABLE IF NOT EXISTS files(id INTEGER PRIMARY KEY, file_path VARCHAR UNIQUE, file_name VARCHAR);
@@ -62,20 +63,30 @@ static QList<FileObject *> findPreviouslyOpenedFiles() {
 	return files;
 }
 
-static bool db_conn() { // TODO when does this get closed???
-	QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+static bool db_conn() {
+	const char * dbName = "0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db";
 
-	try {
-		db.setDatabaseName(QString("0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db"));
-	} catch (_exception exception) {
-		qDebug() << "Failed";
-		return false;
+	std::fstream db(dbName, std::ios::in);
+
+	if (db.is_open()) {
+		// db file exists
+		db.close();
+	} else {
+		std::ofstream outputFile(dbName, std::ios::out);
 	}
 
-	if (!db.open()) {
-		QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),
-							  "Unable to establish a database connection.\n"
-							  "Click Cancel to exit.", QMessageBox::Cancel);
+	try {
+		QSqlDatabase dbEngine = QSqlDatabase::addDatabase("QSQLITE");
+		dbEngine.setDatabaseName(dbName);
+
+		if (!dbEngine.open()) {
+			QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),
+								  "Unable to establish a database connection.\n"
+								  "Click Cancel to exit.", QMessageBox::Cancel);
+			return false;
+		}
+	} catch (_exception exception) {
+		qDebug() << "Failed";
 		return false;
 	}
 

@@ -30,7 +30,6 @@
 #include "CustomDrawer.h"
 #include "IconButton.h"
 #include "../db_conn.h"
-#include "../utils/Utils.h"
 
 namespace {
 

@@ -15,37 +15,38 @@ find_package(Qt6 COMPONENTS
 		Xml
 		REQUIRED)
 
-add_executable(ITools src/main.cpp
+add_executable(ITools app/main.cpp
 		resources.qrc
-		src/ui/IToolsUi.cpp
-		src/ui/IToolsUi.h
-		src/ui/ToolBarEventFilter.cpp
-		src/ui/ToolBarEventFilter.h
-		src/ui/ToolButton.h
-		src/ui/ToolBar.cpp
-		src/ui/ToolBar.h
-		src/ui/IconButton.h
-		src/ui/Editor.cpp
-		src/ui/Editor.h
-		src/ui/LineNumberArea.h
-		src/ui/CustomDrawer.cpp
-		src/ui/CustomDrawer.h
-		src/ui/FilePathLabel.h
-		src/ui/OutputDisplay.h
-		src/ui/CustomLabel.cpp
-		src/ui/CustomLabel.h
-		src/ui/EditorMargin.cpp
-		src/ui/EditorMargin.h
-		src/db_conn.h
-		src/FileObject.h
-		src/FileObject.cpp
-		src/ProcessThread.cpp
-		src/ProcessThread.h
-		src/ui/OutputDisplay.cpp
-		src/utils/Config.h
-		src/utils/Config.cpp
-		src/utils/Utils.cpp
-		src/utils/Utils.h
+		app/ui/IToolsUi.cpp
+		app/ui/IToolsUi.h
+		app/ui/ToolBarEventFilter.cpp
+		app/ui/ToolBarEventFilter.h
+		app/ui/ToolButton.h
+		app/ui/ToolBar.cpp
+		app/ui/ToolBar.h
+		app/ui/IconButton.h
+		app/ui/Editor.cpp
+		app/ui/Editor.h
+		app/ui/LineNumberArea.h
+		app/ui/CustomDrawer.cpp
+		app/ui/CustomDrawer.h
+		app/ui/FilePathLabel.h
+		app/ui/OutputDisplay.h
+		app/ui/CustomLabel.cpp
+		app/ui/CustomLabel.h
+		app/ui/EditorMargin.cpp
+		app/ui/EditorMargin.h
+		app/db_connection.h
+		app/FileObject.h
+		app/FileObject.cpp
+		app/ProcessThread.cpp
+		app/ProcessThread.h
+		app/ui/OutputDisplay.cpp
+		app/utils/Config.h
+		app/utils/Config.cpp
+		app/utils/Utils.cpp
+		app/utils/Utils.h
+		include/plugin_interface.h
 )
 target_link_libraries(ITools
 		Qt::Core
@@ -54,6 +55,8 @@ target_link_libraries(ITools
 		Qt::Sql
 		Qt::Xml
 )
+
+add_subdirectory(plugins_src/powershell_plugin)
 
 add_dependencies(ITools theme_icons_32x32)
 add_custom_target(theme_icons_32x32 ALL COMMAND

@@ -4,7 +4,7 @@
 #include <QApplication>
 #include <QStyleFactory>
 #include "ui/IToolsUi.h"
-#include "db_conn.h"
+#include "db_connection.h"
 #include <QtSql>
 
 int main(int argc, char *argv[]) {

@@ -27,6 +27,12 @@
 #ifndef PLUGIN_INTERFACE_H
 #define PLUGIN_INTERFACE_H
 
+#include <string>
+
+struct ProcessedData {
+	std::wstring resultValue;
+	bool isProcessFailed;
+};
 
 class IPlugin {
 public:
@@ -36,6 +42,7 @@ public:
 	virtual const char* getName() const = 0;
 	virtual void shutdown() = 0;
 	virtual void performAction() = 0;
+	virtual ProcessedData performAction(void *cmd) = 0;
 
 	/**
 	 *

@@ -1,5 +1,7 @@
 project(PowershellExt LANGUAGES CXX)
 
+set(MANAGED_LIBRARY_PUBLISH_DIR "C:\\Users\\talik\\workspace\\ITools\\ManagedLibrary\\ManagedLibraryPublish") # Path from dotnet publish -o
+
 # --- Define the shared library target ---
 # The first argument is the target name. CMake will automatically name the file
 # appropriately for the platform (e.g., my_cool_plugin.dll, libmy_cool_plugin.so, libmy_cool_plugin.dylib).
@@ -27,22 +29,28 @@ target_include_directories(PowershellExt PUBLIC
 
 #    CMake can usually handle the .lib extension directly.
 #    Provide the full path to nethost.lib.
-set(NETHOST_LIB "${CMAKE_DOTNET_TARGET_FRAMEWORK}/nethost.dll")
+set(NET_HOST_DLL "${CMAKE_DOTNET_TARGET_FRAMEWORK}/nethost.dll")
+set(NET_HOST_LIB "${CMAKE_DOTNET_TARGET_FRAMEWORK}/nethost.lib")
+
+if (EXISTS "${NET_HOST_LIB}")
+	target_link_libraries(PowershellExt PRIVATE "${NET_HOST_LIB}")
+else ()
+	message(FATAL_ERROR "${NET_HOST_DLL}not found. Please check your .NET SDK installation.")
+endif ()
 
 # Check if the library file exists
-if (EXISTS "${NETHOST_LIB}")
+if (EXISTS "${NET_HOST_DLL}")
 	# Link the nethost library to your PowershellExt target
-	target_link_libraries(PowershellExt PRIVATE "${NETHOST_LIB}")
 
 	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E make_directory "${PLUGIN_FULL_OUTPUT_DIR}" # Ensure directory exists
 			COMMAND ${CMAKE_COMMAND} -E copy
-			"${NETHOST_LIB}"
+			"${NET_HOST_DLL}"
 			"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-			COMMENT "Copying ${NETHOST_LIB} to ${PLUGIN_SUBDIR}"
+			COMMENT "Copying ${NET_HOST_DLL} to ${PLUGIN_SUBDIR}"
 			VERBATIM)
 else ()
-	message(FATAL_ERROR "nethost.dll not found at ${NETHOST_LIB}. Please check CMAKE_DOTNET_TARGET_FRAMEWORK and your .NET SDK installation.")
+	message(FATAL_ERROR "nethost.dll not found at ${NET_HOST_DLL}. Please check CMAKE_DOTNET_TARGET_FRAMEWORK and your .NET SDK installation.")
 endif ()
 
 # On Windows, this ensures that the functions are exported from the DLL.
@@ -51,27 +59,16 @@ if (WIN32)
 	target_compile_definitions(PowershellExt PRIVATE POWERSHELL_PLUGIN_EXPORTS)
 endif ()
 
-# --- Custom commands to copy ManagedLibrary.dll etc. ---
-set(MANAGED_FILES
-		"${CSHARP_PROJECT_OUTPUT_DIR}\\ManagedLibrary.dll"
-		"${CSHARP_PROJECT_OUTPUT_DIR}\\ManagedLibrary.deps.json"
-		"${CSHARP_PROJECT_OUTPUT_DIR}\\ManagedLibrary.runtimeconfig.json"
-)
+# Glob all files in the source assets directory
+file(GLOB ASSET_FILES "${MANAGED_LIBRARY_PUBLISH_DIR}/*") # Gets files directly in the folder
 
-foreach (MANAGED_FILE ${MANAGED_FILES})
-	if (EXISTS "${MANAGED_FILE}")
-		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-				COMMAND ${CMAKE_COMMAND} -E make_directory "${PLUGIN_FULL_OUTPUT_DIR}" # Ensure directory exists
-				COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				"${MANAGED_FILE}"
-				"${PLUGIN_FULL_OUTPUT_DIR}"
-				COMMENT "Copying ${MANAGED_FILE} to ${PLUGIN_SUBDIR}"
-				VERBATIM)
-	else ()
-		message(WARNING "Managed file not found for copying: ${MANAGED_FILE}")
-	endif ()
-endforeach ()
+# Ensure destination directory exists
+file(MAKE_DIRECTORY "${PLUGIN_FULL_OUTPUT_DIR}/ManagedLibraryPublish")
 
+# Loop through the globbed files and copy them
+foreach(ASSET_FILE ${ASSET_FILES})
+	file(COPY "${ASSET_FILE}" DESTINATION "${PLUGIN_FULL_OUTPUT_DIR}/ManagedLibraryPublish")
+endforeach()
 
 # On Windows, also place the PDB (Program Database for debugging) file alongside the DLL.
 if (MSVC)

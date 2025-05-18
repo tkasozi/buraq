@@ -53,6 +53,8 @@ public:
 	// Scans a directory for plugins and attempts to load them.
 	void loadPluginsFromDirectory(const std::string& directory_path = ".\\..\\Release\\plugins\\ext");
 
+	ProcessedData callPerformAction(void *);
+
 	// Example function to interact with all loaded plugins.
 	void callPerformActionOnAll();
 	void callGetNameOnAll();

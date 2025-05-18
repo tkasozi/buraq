@@ -21,6 +21,7 @@
 #include "IconButton.h"
 #include "OutputDisplay.h"
 #include "ToolBar.h"
+#include "../PluginManager.h"
 
 
 class AppUi : public QMainWindow {
@@ -35,23 +36,31 @@ private slots:
 public:
 	explicit AppUi(QWidget *parent = nullptr);
 
+	// The std::unique_ptr members will automatically
+	// delete their managed objects when AppUi is destroyed.
+	// No manual delete, no manual nullptr.
 	~AppUi() override = default;
 
 	OutputDisplay *getOutputDisplay();
+
 	Editor *getEditor();
+
 	QStatusBar *getQStatusBar();
 
+	PluginManager *getPluginManager();
+
 private:
-	CustomDrawer *drawer;
-	QGridLayout *centralWidgetLayout;
-	IconButton *folderButton;
-	OutputDisplay *outPutArea;
-	QGridLayout *placeHolderLayout;
-	Editor *itoolsEditor;
-	QWidget *editorAndDrawerAreaPanel;
-	QWidget *editorMargin;
-	ToolBar *toolBar;
-	QStatusBar *statusBar;
+	std::unique_ptr<PluginManager> pluginManager;
+	std::unique_ptr<CustomDrawer> drawer;
+	std::unique_ptr<QGridLayout> centralWidgetLayout;
+	std::unique_ptr<IconButton> folderButton;
+	std::unique_ptr<OutputDisplay> outPutArea;
+	std::unique_ptr<QGridLayout> placeHolderLayout;
+	std::unique_ptr<Editor> itoolsEditor;
+	std::unique_ptr<QWidget> editorAndDrawerAreaPanel;
+	std::unique_ptr<QWidget> editorMargin;
+	std::unique_ptr<ToolBar> toolBar;
+	std::unique_ptr<QStatusBar> statusBar;
 };
 
 

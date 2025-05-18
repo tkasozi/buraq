@@ -15,7 +15,7 @@
 
 #include "Editor.h"
 #include "LineNumberArea.h"
-#include "IToolsUi.h"
+#include "AppUi.h"
 #include "../utils/Utils.h"
 
 #define string_equals(keyText, key) \
@@ -50,7 +50,7 @@ Editor::Editor(QWidget *parent) : QPlainTextEdit(parent), parent(parent) {
 	setLayout(layoutC);
 
 	{ // update place holder text
-		QFile file(":/temp.ps1");
+		QFile file(":/test/temp.ps1");
 		file.open(QFile::OpenModeFlag::ReadOnly);
 
 		QString fileContent = QString::fromLatin1(file.readAll());
@@ -251,12 +251,12 @@ void Editor::openAndParseFile(const QString &filePath, QFile::OpenModeFlag modeF
 }
 
 void Editor::autoSave() {
-	auto iToolsUi = dynamic_cast<IToolsUi *>(parent);
+	auto appUi = dynamic_cast<AppUi *>(parent);
 
 	// auto save works only if the file had been saved before
 	// therefore currentFile should have been set
-	if (iToolsUi != nullptr && !currentFile.isEmpty()) {
-		auto statusBar = iToolsUi->getQStatusBar();
+	if (appUi != nullptr && !currentFile.isEmpty()) {
+		auto statusBar = appUi->getQStatusBar();
 
 		// Open the file for writing
 		QFile file(currentFile);
@@ -370,4 +370,8 @@ void Editor::keyPressEvent(QKeyEvent *e) {
 	previousText = toPlainText();
 
 	QPlainTextEdit::keyPressEvent(e);
+}
+
+void Editor::test(const char *name) {
+	qDebug() << "[" << name << "] Testing..";
 }

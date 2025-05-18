@@ -1,8 +1,8 @@
 //
 // Created by Talik Kasozi on 2/3/2024.
 //
-#ifndef IT_TOOLS_IT_UI_H
-#define IT_TOOLS_IT_UI_H
+#ifndef APP_UI_H
+#define APP_UI_H
 
 #include <QMainWindow>
 #include <QPushButton>
@@ -23,7 +23,7 @@
 #include "ToolBar.h"
 
 
-class IToolsUi : public QMainWindow {
+class AppUi : public QMainWindow {
 Q_OBJECT
 
 private slots:
@@ -33,9 +33,9 @@ private slots:
 	void onShowOutputButtonClicked();
 
 public:
-	explicit IToolsUi(QWidget *parent = nullptr);
+	explicit AppUi(QWidget *parent = nullptr);
 
-	~IToolsUi() override = default;
+	~AppUi() override = default;
 
 	OutputDisplay *getOutputDisplay();
 	Editor *getEditor();
@@ -55,4 +55,4 @@ private:
 };
 
 
-#endif // IT_TOOLS_IT_UI_H
+#endif // APP_UI_H

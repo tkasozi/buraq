@@ -29,7 +29,7 @@
 #include <QFileDialog>
 #include "CustomDrawer.h"
 #include "IconButton.h"
-#include "../db_conn.h"
+#include "../db_connection.h"
 
 namespace {
 

@@ -184,7 +184,7 @@ public:
 			// IMPORTANT: Adjust this path to where your ManagedLibrary.dll and ManagedLibrary.runtimeconfig.json are located
 			// You might want to make this configurable or relative to your executable
 			fs::path managed_assembly_dir =
-					fs::current_path().parent_path() / "ManagedLibrary" / "bin" / "Debug" / "net8.0"; // Example path
+					fs::current_path().parent_path() / "bin" / "plugins" / "ext"; // Example path
 			fs::path config_path = managed_assembly_dir / "ManagedLibrary.runtimeconfig.json";
 			fs::path assembly_path = managed_assembly_dir / "ManagedLibrary.dll";
 
@@ -210,12 +210,14 @@ public:
 			std::wcout << L".NET runtime initialized and load_assembly_and_get_function_pointer delegate obtained."
 					   << std::endl;
 
+			std::wcout << "assembly_path: " << assembly_path.c_str() << std::endl;
+
 			// --- 4. Get a pointer to the managed static method ---
 			// For SayHello
 			void_fptr_t say_hello_fptr = nullptr;
 			int rc = load_assembly_and_get_fp(
 					assembly_path.c_str(),
-					STR("ManagedLibrary.MyWorker, ManagedLibrary"), // Assembly-qualified type name
+					STR("ManagedLibrary.CSharpWorker, ManagedLibrary"), // Assembly-qualified type name
 					STR("SayHello"),                               // Method name (must match UnmanagedCallersOnly EntryPoint or method name)
 					UNMANAGEDCALLERSONLY_METHOD,                   // Indicates it's an UnmanagedCallersOnly method
 					nullptr,                                       // Reserved
@@ -245,7 +247,7 @@ public:
 
 			rc = load_assembly_and_get_fp(
 					assembly_path.c_str(),
-					STR("ManagedLibrary.MyWorker, ManagedLibrary"), // Type name (namespace.class, assembly_name)
+					STR("ManagedLibrary.CSharpWorker, ManagedLibrary"), // Type name (namespace.class, assembly_name)
 					STR("Execute"),                                // Method name (must match EntryPoint in UnmanagedCallersOnly)
 					UNMANAGEDCALLERSONLY_METHOD,                   // Delegate type name (or UNMANAGEDCALLERSONLY_METHOD for UnmanagedCallersOnly)
 					nullptr,                                       // Reserved

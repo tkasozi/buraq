@@ -33,8 +33,6 @@ int main(int argc, char *argv[]) {
 
 	AppUi ui(nullptr);
 	ui.show();
-//	std::unique_ptr<AppUi> ui_ptr = std::make_unique<AppUi>();
-//	ui_ptr->show();
 
 //	// Create an instance of your application-specific context/API
 	IToolsApi app_api;
@@ -43,7 +41,7 @@ int main(int argc, char *argv[]) {
 	PluginManager manager(&app_api); // Or manager(nullptr);
 
 	// Load plugins from the specified directory
-	manager.loadPlugin("C:\\Users\\talik\\workspace\\ITools\\Release\\libPowershellExt.dll");
+	manager.loadPlugin(".\\libPowershellExt.dll");
 
 	// Interact with loaded plugins
 	manager.callGetNameOnAll();

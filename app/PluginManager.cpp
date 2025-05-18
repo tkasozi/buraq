@@ -58,7 +58,6 @@ bool PluginManager::loadPlugin(const std::string& plugin_path) {
 	std::cout << "Attempting to load plugin: " << plugin_path << std::endl;
 
 #ifdef _WIN32
-	std::cout << "-----What? Ahhhhhhh "<< plugin_path.c_str() << std::endl;
 	HMODULE plugin_handle = LoadLibraryA(plugin_path.c_str());
 	if (!plugin_handle) {
 		logWindowsError("LoadLibraryA for " + plugin_path);

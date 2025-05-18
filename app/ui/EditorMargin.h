@@ -2,8 +2,8 @@
 // Created by talik on 4/20/2024.
 //
 
-#ifndef IT_TOOLS_EDITORMARGIN_H
-#define IT_TOOLS_EDITORMARGIN_H
+#ifndef IT_TOOLS_EDITOR_MARGIN_H
+#define IT_TOOLS_EDITOR_MARGIN_H
 
 #include <QWidget>
 #include <QPlainTextEdit>
@@ -11,7 +11,7 @@
 #include "CustomLabel.h"
 #include "Editor.h"
 #include "IconButton.h"
-#include "IToolsUi.h"
+#include "AppUi.h"
 
 class EditorMargin : public QWidget {
 Q_OBJECT
@@ -24,7 +24,7 @@ private slots:
 	void updateOutputResult(int exitCode, const QString &output, const QString &error);
 
 public:
-	explicit EditorMargin( IToolsUi *ptrParent);
+	explicit EditorMargin(AppUi *ptrParent);
 
 	~EditorMargin() override = default;
 
@@ -36,8 +36,8 @@ private:
 
 	IconButton *exeScript;
 	IconButton *exeSelectedScript;
-	IToolsUi *ptrParent;
+	AppUi *ptrParent;
 };
 
 
-#endif //IT_TOOLS_EDITORMARGIN_H
+#endif //IT_TOOLS_EDITOR_MARGIN_H

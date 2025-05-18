@@ -9,12 +9,11 @@
 #include "EditorMargin.h"
 #include "Editor.h"
 #include "IconButton.h"
-#include "IToolsUi.h"
+#include "AppUi.h"
 
 #include "../ProcessThread.h"
-#include "../utils/Utils.h"
 
-EditorMargin::EditorMargin(IToolsUi *ptrParent) : QWidget(ptrParent), ptrParent(ptrParent) {
+EditorMargin::EditorMargin(AppUi *ptrParent) : QWidget(ptrParent), ptrParent(ptrParent) {
 	auto layout = new QVBoxLayout;
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 4, 8, 0);

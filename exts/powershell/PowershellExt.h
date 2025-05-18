@@ -24,5 +24,7 @@
 // Created by talik on 5/15/2025.
 //
 
-#include "Powershell.h"
-#include "plugin_interface.h"
+#ifndef ITOOLS_POWERSHELLEXT_H
+#define ITOOLS_POWERSHELLEXT_H
+
+#endif //ITOOLS_POWERSHELLEXT_H

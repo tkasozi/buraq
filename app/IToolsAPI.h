@@ -21,10 +21,30 @@
 // SOFTWARE.
 
 //
-// Created by talik on 5/15/2025.
+// Created by talik on 5/16/2025.
 //
 
-#ifndef ITOOLS_PLUGIN_INTERFACE_H
-#define ITOOLS_PLUGIN_INTERFACE_H
+#ifndef ITOOLS_API_H
+#define ITOOLS_API_H
 
-#endif //ITOOLS_PLUGIN_INTERFACE_H
+#include <iostream>
+#include <memory>
+//#include "ui/AppUi.h"
+
+// Example of an application context you might pass to plugins
+struct IToolsApi {
+//	std::unique_ptr<AppUi> ui_ptr;
+
+//	AppUi* ui_ptr;
+
+	IToolsApi() {}
+
+//	explicit IToolsApi(AppUi* ptr) : ui_ptr(ptr) {}
+
+	void someApplicationFunction() {
+		std::cout << "[ApplicationAPI] Some application function was called by a plugin." << std::endl;
+	}
+	// Add more functions or data members that plugins might need
+};
+
+#endif //ITOOLS_API_H

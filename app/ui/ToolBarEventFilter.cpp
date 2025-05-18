@@ -6,10 +6,8 @@
 #include <QMouseEvent>
 
 #include "ToolBarEventFilter.h"
-#include "IToolsUi.h"
+#include "AppUi.h"
 #include "ToolBar.h"
-#include "../utils/Utils.h"
-
 
 bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e) {
 
@@ -20,7 +18,7 @@ bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e) {
 		return false; // Pass event to the object's normal handlers
 	}
 
-	auto *ui = dynamic_cast<IToolsUi *>(obj->parent());
+	auto *ui = dynamic_cast<AppUi *>(obj->parent());
 	auto geo = toolBar->geometry();
 
 	switch (event->type()) {

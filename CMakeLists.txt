@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.27)
+
 project(ITools)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -17,8 +19,8 @@ find_package(Qt6 COMPONENTS
 
 add_executable(ITools app/main.cpp
 		resources.qrc
-		app/ui/IToolsUi.cpp
-		app/ui/IToolsUi.h
+		app/ui/AppUi.cpp
+		app/ui/AppUi.h
 		app/ui/ToolBarEventFilter.cpp
 		app/ui/ToolBarEventFilter.h
 		app/ui/ToolButton.h
@@ -46,7 +48,10 @@ add_executable(ITools app/main.cpp
 		app/utils/Config.cpp
 		app/utils/Utils.cpp
 		app/utils/Utils.h
-		include/plugin_interface.h
+		include/PluginInterface.h
+		app/PluginManager.cpp
+		app/PluginManager.h
+		app/IToolsAPI.h
 )
 target_link_libraries(ITools
 		Qt::Core
@@ -56,7 +61,7 @@ target_link_libraries(ITools
 		Qt::Xml
 )
 
-add_subdirectory(plugins_src/powershell_plugin)
+add_subdirectory(exts/powershell)
 
 add_dependencies(ITools theme_icons_32x32)
 add_custom_target(theme_icons_32x32 ALL COMMAND
@@ -66,7 +71,6 @@ add_custom_target(theme_icons_32x32 ALL COMMAND
 )
 
 add_dependencies(ITools theme_icons)
-
 add_custom_target(theme_icons ALL COMMAND
 		${CMAKE_COMMAND} -E copy_directory
 		${PROJECT_SOURCE_DIR}/icons

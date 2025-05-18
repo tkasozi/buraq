@@ -24,7 +24,32 @@
 // Created by talik on 5/15/2025.
 //
 
-#ifndef ITOOLS_POWERSHELL_H
-#define ITOOLS_POWERSHELL_H
+#ifndef PLUGIN_INTERFACE_H
+#define PLUGIN_INTERFACE_H
 
-#endif //ITOOLS_POWERSHELL_H
+
+class IPlugin {
+public:
+
+	virtual ~IPlugin() = default;
+
+	virtual const char* getName() const = 0;
+	virtual void shutdown() = 0;
+	virtual void performAction() = 0;
+
+	/**
+	 *
+	 * @param app_context A pointer to an object or struct in the main thread that provides necessary data to
+	 * the plugin.
+	 * @return True if successfully initialized.
+	 */
+	virtual bool initialize(void* app_context) = 0;
+};
+
+// Avoid C++ name mangling
+extern "C" {
+typedef  IPlugin* (*CreatePluginFunc)();
+typedef void (*DestroyPluginFunc)(IPlugin*);
+}
+
+#endif //PLUGIN_INTERFACE_H

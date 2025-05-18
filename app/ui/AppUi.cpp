@@ -24,7 +24,7 @@
 // Created by Talik Kasozi on 2/3/2024.
 //
 
-#include "IToolsUi.h"
+#include "AppUi.h"
 #include "ToolBar.h"
 #include "IconButton.h"
 #include "Editor.h"
@@ -33,7 +33,7 @@
 #include <sstream>
 
 // TODO -- rename variable to be more readable and add documentation
-IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
+AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 	setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
 	// This can be updated dynamically.
@@ -109,7 +109,7 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 	centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
 
 	auto outputButton = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().terminalIcon));
-	connect(outputButton, &IconButton::clicked, this, &IToolsUi::onShowOutputButtonClicked);
+	connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
 	layoutB->addWidget(outputButton);
 
 	auto *settingButton = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().settingsIcon));
@@ -120,7 +120,7 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 
 	// Component
 //	centralWidgetLayout->setColumnMinimumWidth(1, 0);
-	connect(folderButton, &IconButton::clicked, this, &IToolsUi::onClicked);
+	connect(folderButton, &IconButton::clicked, this, &AppUi::onClicked);
 
 	// layout c
 	layoutB->setSpacing(0);
@@ -154,7 +154,7 @@ IToolsUi::IToolsUi(QWidget *parent) : QMainWindow(parent) {
 	statusBar->showMessage("Ready.", 2000);
 }
 
-void IToolsUi::onClicked() {
+void AppUi::onClicked() {
 	drawer->toggle();
 	if (drawer->isVisible()) {
 		placeHolderLayout->addWidget(drawer, 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
@@ -163,7 +163,7 @@ void IToolsUi::onClicked() {
 	}
 }
 
-void IToolsUi::onShowOutputButtonClicked() {
+void AppUi::onShowOutputButtonClicked() {
 	outPutArea->toggle();
 	if (outPutArea->isVisible()) {
 		centralWidgetLayout->addWidget(outPutArea, 6, 2, 6, 12);
@@ -172,14 +172,14 @@ void IToolsUi::onShowOutputButtonClicked() {
 	}
 }
 
-OutputDisplay *IToolsUi::getOutputDisplay() {
+OutputDisplay *AppUi::getOutputDisplay() {
 	return outPutArea;
 }
 
-Editor *IToolsUi::getEditor() {
+Editor *AppUi::getEditor() {
 	return itoolsEditor;
 }
 
-QStatusBar *IToolsUi::getQStatusBar() {
+QStatusBar *AppUi::getQStatusBar() {
 	return statusBar;
 }

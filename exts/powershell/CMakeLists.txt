@@ -59,31 +59,8 @@ if (WIN32)
 	target_compile_definitions(PowershellExt PRIVATE POWERSHELL_PLUGIN_EXPORTS)
 endif ()
 
-# --- Custom commands to copy ManagedLibrary.dll etc. ---
-#set(MANAGED_FILES
-#		"${MANAGED_LIBRARY_PUBLISH_DIR}/ManagedLibrary.dll"
-#		"${MANAGED_LIBRARY_PUBLISH_DIR}/ManagedLibrary.deps.json"
-#		"${MANAGED_LIBRARY_PUBLISH_DIR}/ManagedLibrary.runtimeconfig.json"
-#)
-#
-#foreach (MANAGED_FILE ${MANAGED_FILES})
-#	if (EXISTS "${MANAGED_FILE}")
-#		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-#				COMMAND ${CMAKE_COMMAND} -E make_directory "${PLUGIN_FULL_OUTPUT_DIR}" # Ensure directory exists
-#				COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#				"${MANAGED_FILE}"
-#				"${PLUGIN_FULL_OUTPUT_DIR}"
-#				COMMENT "Copying ${MANAGED_FILE} to ${PLUGIN_SUBDIR}"
-#				VERBATIM)
-#	else ()
-#		message(WARNING "Managed file not found for copying: ${MANAGED_FILE}")
-#	endif ()
-#endforeach ()
-
 # Glob all files in the source assets directory
 file(GLOB ASSET_FILES "${MANAGED_LIBRARY_PUBLISH_DIR}/*") # Gets files directly in the folder
-# To include files in subdirectories:
-# file(GLOB_RECURSE ASSET_FILES "${MY_SOURCE_ASSETS_DIR}/*")
 
 # Ensure destination directory exists
 file(MAKE_DIRECTORY "${PLUGIN_FULL_OUTPUT_DIR}/ManagedLibraryPublish")

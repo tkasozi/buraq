@@ -48,21 +48,9 @@ void OutputDisplay::toggle() {
 }
 
 void OutputDisplay::log(const QString &strOutput, const QString &errorOutput) {
-	QLabel *output = createLabel(strOutput);
+	QStringList list = strOutput.split("\\u2029");
+
 	QLabel *error = createLabel(errorOutput, "error");
-
-	int height = 0;
-	if (output != nullptr) { // Add to the total height of this log
-		QSize recommendedSize = output->sizeHint();
-		height += recommendedSize.height();
-	}
-
-	if (error != nullptr) { // Add to the total height of this log
-		QSize recommendedSize = error->sizeHint();
-		height += recommendedSize.height();
-	}
-
-	main->setFixedHeight(main->height() + std::max((int)(height * 1.3), 150));
 
 	// This new log to show/print
 	auto thisLog = new QWidget;
@@ -72,8 +60,9 @@ void OutputDisplay::log(const QString &strOutput, const QString &errorOutput) {
 			"margin: 8px;"
 			"padding: 8px;"
 			"background-color: #232323;"
-			);
+	);
 	//@formatter:on
+
 	auto layout = new QVBoxLayout;
 	thisLog->setLayout(layout);
 
@@ -88,10 +77,27 @@ void OutputDisplay::log(const QString &strOutput, const QString &errorOutput) {
 	layout->addWidget(exeTime);
 	// End Adds timestamp
 
-	// Added after adjusting the main content area height in order to get the right height
-	if (output != nullptr) layout->addWidget(output);
-	if (error != nullptr) layout->addWidget(error);
+	for (const QString &qString: list) {
+		QLabel *output = createLabel(qString);
 
+		int height = 0;
+		if (output != nullptr) { // Add to the total height of this log
+			QSize recommendedSize = output->sizeHint();
+			height += recommendedSize.height();
+		}
+
+		if (error != nullptr) { // Add to the total height of this log
+			QSize recommendedSize = error->sizeHint();
+			height += recommendedSize.height();
+		}
+
+		main->setFixedHeight(main->height() + std::max((int) (height * 1.3), 10));
+
+		// Added after adjusting the main content area height in order to get the right height
+		if (output != nullptr) layout->addWidget(output);
+	}
+
+	if (error != nullptr) layout->addWidget(error);
 	qResultLogsLayout->addWidget(thisLog);
 }
 
@@ -117,9 +123,7 @@ QLabel *OutputDisplay::createLabel(const QString &text, QString state) {
 	// Get the recommended size from sizeHint()
 	QSize recommendedSize = label->sizeHint();
 	recommendedSize.setWidth(recommendedSize.width() * 2); // Add some extra width
-	recommendedSize.setHeight(
-			recommendedSize.height() + std::max(100, recommendedSize.height())); // Add some extra width
-
+	recommendedSize.setHeight(recommendedSize.height() +  std::max(100, recommendedSize.height()));
 	// Set the label's size manually
 	label->setFixedSize(recommendedSize);
 

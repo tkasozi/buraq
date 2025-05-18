@@ -31,25 +31,11 @@ int main(int argc, char *argv[]) {
 	styleFile.open(QIODevice::ReadOnly);
 	app.setStyleSheet(styleFile.readAll());
 
+	// Interact with loaded plugins
+
 	AppUi ui(nullptr);
 	ui.show();
 
-//	// Create an instance of your application-specific context/API
-	IToolsApi app_api;
-
-	// Pass the address of app_api (or nullptr if no context is needed)
-	PluginManager manager(&app_api); // Or manager(nullptr);
-
-	// Load plugins from the specified directory
-	manager.loadPlugin(".\\libPowershellExt.dll");
-
-	// Interact with loaded plugins
-	manager.callGetNameOnAll();
-
-	manager.callPerformActionOnAll();
-
-	// unload all plugins before application exits
-	manager.unloadAllPlugins();
 
 	return QApplication::exec();
 }

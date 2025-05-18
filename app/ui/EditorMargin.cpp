@@ -55,7 +55,12 @@ void EditorMargin::onExecuteWholeScriptButtonClicked() {
 	// Get the current script from the editor
 	QString script = editor->toPlainText();
 
-	onExecuteScriptButtonClicked(script);
+	if (!script.isEmpty()) {
+		// Removes Paragraph Separator (PS) character
+		auto cleaned = script.replace("\u2029", "\n");
+		ProcessedData processedData = ptrParent->getPluginManager()->callPerformAction((void *) cleaned.toStdString().c_str());
+		updateOutputResult(0, QString::fromStdWString(processedData.resultValue), nullptr);
+	}
 }
 
 void EditorMargin::onExecuteSelectedScriptButtonClicked() {
@@ -65,8 +70,8 @@ void EditorMargin::onExecuteSelectedScriptButtonClicked() {
 	if (!selectedScript.isEmpty()) {
 		// Removes Paragraph Separator (PS) character
 		auto cleaned = selectedScript.replace("\u2029", "\n");
-		// qDebug() << cleaned;
-		onExecuteScriptButtonClicked(cleaned);
+		ProcessedData processedData = ptrParent->getPluginManager()->callPerformAction((void *) cleaned.toStdString().c_str());
+		updateOutputResult(0, QString::fromStdWString(processedData.resultValue), nullptr);
 	}
 }
 

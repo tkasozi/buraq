@@ -1,5 +1,7 @@
+rm -r .\ManagedLibraryPublish
+
 # In the ManagedLibrary project directory
-dotnet publish -c Release -r win-x64 --no-self-contained -o ".\ManagedLibraryPublish"  
+dotnet publish -c Release -r win-x64 --no-self-contained -o ".\ManagedLibraryPublish"
 
 # clean
 

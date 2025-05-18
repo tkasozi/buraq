@@ -53,8 +53,8 @@ namespace ManagedLibrary
 
         public static string ExecuteAndDisplayResults(PowerShell psInstance, string commandDescription)
         {
-            StringBuilder sb = new StringBuilder($"Executing PS: '{commandDescription}'");
-            Console.WriteLine($"Executing PS: '{commandDescription}'");
+            // StringBuilder sb = new StringBuilder($"Executing PS: '{commandDescription}'");
+            StringBuilder sb = new StringBuilder();
             try
             {
                 // Invoke the command
@@ -63,16 +63,14 @@ namespace ManagedLibrary
                 // Process results
                 if (results.Count > 0)
                 {
-                    Console.WriteLine("Output:");
-                    sb.Append("Output:");
                     foreach (PSObject result in results)
                     {
                         // The result object can be complex. For simple output, .ToString() might be enough.
                         // Or, you can access its properties: result.Properties["PropertyName"].Value
                         if (result != null)
                         {
-                            Console.WriteLine($"- {result.ToString()}");
-                            sb.Append($"- {result.ToString()}");
+                            sb.Append($"{result.ToString()}");
+                            sb.Append($"\\u2029");
                             // Example of accessing a specific property if you know it exists
                             // if (result.Properties["ProcessName"] != null) {
                             //     Console.WriteLine($"  Process Name: {result.Properties["ProcessName"].Value}");
@@ -84,14 +82,14 @@ namespace ManagedLibrary
                 // Check for errors in the error stream
                 if (psInstance.Streams.Error.Count > 0)
                 {
-                    Console.WriteLine("Errors:");
+                    sb.Append("Errors:").Append($"\\u2029");
                     foreach (ErrorRecord error in psInstance.Streams.Error)
                     {
                         Console.WriteLine($"- Error: {error.ToString()}");
                         Console.WriteLine($"  Exception: {error.Exception.Message}");
                         // You can get more details from error.InvocationInfo, error.CategoryInfo, etc.
-                        sb.Append($"- Error: {error.ToString()}");
-                        sb.Append($"  Exception: {error.Exception.Message}");
+                        sb.Append($"{error.ToString()}").Append($"\\u2029");
+                        sb.Append($"Exception: {error.Exception.Message}").Append($"\\u2029");
                     }
                 }
 

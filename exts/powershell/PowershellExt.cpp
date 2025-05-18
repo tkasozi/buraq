@@ -184,7 +184,8 @@ public:
 			// IMPORTANT: Adjust this path to where your ManagedLibrary.dll and ManagedLibrary.runtimeconfig.json are located
 			// You might want to make this configurable or relative to your executable
 			fs::path managed_assembly_dir =
-					fs::current_path().parent_path() / "bin" / "plugins" / "ext"; // Example path
+					fs::current_path().parent_path() / "bin" / "plugins" / "ext" /
+					"ManagedLibraryPublish"; // Example path
 			fs::path config_path = managed_assembly_dir / "ManagedLibrary.runtimeconfig.json";
 			fs::path assembly_path = managed_assembly_dir / "ManagedLibrary.dll";
 
@@ -242,7 +243,7 @@ public:
 			// For Execute with arguments
 			// Define the delegate type for the C# method
 			// Matches: public static int Execute(IntPtr arg, int argSizeBytes)
-			typedef int (CORECLR_DELEGATE_CALLTYPE *execute_method_fn)(void *args, int sizeBytes);
+			typedef wchar_t *(CORECLR_DELEGATE_CALLTYPE *execute_method_fn)(void *args, int sizeBytes);
 			execute_method_fn execute_fptr = nullptr;
 
 			rc = load_assembly_and_get_fp(
@@ -261,15 +262,43 @@ public:
 			std::wcout << L"Delegate for Execute obtained." << std::endl;
 
 			// --- 5. Prepare arguments and call the managed method ---
-			const char *message_to_send = "Hello from C++ Native Host!";
+			const char *message_to_send = "Get-Process | Sort-Object CPU -Descending | Select-Object -First 5";
+//			const char *message_to_send = "Get-Process";
 			CSharpWorkerArgs native_args;
 			native_args.message = message_to_send;
 			native_args.number = 42;
 
 			// Call the C# method
-			int result = execute_fptr(&native_args, sizeof(native_args));
-			std::wcout << L"Called Execute. C# method returned: " << result << std::endl;
+			const wchar_t *wide_result_from_cs = nullptr;
+			try {
+				wide_result_from_cs = execute_fptr(&native_args, sizeof(native_args));
 
+				if (wide_result_from_cs != nullptr) {
+					std::wcout << L"Called Execute. C# method returned: \n" << wide_result_from_cs << L"\""
+							   << std::endl;
+
+					// You can convert it to std::wstring if needed for further use
+					std::wstring result_str(wide_result_from_cs);
+					// Use result_str
+
+					// IMPORTANT: Free the memory allocated by the .NET marshaller
+					CoTaskMemFree((LPVOID) wide_result_from_cs); // Cast to LPVOID for CoTaskMemFree
+					wide_result_from_cs = nullptr; // Good practice to nullify after free
+					std::wcout << L"Memory for returned string freed." << std::endl;
+				} else {
+					std::wcout << L"Called Execute. C# method returned nullptr." << std::endl;
+				}
+			} catch (const std::exception &e) {
+				std::wcerr << L"Exception during C# Execute call: " << e.what() << std::endl;
+				if (wide_result_from_cs != nullptr) { // If exception occurred after allocation but before free
+					CoTaskMemFree((LPVOID) wide_result_from_cs);
+				}
+			} catch (...) {
+				std::wcerr << L"Unknown exception during C# Execute call." << std::endl;
+				if (wide_result_from_cs != nullptr) {
+					CoTaskMemFree((LPVOID) wide_result_from_cs);
+				}
+			}
 
 			// Note: The hostfxr context is typically closed when the host exits or
 			// when hostfxr_close is called on the handle from hostfxr_initialize_for_runtime_config.
@@ -282,6 +311,7 @@ public:
 			///------------------------------------------
 		}
 	}
+
 };
 
 // Define for consistent export/import macros
@@ -297,7 +327,7 @@ public:
 extern "C"
 {
 // Functions will be looked up by name by the plugin manager
-PLUGIN_API IPlugin* create_plugin() {
+PLUGIN_API IPlugin *create_plugin() {
 	return new PowershellPlugin();
 }
 PLUGIN_API void destroy_plugin(IPlugin *plugin) {

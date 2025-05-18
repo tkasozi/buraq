@@ -234,6 +234,7 @@ void PluginManager::callPerformActionOnAll() {
 	}
 	std::cout << "--- Finished calling performAction() ---" << std::endl;
 }
+
 void PluginManager::callGetNameOnAll() {
 	if (plugins_.empty()) {
 		std::cout << "No plugins loaded." << std::endl;

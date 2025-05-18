@@ -55,5 +55,6 @@ cmake-build-release/
 Release/
 ManagedLibrary/bin/
 ManagedLibrary/obj/
+ManagedLibrary/ManagedLibraryPublish/
 
 TestManagedApp/

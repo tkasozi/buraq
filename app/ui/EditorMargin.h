@@ -18,6 +18,7 @@ class EditorMargin : public QWidget {
 Q_OBJECT
 
 public slots:
+
 	void handleTaskResults(const QVariant &result); // Modified to take QVariant
 	void handleProgress(int);
 
@@ -27,11 +28,10 @@ private slots:
 
 	void handleWorkerFinished();
 
-	void runSelectedCode();
-
 	void updateOutputResult(int exitCode, const QString &output, const QString &error);
 
 signals:
+
 	void processStarted();
 
 public:
@@ -54,7 +54,6 @@ protected:
 private:
 	// smart pointer will be cleaned up
 	std::unique_ptr<IconButton> runCode_;
-	std::unique_ptr<IconButton> runSelectedCode_;
 	std::unique_ptr<AppUi> appUi;
 
 	// cleanup will be handled by  &QObject::deleteLater
@@ -62,6 +61,8 @@ private:
 	Minion *minion;
 
 	void setupWorkerThread();
+
+	std::function<QVariant()> codeRunnerFunc();
 };
 
 

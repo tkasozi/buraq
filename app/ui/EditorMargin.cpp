@@ -55,18 +55,16 @@ EditorMargin::EditorMargin(AppUi *ptrParent) :
 	runCode_ = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons().executeIcon),
 											playButtonSize, playButtonSize, runBtnStyles);
 
-	runSelectedCode_ = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons().executeSelectedIcon),
-													playButtonSize, playButtonSize, runBtnStyles);
-
 	// set tooltip for the run buttons
-	runCode_->setToolTip("Execute the whole script");
-	runSelectedCode_->setToolTip("Execute selected/highlighted script");
+	runCode_->setToolTip(
+			"Run code."
+			" & "
+			"Highlighted code."
+	);
 
 	layout->addWidget(runCode_.get());
-	layout->addWidget(runSelectedCode_.get());
 
 	connect(runCode_.get(), &IconButton::clicked, this, &EditorMargin::runCode);
-	connect(runSelectedCode_.get(), &IconButton::clicked, this, &EditorMargin::runSelectedCode);
 
 	setLayout(layout);
 	setFixedWidth(playButtonSize);
@@ -85,8 +83,18 @@ void EditorMargin::runCode() {
 
 	this->setupWorkerThread();
 
-	std::function<QVariant()> task = [this]() -> QVariant {
-		QString script = appUi->getEditor()->toPlainText();
+	QMetaObject::invokeMethod(minion, "doWork", Qt::QueuedConnection,
+							  Q_ARG(const std::function<QVariant()>, codeRunnerFunc()));
+}
+
+std::function<QVariant()> EditorMargin::codeRunnerFunc() {
+	return [this]() -> QVariant {
+		// Run selected code
+		QString script = appUi->getEditor()->textCursor().selectedText();
+		if (script.isEmpty()) {
+			// run entire file
+			script = appUi->getEditor()->toPlainText();
+		}
 
 		if (script.isEmpty()) {
 			return {};
@@ -100,21 +108,6 @@ void EditorMargin::runCode() {
 
 		return QVariant::fromValue(processedData.resultValue);
 	};
-
-	QMetaObject::invokeMethod(minion, "doWork", Qt::QueuedConnection, Q_ARG(const std::function<QVariant()>, task));
-}
-
-void EditorMargin::runSelectedCode() {
-	Editor *editor = appUi->getEditor();
-	QString selectedScript = editor->textCursor().selectedText();
-
-	if (!selectedScript.isEmpty()) {
-		// Removes Paragraph Separator (PS) character
-		auto cleaned = selectedScript.replace("\u2029", "\n");
-		ProcessedData processedData = appUi->getLangPluginManager()->callPerformAction(
-				(void *) cleaned.toStdString().c_str());
-		updateOutputResult(0, QString::fromStdWString(processedData.resultValue), nullptr);
-	}
 }
 
 void EditorMargin::updateOutputResult(int exitCode, const QString &output, const QString &error) {
@@ -127,7 +120,7 @@ void EditorMargin::updateOutputResult(int exitCode, const QString &output, const
 
 		outputDisplay->log(output, error);
 
-		statusBar->showMessage(error.isEmpty() ? "Done!" : "Completed with errors.", 2000);
+		statusBar->showMessage(error.isEmpty() ? "Completed!" : "Completed with errors.", 2000);
 	} else {
 		statusBar->showMessage("Process failed!");
 		outputDisplay->log("", error);
@@ -178,12 +171,12 @@ void EditorMargin::handleTaskResults(const QVariant &result) {
 
 void EditorMargin::handleProgress(int i) {
 	appUi->getOutputDisplay();
-	appUi->getQStatusBar()->showMessage("Executing...", 50000);
+	appUi->getQStatusBar()->showMessage("Executing...", 5000);
 }
 
 void EditorMargin::handleWorkerFinished() {
 	appUi->getOutputDisplay();
-	appUi->getQStatusBar()->showMessage("Done!", 50000);
+	appUi->getQStatusBar()->showMessage("Completed", 5000);
 
 	workerThread = nullptr;
 	minion = nullptr;

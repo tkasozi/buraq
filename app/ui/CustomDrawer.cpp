@@ -68,7 +68,7 @@ CustomDrawer::CustomDrawer(Editor *editorPtr, QWidget *parent) : editor(editorPt
 	connect(addScript, &IconButton::clicked, this, &CustomDrawer::onAddButtonClicked);
 
 	auto label = new QLabel();
-	label->setText("Open Script");
+	label->setText("Workspace");
 
 	layout->addWidget(addScript, 0, 1, 12, 12, Qt::AlignmentFlag::AlignRight);
 	layout->addWidget(label, 0, 0, 12, 1);
@@ -93,7 +93,7 @@ void CustomDrawer::toggle() {
 
 void CustomDrawer::onAddButtonClicked() {
 	QFileDialog dialog(this);
-	dialog.setNameFilter(tr("powershell files (*.*ps1);;Text files (*.txt);;"));
+	// Removes name filter to allow future support for other languages
 	dialog.setViewMode(QFileDialog::Detail);
 
 	QStringList fileNames;

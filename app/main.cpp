@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 	// Initialize the database:
 	QSqlError err = init_db();
 	if (err.type() != QSqlError::NoError) {
-		qDebug() << "Error executing initializing db:" << err.text();
+		// "Error executing initializing db:" << err.text();
 		return EXIT_FAILURE;
 	}
 

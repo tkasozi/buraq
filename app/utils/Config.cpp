@@ -36,7 +36,6 @@ Config::Config() :
 
 	QFile file(":/config/main_config.xml");
 	if (!file.open(QIODevice::ReadOnly)) {
-		qDebug() << "Error opening file:" << file.errorString();
 		exit(-1);
 	}
 
@@ -50,7 +49,6 @@ Config::Config() :
 	// Get the root element (configuration)
 	QDomElement root = configDoc.documentElement();
 	if (root.tagName() != "configuration") {
-		qDebug() << "Error: Root element is not 'configuration'.";
 		exit(-1);
 	}
 
@@ -68,7 +66,7 @@ Config::Config() :
 		QDomElement appVersionElement = appVersionList.at(0).toElement();
 		this->version = QString(appVersionElement.text());
 	} else {
-		qDebug() << "Error: Configuration is missing a 'Version'.";
+		// Error: Configuration is missing a 'Version'.;
 		exit(-1);
 	}
 
@@ -86,7 +84,7 @@ Config::Config() :
 		QDomElement windowElement = windowList.at(0).toElement();
 		this->processWindowAttr(windowElement);
 	} else {
-		qDebug() << "Error: Configuration is missing a 'window'.";
+		// "Error: Configuration is missing a 'window'.";
 		exit(-1);
 	}
 
@@ -104,7 +102,7 @@ Config::Config() :
 		QDomElement mainStylesElement = mainStylesList.at(0).toElement();
 		this->processStyles(mainStylesElement);
 	} else {
-		qDebug() << "Error: Configuration is missing a 'Styles'.";
+		// "Error: Configuration is missing a 'Styles'.";
 		exit(-1);
 	}
 

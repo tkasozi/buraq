@@ -371,7 +371,3 @@ void Editor::keyPressEvent(QKeyEvent *e) {
 
 	QPlainTextEdit::keyPressEvent(e);
 }
-
-void Editor::test(const char *name) {
-	qDebug() << "[" << name << "] Testing..";
-}

@@ -52,7 +52,7 @@ const auto SELECT_FILE_BY_FILE_PATH_SQL = QLatin1String(R"(SELECT * FROM files W
 static QVariant insertFile(const QString &filePath, const QString &title) {
 	QSqlQuery query;
 	if (!query.prepare(INSERT_FILE_SQL)) {
-		qDebug() << "Error executing query:" << query.lastError().text();
+		// "Error executing query:" << query.lastError().text();
 	}
 
 	query.addBindValue(filePath);
@@ -66,7 +66,7 @@ static QList<FileObject *> findPreviouslyOpenedFiles() {
 	QSqlQuery query;
 
 	if (!query.exec(SELECT_FILES_SQL)) {
-		qDebug() << "Error executing query:" << query.lastError().text();
+		// qDebug() << "Error executing query:" << query.lastError().text();
 	}
 
 	QList<FileObject *> files;
@@ -108,7 +108,6 @@ static bool db_conn() {
 			return false;
 		}
 	} catch (_exception exception) {
-		qDebug() << "Failed";
 		return false;
 	}
 
@@ -119,7 +118,7 @@ static QSqlError init_db() {
 
 	QSqlQuery query;
 	if (!query.exec(FILES_SQL)) {
-		qDebug() << "Error executing query:" << query.lastError().text();
+		// qDebug() << "Error executing query:" << query.lastError().text();
 		return query.lastError();
 	}
 

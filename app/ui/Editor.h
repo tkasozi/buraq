@@ -48,8 +48,6 @@ public:
 
 	int lineNumberAreaWidth();
 
-	void test(const char *string);
-
 private slots:
 
 	void updateLineNumberAreaWidth(int newBlockCount);

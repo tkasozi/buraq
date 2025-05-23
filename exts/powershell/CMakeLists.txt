@@ -1,6 +1,6 @@
 project(PowershellExt LANGUAGES CXX)
 
-set(MANAGED_LIBRARY_PUBLISH_DIR "C:\\Users\\talik\\workspace\\ITools\\ManagedLibrary\\ManagedLibraryPublish") # Path from dotnet publish -o
+set(MANAGED_LIBRARY_PUBLISH_DIR "${CMAKE_HOME_DIRECTORY}/ManagedLibrary/ManagedLibraryPublish") # Path from dotnet publish -o
 
 # --- Define the shared library target ---
 # The first argument is the target name. CMake will automatically name the file

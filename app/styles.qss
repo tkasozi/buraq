@@ -8,29 +8,12 @@ QWidget {
   line-height: 1.5; /* One and a half times the font size */
 }
 
-/*ToolButton {*/
-/*  height: "100%";*/
-/*  minWidth: "100%";*/
-/*  border: none;*/
-/*}*/
-
-IconButton:hover {
-  background-color: yellow;
-}
-
 QPlainTextEdit {
   color: #FFFFFF;
   background-color: #101010;
   font-size: 16px;
 }
 
-Editor {
-/*  font-family: monospace;*/
-  font-size: 18px;
-  show-decoration-selected;
-  selection-color: #232323;
-  selection-background-color: #87CEEB; /* lightblue - same as variabled */
-}
 
 QWidget br {
     display: none;

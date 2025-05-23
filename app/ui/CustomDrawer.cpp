@@ -42,16 +42,16 @@ namespace {
 
 		return nullptr;
 	}
-};
+}
 
-CustomDrawer::CustomDrawer(Editor *editorPtr, QWidget *parent) : editor(editorPtr), QWidget(parent) {
+CustomDrawer::CustomDrawer(Editor *ptr) : editor(ptr), QWidget(ptr) {
 	setStyleSheet("background-color: #252525;");
 
 	setFixedWidth(DrawerMeasurements::width);
 	setMaximumHeight(500);
 
-	pLayout = new QVBoxLayout;
-	setLayout(pLayout);
+	pLayout = std::make_unique<QVBoxLayout>();
+	setLayout(pLayout.get());
 	pLayout->setSpacing(8);
 	pLayout->setContentsMargins(2, 4, 2, 4);
 
@@ -64,13 +64,13 @@ CustomDrawer::CustomDrawer(Editor *editorPtr, QWidget *parent) : editor(editorPt
 	auto *layout = new QGridLayout;
 	panel->setLayout(layout);
 
-	addScript = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().addFileIcon));
-	connect(addScript, &IconButton::clicked, this, &CustomDrawer::onAddButtonClicked);
+	addFile = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons()->addFileIcon));
+	connect(addFile.get(), &IconButton::clicked, this, &CustomDrawer::onAddButtonClicked);
 
 	auto label = new QLabel();
 	label->setText("Workspace");
 
-	layout->addWidget(addScript, 0, 1, 12, 12, Qt::AlignmentFlag::AlignRight);
+	layout->addWidget(addFile.get(), 0, 1, 12, 12, Qt::AlignmentFlag::AlignRight);
 	layout->addWidget(label, 0, 0, 12, 1);
 
 	pLayout->addWidget(panel, Qt::AlignmentFlag::AlignRight);
@@ -161,6 +161,9 @@ void CustomDrawer::onFileLabelClick() {
 	setActive(label);
 
 	// Update the editor
+	if (!editor) {
+		return;
+	}
 	editor->openAndParseFile(label->getFilePath(), QFile::OpenModeFlag::ReadWrite);
 }
 

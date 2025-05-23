@@ -232,7 +232,7 @@ public:
 
 		std::wcout << L"performAction with arguments: " << (const char *)cmd << std::endl;
 		// const char *message_to_send = "Get-Process";
-		CSharpWorkerArgs native_args;
+		CSharpWorkerArgs native_args{};
 		native_args.message = (const char *)cmd;
 		native_args.number = 42;
 
@@ -278,7 +278,7 @@ public:
 			// --- 5. Prepare arguments and call the managed method ---
 			const char *message_to_send = "Get-Process | Sort-Object CPU -Descending | Select-Object -First 5";
 			// const char *message_to_send = "Get-Process";
-			CSharpWorkerArgs native_args;
+			CSharpWorkerArgs native_args{};
 			native_args.message = message_to_send;
 			native_args.number = 42;
 

@@ -34,14 +34,14 @@ ToolBar::ToolBar(QWidget *parent) {
 	installEventFilter(filter);
 
 	// Toolbar css
-	setStyleSheet(ItoolsNS::main_config.getMainStyles().toolBar.styleSheet);
+	setStyleSheet(ItoolsNS::main_config.getMainStyles()->toolBar.styleSheet);
 
 	// initializing control buttons.
 	this->versionLabel = new QLabel(ItoolsNS::main_config.getVersion());
-	this->minimizeBtn = new ToolButton(QIcon(ItoolsNS::main_config.getWindow().minimizeIcon));
-	this->closeBtn = new ToolButton(QIcon(ItoolsNS::main_config.getWindow().closeIcon), "red");
+	this->minimizeBtn = new ToolButton(QIcon(ItoolsNS::main_config.getWindow()->minimizeIcon));
+	this->closeBtn = new ToolButton(QIcon(ItoolsNS::main_config.getWindow()->closeIcon), "red");
 	// by default, window is minimized.
-	this->maxRestoreBtn = new ToolButton(QIcon(ItoolsNS::main_config.getWindow().maximizeIcon));
+	this->maxRestoreBtn = new ToolButton(QIcon(ItoolsNS::main_config.getWindow()->maximizeIcon));
 
 	// sets up the grid layout on this component
 	configureLayout();
@@ -68,8 +68,8 @@ void ToolBar::onMaximizeRestoreWindowButtonClicked() {
 }
 
 void ToolBar::updateMaxAndRestoreIconButton() {
-	QIcon maximizeIcon(ItoolsNS::main_config.getWindow().maximizeIcon);
-	QIcon restoreIcon(ItoolsNS::main_config.getWindow().restoreIcon);
+	QIcon maximizeIcon(ItoolsNS::main_config.getWindow()->maximizeIcon);
+	QIcon restoreIcon(ItoolsNS::main_config.getWindow()->restoreIcon);
 
 	auto *parent = dynamic_cast<QMainWindow *>(this->parent());
 	if (parent != nullptr) {

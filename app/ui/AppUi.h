@@ -22,13 +22,14 @@
 #include "OutputDisplay.h"
 #include "ToolBar.h"
 #include "../PluginManager.h"
+#include "EditorActionArea.h"
 
 
 class AppUi : public QMainWindow {
 Q_OBJECT
 
 public slots:
-	void processStatusSlot();
+	void processStatusSlot(const QString &, int timeout = 5000);
 
 private slots:
 
@@ -60,7 +61,6 @@ private:
 	std::unique_ptr<OutputDisplay> outPutArea;
 	std::unique_ptr<QGridLayout> placeHolderLayout;
 	std::unique_ptr<Editor> itoolsEditor;
-	std::unique_ptr<QWidget> editorAndDrawerAreaPanel;
 	std::unique_ptr<QWidget> editorMargin;
 	std::unique_ptr<ToolBar> toolBar;
 	std::unique_ptr<QStatusBar> statusBar;

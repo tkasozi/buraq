@@ -39,7 +39,7 @@ Q_OBJECT
 public:
 	~OutputDisplay() override = default;
 
-	explicit OutputDisplay(QWidget *parent = nullptr);
+	explicit OutputDisplay(QWidget *appUi = nullptr);
 
 	void toggle();
 
@@ -49,6 +49,7 @@ private:
 	// state is "error" or "default"
 	static QLabel *createLabel(const QString &text, QString state = "default");
 	std::unique_ptr<QPlainTextEdit> main;
+	QWidget *appUi;
 };
 
 #endif //OUTPUT_DISPLAY_H

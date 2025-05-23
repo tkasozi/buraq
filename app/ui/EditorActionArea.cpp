@@ -30,19 +30,16 @@
 #include <QTextStream>
 #include <QInputDialog> // For getting parameters for different tasks
 
-#include "EditorMargin.h"
+#include "EditorActionArea.h"
 #include "Editor.h"
 #include "IconButton.h"
 #include "AppUi.h"
 
-EditorMargin::EditorMargin(AppUi *ptrParent) :
-		QWidget(ptrParent),
-		appUi(ptrParent),
+EditorActionArea::EditorActionArea(QWidget *appUi) :
+		QWidget(nullptr),
+		appUi(appUi),
 		minion(nullptr),
 		workerThread(nullptr) {
-	auto layout = new QVBoxLayout;
-	layout->setSpacing(0);
-	layout->setContentsMargins(0, 4, 8, 0);
 
 	const int playButtonSize = 32;
 
@@ -52,7 +49,7 @@ EditorMargin::EditorMargin(AppUi *ptrParent) :
 			"background-color: #232323;"
 	);
 
-	runCode_ = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons().executeIcon),
+	runCode_ = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons()->executeIcon),
 											playButtonSize, playButtonSize, runBtnStyles);
 
 	// set tooltip for the run buttons
@@ -62,20 +59,23 @@ EditorMargin::EditorMargin(AppUi *ptrParent) :
 			"Highlighted code."
 	);
 
+	auto layout = new QVBoxLayout;
+	layout->setSpacing(0);
+	layout->setContentsMargins(0, 4, 8, 0);
 	layout->addWidget(runCode_.get());
 
-	connect(runCode_.get(), &IconButton::clicked, this, &EditorMargin::runCode);
+	connect(runCode_.get(), &IconButton::clicked, this, &EditorActionArea::runCode);
 
 	setLayout(layout);
 	setFixedWidth(playButtonSize);
 	setStyleSheet("border-left: 1px solid #383838;");
 }
 
-void EditorMargin::paintEvent(QPaintEvent *event) {
+void EditorActionArea::paintEvent(QPaintEvent *event) {
 	QWidget::paintEvent(event);
 }
 
-void EditorMargin::runCode() {
+void EditorActionArea::runCode() {
 	if (workerThread && workerThread->isRunning()) {
 		// Work is already in progress. Please stop current work first.;
 		return;
@@ -83,17 +83,17 @@ void EditorMargin::runCode() {
 
 	this->setupWorkerThread();
 
-	QMetaObject::invokeMethod(minion, "doWork", Qt::QueuedConnection,
-							  Q_ARG(const std::function<QVariant()>, codeRunnerFunc()));
-}
+	std::function<QVariant()> task =  [this]() -> QVariant {
+		if(!((AppUi *)appUi)->getEditor()) {
+			// editor must be defined
+			return {};
+		}
 
-std::function<QVariant()> EditorMargin::codeRunnerFunc() {
-	return [this]() -> QVariant {
 		// Run selected code
-		QString script = appUi->getEditor()->textCursor().selectedText();
+		QString script = ((AppUi *)appUi)->getEditor()->textCursor().selectedText();
 		if (script.isEmpty()) {
 			// run entire file
-			script = appUi->getEditor()->toPlainText();
+			script = ((AppUi *)appUi)->getEditor()->toPlainText();
 		}
 
 		if (script.isEmpty()) {
@@ -103,16 +103,22 @@ std::function<QVariant()> EditorMargin::codeRunnerFunc() {
 		// Removes Paragraph Separator (PS) character
 		auto cleaned = script.replace("\u2029", "\n");
 
-		const ProcessedData processedData = appUi->getLangPluginManager()->callPerformAction(
+		if(!((AppUi *)appUi)->getLangPluginManager()) {
+			// LangPluginManager must be defined
+			return {};
+		}
+		const ProcessedData processedData = ((AppUi *)appUi)->getLangPluginManager()->callPerformAction(
 				(void *) cleaned.toStdString().c_str());
 
 		return QVariant::fromValue(processedData.resultValue);
 	};
+
+	QMetaObject::invokeMethod(minion, "doWork", Qt::QueuedConnection, Q_ARG(const std::function<QVariant()>, task));
 }
 
-void EditorMargin::updateOutputResult(int exitCode, const QString &output, const QString &error) {
-	OutputDisplay *outputDisplay = appUi->getOutputDisplay();
-	QStatusBar * statusBar = appUi->getQStatusBar();
+void EditorActionArea::updateOutputResult(int exitCode, const QString &output, const QString &error) {
+	OutputDisplay *outputDisplay = ((AppUi *)appUi)->getOutputDisplay();
+	QStatusBar * statusBar = ((AppUi *)appUi)->getQStatusBar();
 
 	outputDisplay->show();
 
@@ -127,7 +133,7 @@ void EditorMargin::updateOutputResult(int exitCode, const QString &output, const
 	}
 }
 
-void EditorMargin::setupWorkerThread() {
+void EditorActionArea::setupWorkerThread() {
 	workerThread = new QThread(this);
 	workerThread->setObjectName("CodeRunner");
 
@@ -139,13 +145,13 @@ void EditorMargin::setupWorkerThread() {
 	// 4. Connect Signals and Slots
 	//    When thread starts, tell minion to start working
 	connect(workerThread, &QThread::started, minion, [this]() {
-		appUi->getQStatusBar()->showMessage("Executing..");
+		((AppUi *)appUi)->getQStatusBar()->showMessage("Executing..");
 	});
 
 	// Connect minion signals to MainWindow slots
-	connect(minion, &Minion::progressUpdated, this, &EditorMargin::handleProgress);
-	connect(minion, &Minion::resultReady, this, &EditorMargin::handleTaskResults);
-	connect(minion, &Minion::workFinished, this, &EditorMargin::handleWorkerFinished, Qt::QueuedConnection);
+	connect(minion, &Minion::progressUpdated, this, &EditorActionArea::handleProgress);
+	connect(minion, &Minion::resultReady, this, &EditorActionArea::handleTaskResults);
+	connect(minion, &Minion::workFinished, this, &EditorActionArea::handleWorkerFinished, Qt::QueuedConnection);
 
 	// When the worker signals it's done with its task
 	connect(minion, &Minion::workFinished, workerThread,
@@ -160,7 +166,7 @@ void EditorMargin::setupWorkerThread() {
 	workerThread->start();
 }
 
-void EditorMargin::handleTaskResults(const QVariant &result) {
+void EditorActionArea::handleTaskResults(const QVariant &result) {
 	if (result.isValid() && result.canConvert<std::wstring>()) {
 		const auto data = result.value<std::wstring>();
 		QString error = "", resultString = QString::fromStdWString(data);
@@ -176,15 +182,32 @@ void EditorMargin::handleTaskResults(const QVariant &result) {
 	}
 }
 
-void EditorMargin::handleProgress(int i) {
-	appUi->getOutputDisplay();
-	appUi->getQStatusBar()->showMessage("Executing...", 5000);
+void EditorActionArea::handleProgress(int i) {
+	((AppUi *)appUi)->getOutputDisplay();
+	((AppUi *)appUi)->getQStatusBar()->showMessage("Executing...", 5000);
 }
 
-void EditorMargin::handleWorkerFinished() {
-	appUi->getOutputDisplay();
-	appUi->getQStatusBar()->showMessage("Completed", 5000);
+void EditorActionArea::handleWorkerFinished() {
+	((AppUi *)appUi)->getOutputDisplay();
+	((AppUi *)appUi)->getQStatusBar()->showMessage("Completed", 5000);
 
 	workerThread = nullptr;
 	minion = nullptr;
+}
+
+EditorActionArea::~EditorActionArea() {
+	qDebug() << "Executing: ~EditorActionArea()";
+
+	// smart pointers are deleted automatically
+	// editor pointer should be deleted elsewhere
+	appUi = nullptr;
+
+	if (workerThread && workerThread->isRunning()) {
+		workerThread->requestInterruption();
+		workerThread->quit(); // Ask event loop to quit
+		if (!workerThread->wait(5000)) { // Wait for max 5 seconds
+			workerThread->terminate(); // Force terminate (last resort)
+			workerThread->wait();      // Wait for termination
+		}
+	}
 }

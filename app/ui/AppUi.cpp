@@ -29,16 +29,19 @@
 #include "IconButton.h"
 #include "Editor.h"
 #include "CustomDrawer.h"
-#include "EditorMargin.h"
+#include "EditorActionArea.h"
 #include "../IToolsAPI.h"
 #include <sstream>
+#include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 
-// TODO -- rename variable to be more readable and add documentation
+namespace fs = std::filesystem;
+
 AppUi::AppUi(QWidget *parent)
 		: QMainWindow(parent), pluginManager(new PluginManager(new IToolsApi)) {
 
 	// Load plugins from the specified directory
-	pluginManager->loadPlugin(".\\libPowershellExt.dll");
+	fs::path powershell_plugin = fs::current_path().parent_path() / "bin"/ "libPowershellExt.dll";
+	pluginManager->loadPlugin(powershell_plugin.string());
 
 	// Other UI
 	setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
@@ -50,9 +53,9 @@ AppUi::AppUi(QWidget *parent)
 	setStyleSheet("background-color: #232323; color: #606060;");
 
 	// setting up default window size
-	const WindowConfig &windowConfig = ItoolsNS::main_config.getWindow();
-	resize(windowConfig.normalSize, windowConfig.minHeight);
-	setMinimumSize(windowConfig.minWidth, windowConfig.minHeight);
+	const auto windowConfig = ItoolsNS::main_config.getWindow();
+	resize(windowConfig->normalSize, windowConfig->minHeight);
+	setMinimumSize(windowConfig->minWidth, windowConfig->minHeight);
 
 	// Add Tool bar
 	toolBar = std::make_unique<ToolBar>(this);
@@ -60,7 +63,7 @@ AppUi::AppUi(QWidget *parent)
 
 	// Add Status bar
 	statusBar = std::make_unique<QStatusBar>();
-	statusBar->setStyleSheet(ItoolsNS::main_config.getMainStyles().statusToolBar.styleSheet);
+	statusBar->setStyleSheet(ItoolsNS::main_config.getMainStyles()->statusToolBar.styleSheet);
 	setStatusBar(statusBar.get());
 
 	// Setting window title and docking icon
@@ -83,7 +86,7 @@ AppUi::AppUi(QWidget *parent)
 	centralWidgetLayout2->setContentsMargins(0, 0, 0, 0);
 
 	auto *centralWidgetControlPanel = new QWidget;
-	centralWidgetControlPanel->setStyleSheet(ItoolsNS::main_config.getMainStyles().controlToolBar.styleSheet);
+	centralWidgetControlPanel->setStyleSheet(ItoolsNS::main_config.getMainStyles()->controlToolBar.styleSheet);
 	centralWidgetControlPanel->setFixedWidth(64);
 	centralWidgetControlPanel->setLayout(centralWidgetLayout2);
 
@@ -98,10 +101,7 @@ AppUi::AppUi(QWidget *parent)
 
 	centralWidgetLayout2->addWidget(centralWidgetControlPanelA, 0, 0, 1, 12, Qt::AlignJustify);
 
-	// space between
-//	centralWidgetLayout2->addWidget(new QWidget, 1, 0, 11, 12);
-
-	folderButton = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons().folderIcon));
+	folderButton = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons()->folderIcon));
 
 	layoutA->addWidget(folderButton.get());
 
@@ -115,11 +115,11 @@ AppUi::AppUi(QWidget *parent)
 
 	centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
 
-	auto outputButton = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().terminalIcon));
+	auto outputButton = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons()->terminalIcon));
 	connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
 	layoutB->addWidget(outputButton);
 
-	auto *settingButton = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().settingsIcon));
+	auto *settingButton = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons()->settingsIcon));
 	layoutB->addWidget(settingButton);
 
 	// add to central widget
@@ -133,15 +133,14 @@ AppUi::AppUi(QWidget *parent)
 	layoutB->setSpacing(0);
 	layoutB->setContentsMargins(0, 0, 0, 0);
 
-
 	// This where the output generated after executing the script will be displayed
 	outPutArea = std::make_unique<OutputDisplay>(this);
 
 	// The text or script editor.
-	editorMargin = std::make_unique<EditorMargin>(this);
+	editorMargin = std::make_unique<EditorActionArea>(this);
 	itoolsEditor = std::make_unique<Editor>(this);
 
-	drawer = std::make_unique<CustomDrawer>(itoolsEditor.get(), this);
+	drawer = std::make_unique<CustomDrawer>(itoolsEditor.get());
 
 	placeHolderLayout = std::make_unique<QGridLayout>();
 	placeHolderLayout->setSpacing(0);
@@ -152,13 +151,13 @@ AppUi::AppUi(QWidget *parent)
 	placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 10);
 
 	// add main content area
-	editorAndDrawerAreaPanel = std::make_unique<QWidget>();
+	auto editorAndDrawerAreaPanel = new QWidget;
 	editorAndDrawerAreaPanel->setLayout(placeHolderLayout.get());
-	centralWidgetLayout->addWidget(editorAndDrawerAreaPanel.get(), 0, 2, 12, 12);
+	centralWidgetLayout->addWidget(editorAndDrawerAreaPanel, 0, 2, 12, 12);
 	centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
 
 	// Add a temporary message that disappears after 5 seconds
-	statusBar->showMessage("Ready.", 2000);
+	processStatusSlot("Ready.", 2000);
 }
 
 void AppUi::onClicked() {
@@ -195,8 +194,6 @@ PluginManager *AppUi::getLangPluginManager() {
 	return pluginManager.get();
 }
 
-void AppUi::processStatusSlot() {
-	outPutArea->show();
-	this->show();
-	statusBar->showMessage("Executing.. ", 50000);
+void AppUi::processStatusSlot(const QString &message, const int timeout) {
+	statusBar->showMessage(message, timeout);
 }

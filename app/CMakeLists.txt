@@ -31,8 +31,8 @@ add_executable(ITools main.cpp
 		ui/OutputDisplay.h
 		ui/CustomLabel.cpp
 		ui/CustomLabel.h
-		ui/EditorMargin.cpp
-		ui/EditorMargin.h
+		ui/EditorActionArea.cpp
+		ui/EditorActionArea.h
 		db_connection.h
 		FileObject.h
 		FileObject.cpp

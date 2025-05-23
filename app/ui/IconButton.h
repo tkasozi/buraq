@@ -52,7 +52,7 @@ public:
 	void leaveEvent(QEvent *p) override {
 		setStyleSheet(
 				"border: 0px;" +
-				ItoolsNS::main_config.getMainStyles().commonStyle.styleSheet
+				ItoolsNS::main_config.getMainStyles()->commonStyle.styleSheet
 		);
 	}
 
@@ -65,7 +65,7 @@ public:
 		} else {
 			setStyleSheet(
 					"border-radius: 10px;" +
-					ItoolsNS::main_config.getMainStyles().toolBarHover.styleSheet
+					ItoolsNS::main_config.getMainStyles()->toolBarHover.styleSheet
 			);
 		}
 	}

@@ -14,7 +14,7 @@
 #include "AppUi.h"
 #include "../utils/Minion.h"
 
-class EditorMargin : public QWidget {
+class EditorActionArea : public QWidget {
 Q_OBJECT
 
 public slots:
@@ -35,18 +35,9 @@ signals:
 	void processStarted();
 
 public:
-	explicit EditorMargin(AppUi *ptrParent);
+	explicit EditorActionArea(QWidget *appUi);
 
-	~EditorMargin() override {
-		if (workerThread && workerThread->isRunning()) {
-			workerThread->requestInterruption();
-			workerThread->quit(); // Ask event loop to quit
-			if (!workerThread->wait(5000)) { // Wait for max 5 seconds
-				workerThread->terminate(); // Force terminate (last resort)
-				workerThread->wait();      // Wait for termination
-			}
-		}
-	};
+	~EditorActionArea() override;
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
@@ -54,15 +45,15 @@ protected:
 private:
 	// smart pointer will be cleaned up
 	std::unique_ptr<IconButton> runCode_;
-	std::unique_ptr<AppUi> appUi;
+
+	// should be managed elsewhere
+	QWidget *appUi;
 
 	// cleanup will be handled by  &QObject::deleteLater
 	QThread *workerThread;
 	Minion *minion;
 
 	void setupWorkerThread();
-
-	std::function<QVariant()> codeRunnerFunc();
 };
 
 

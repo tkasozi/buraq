@@ -3,7 +3,6 @@
     <Title>ITools</Title>
     <Version>ITools v0.0.11</Version>
     <AppLogo>workflow</AppLogo>
-    <powershellPath>C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe</powershellPath>
     <window minWidth="800"
             minHeight="720"
             normalSize="1200"

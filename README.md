@@ -21,7 +21,7 @@ This README would normally document whatever steps are necessary to get your app
 * Configuration
 * Dependencies
 * Database configuration
-* How to exeScript tests
+* How to runCode_ tests
 * Deployment instructions
 
 ### Contribution guidelines ###

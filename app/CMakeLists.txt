@@ -36,8 +36,8 @@ add_executable(ITools main.cpp
 		db_connection.h
 		FileObject.h
 		FileObject.cpp
-		ProcessThread.cpp
-		ProcessThread.h
+		utils/Minion.cpp
+		utils/Minion.h
 		ui/OutputDisplay.cpp
 		utils/Config.h
 		utils/Config.cpp

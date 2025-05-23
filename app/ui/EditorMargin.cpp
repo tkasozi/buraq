@@ -1,43 +1,72 @@
+// MIT License
+//
+// Copyright (c)  "2025" Talik A. Kasozi
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 //
 // Created by talik on 4/20/2024.
 //
 
 #include <QTextBlock>
+#include <QThread>
 #include <QString>
 #include <QTextStream>
+#include <QInputDialog> // For getting parameters for different tasks
 
 #include "EditorMargin.h"
 #include "Editor.h"
 #include "IconButton.h"
 #include "AppUi.h"
 
-#include "../ProcessThread.h"
-
-EditorMargin::EditorMargin(AppUi *ptrParent) : QWidget(ptrParent), ptrParent(ptrParent) {
+EditorMargin::EditorMargin(AppUi *ptrParent) :
+		QWidget(ptrParent),
+		appUi(ptrParent),
+		minion(nullptr),
+		workerThread(nullptr) {
 	auto layout = new QVBoxLayout;
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 4, 8, 0);
 
 	const int playButtonSize = 32;
-	QString runBtnStyles("color: #FFF;"
-						 "border: 0px;"
-						 "background-color: #232323;");
 
-	exeScript = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().executeIcon),
-							   playButtonSize, playButtonSize, runBtnStyles);
+	QString runBtnStyles(
+			"color: #FFF;"
+			"border: 0px;"
+			"background-color: #232323;"
+	);
 
-	exeSelectedScript = new IconButton(QIcon(ItoolsNS::main_config.getAppIcons().executeSelectedIcon),
-									   playButtonSize, playButtonSize, runBtnStyles);
+	runCode_ = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons().executeIcon),
+											playButtonSize, playButtonSize, runBtnStyles);
+
+	runSelectedCode_ = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons().executeSelectedIcon),
+													playButtonSize, playButtonSize, runBtnStyles);
 
 	// set tooltip for the run buttons
-	exeScript->setToolTip("Execute the whole script");
-	exeSelectedScript->setToolTip("Execute selected/highlighted script");
+	runCode_->setToolTip("Execute the whole script");
+	runSelectedCode_->setToolTip("Execute selected/highlighted script");
 
-	layout->addWidget(exeScript);
-	layout->addWidget(exeSelectedScript);
+	layout->addWidget(runCode_.get());
+	layout->addWidget(runSelectedCode_.get());
 
-	connect(exeScript, &IconButton::clicked, this, &EditorMargin::onExecuteWholeScriptButtonClicked);
-	connect(exeSelectedScript, &IconButton::clicked, this, &EditorMargin::onExecuteSelectedScriptButtonClicked);
+	connect(runCode_.get(), &IconButton::clicked, this, &EditorMargin::runCode);
+	connect(runSelectedCode_.get(), &IconButton::clicked, this, &EditorMargin::runSelectedCode);
 
 	setLayout(layout);
 	setFixedWidth(playButtonSize);
@@ -48,57 +77,49 @@ void EditorMargin::paintEvent(QPaintEvent *event) {
 	QWidget::paintEvent(event);
 }
 
+void EditorMargin::runCode() {
+	if (workerThread && workerThread->isRunning()) {
+		// Work is already in progress. Please stop current work first.;
+		return;
+	}
 
-void EditorMargin::onExecuteWholeScriptButtonClicked() {
-	Editor *editor = ptrParent->getEditor();
+	this->setupWorkerThread();
 
-	// Get the current script from the editor
-	QString script = editor->toPlainText();
+	std::function<QVariant()> task = [this]() -> QVariant {
+		QString script = appUi->getEditor()->toPlainText();
 
-	if (!script.isEmpty()) {
+		if (script.isEmpty()) {
+			return {};
+		}
+
 		// Removes Paragraph Separator (PS) character
 		auto cleaned = script.replace("\u2029", "\n");
-		ProcessedData processedData = ptrParent->getPluginManager()->callPerformAction((void *) cleaned.toStdString().c_str());
-		updateOutputResult(0, QString::fromStdWString(processedData.resultValue), nullptr);
-	}
+
+		const ProcessedData processedData = appUi->getLangPluginManager()->callPerformAction(
+				(void *) cleaned.toStdString().c_str());
+
+		return QVariant::fromValue(processedData.resultValue);
+	};
+
+	QMetaObject::invokeMethod(minion, "doWork", Qt::QueuedConnection, Q_ARG(const std::function<QVariant()>, task));
 }
 
-void EditorMargin::onExecuteSelectedScriptButtonClicked() {
-	Editor *editor = ptrParent->getEditor();
+void EditorMargin::runSelectedCode() {
+	Editor *editor = appUi->getEditor();
 	QString selectedScript = editor->textCursor().selectedText();
 
 	if (!selectedScript.isEmpty()) {
 		// Removes Paragraph Separator (PS) character
 		auto cleaned = selectedScript.replace("\u2029", "\n");
-		ProcessedData processedData = ptrParent->getPluginManager()->callPerformAction((void *) cleaned.toStdString().c_str());
+		ProcessedData processedData = appUi->getLangPluginManager()->callPerformAction(
+				(void *) cleaned.toStdString().c_str());
 		updateOutputResult(0, QString::fromStdWString(processedData.resultValue), nullptr);
 	}
 }
 
-void EditorMargin::onExecuteScriptButtonClicked(QString &script) const {
-	// Define arguments for powershell.exe
-	QStringList arguments;
-	arguments << "-ExecutionPolicy" << "Bypass";  // Be cautious with security implications!
-	arguments << "-Command";
-	arguments << script;
-
-	// Create a QProcess object
-	auto *thread = new ProcessThread(ItoolsNS::main_config.getPowershellPath(), arguments);
-
-	connect(thread, &ProcessThread::processStarted, this, &EditorMargin::onProcessStarted);
-	connect(thread, &ProcessThread::processFinished, this, &EditorMargin::updateOutputResult);
-
-	thread->start();
-}
-
-void EditorMargin::onProcessStarted() {
-	QStatusBar * statusBar = ptrParent->getQStatusBar();
-	statusBar->showMessage("Executing.. ", 2000);
-}
-
 void EditorMargin::updateOutputResult(int exitCode, const QString &output, const QString &error) {
-	OutputDisplay *outputDisplay = ptrParent->getOutputDisplay();
-	QStatusBar * statusBar = ptrParent->getQStatusBar();
+	OutputDisplay *outputDisplay = appUi->getOutputDisplay();
+	QStatusBar * statusBar = appUi->getQStatusBar();
 
 	outputDisplay->show();
 
@@ -111,4 +132,59 @@ void EditorMargin::updateOutputResult(int exitCode, const QString &output, const
 		statusBar->showMessage("Process failed!");
 		outputDisplay->log("", error);
 	}
+}
+
+void EditorMargin::setupWorkerThread() {
+	workerThread = new QThread(this);
+	workerThread->setObjectName("CodeRunner");
+
+	// 2. Create Minion (no parent initially, will be managed by thread lifecycle)
+	minion = new Minion();
+	// moves minion's work the workerThead
+	minion->moveToThread(workerThread);
+
+	// 4. Connect Signals and Slots
+	//    When thread starts, tell minion to start working
+	connect(workerThread, &QThread::started, minion, [this]() {
+		appUi->getQStatusBar()->showMessage("Executing..");
+	});
+
+	// Connect minion signals to MainWindow slots
+	connect(minion, &Minion::progressUpdated, this, &EditorMargin::handleProgress);
+	connect(minion, &Minion::resultReady, this, &EditorMargin::handleTaskResults);
+	connect(minion, &Minion::workFinished, this, &EditorMargin::handleWorkerFinished, Qt::QueuedConnection);
+
+	// When the worker signals it's done with its task
+	connect(minion, &Minion::workFinished, workerThread,
+			&QThread::quit, Qt::QueuedConnection); // Tell thread to exit its event loop
+
+	// When the thread's event loop has finished (after quit())
+	connect(workerThread, &QThread::finished, minion, &QObject::deleteLater, Qt::QueuedConnection);
+	connect(workerThread, &QThread::finished, workerThread, &QObject::deleteLater,
+			Qt::QueuedConnection); // Self-delete thread object
+
+	// 5. Start the thread
+	workerThread->start();
+}
+
+void EditorMargin::handleTaskResults(const QVariant &result) {
+	if (result.isValid() && result.canConvert<std::wstring>()) {
+		const auto data = result.value<std::wstring>();
+		updateOutputResult(0, QString::fromStdWString(data), "");
+	} else {
+		updateOutputResult(1, "", "Error failed to execute task.");
+	}
+}
+
+void EditorMargin::handleProgress(int i) {
+	appUi->getOutputDisplay();
+	appUi->getQStatusBar()->showMessage("Executing...", 50000);
+}
+
+void EditorMargin::handleWorkerFinished() {
+	appUi->getOutputDisplay();
+	appUi->getQStatusBar()->showMessage("Done!", 50000);
+
+	workerThread = nullptr;
+	minion = nullptr;
 }

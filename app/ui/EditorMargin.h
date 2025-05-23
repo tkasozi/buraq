@@ -6,37 +6,62 @@
 #define IT_TOOLS_EDITOR_MARGIN_H
 
 #include <QWidget>
+#include <QThread>
 #include <QPlainTextEdit>
-#include <QProcess>
 #include "CustomLabel.h"
 #include "Editor.h"
 #include "IconButton.h"
 #include "AppUi.h"
+#include "../utils/Minion.h"
 
 class EditorMargin : public QWidget {
 Q_OBJECT
 
+public slots:
+	void handleTaskResults(const QVariant &result); // Modified to take QVariant
+	void handleProgress(int);
+
 private slots:
 
-	void onExecuteWholeScriptButtonClicked();
-	void onExecuteSelectedScriptButtonClicked();
-	void onProcessStarted();
+	void runCode();
+
+	void handleWorkerFinished();
+
+	void runSelectedCode();
+
 	void updateOutputResult(int exitCode, const QString &output, const QString &error);
+
+signals:
+	void processStarted();
 
 public:
 	explicit EditorMargin(AppUi *ptrParent);
 
-	~EditorMargin() override = default;
+	~EditorMargin() override {
+		if (workerThread && workerThread->isRunning()) {
+			workerThread->requestInterruption();
+			workerThread->quit(); // Ask event loop to quit
+			if (!workerThread->wait(5000)) { // Wait for max 5 seconds
+				workerThread->terminate(); // Force terminate (last resort)
+				workerThread->wait();      // Wait for termination
+			}
+		}
+	};
 
 protected:
 	void paintEvent(QPaintEvent *event) override;
 
 private:
-	void onExecuteScriptButtonClicked(QString&) const;
+	// smart pointer will be cleaned up
+	std::unique_ptr<IconButton> runCode_;
+	std::unique_ptr<IconButton> runSelectedCode_;
+	std::unique_ptr<AppUi> appUi;
 
-	IconButton *exeScript;
-	IconButton *exeSelectedScript;
-	AppUi *ptrParent;
+	// cleanup will be handled by  &QObject::deleteLater
+	QThread *workerThread;
+	Minion *minion;
+
+	void setupWorkerThread();
 };
 
 

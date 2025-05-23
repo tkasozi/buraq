@@ -21,41 +21,37 @@
 // SOFTWARE.
 
 //
-// Created by talik on 5/15/2025.
+// Created by talik on 4/30/2024.
 //
 
-#ifndef PLUGIN_INTERFACE_H
-#define PLUGIN_INTERFACE_H
+#include "Minion.h"
+#include <QVariant>
 
-#include <string>
 
-struct ProcessedData {
-	std::wstring resultValue;
-};
-
-class IPlugin {
-public:
-
-	virtual ~IPlugin() = default;
-
-	virtual const char* getName() const = 0;
-	virtual void shutdown() = 0;
-	virtual void performAction() = 0;
-	virtual ProcessedData performAction(void *cmd) = 0;
-
-	/**
-	 *
-	 * @param app_context A pointer to an object or struct in the main thread that provides necessary data to
-	 * the plugin.
-	 * @return True if successfully initialized.
-	 */
-	virtual bool initialize(void* app_context) = 0;
-};
-
-// Avoid C++ name mangling
-extern "C" {
-typedef  IPlugin* (*CreatePluginFunc)();
-typedef void (*DestroyPluginFunc)(IPlugin*);
+Minion::Minion(QObject *parent) : QObject(parent) {
+	// empty
 }
 
-#endif //PLUGIN_INTERFACE_H
+void Minion::doWork(const std::function<QVariant()>& task) {
+	if (!task) {
+		emit resultReady(QVariant());
+		emit workFinished();
+		return;
+	}
+
+	QVariant result;
+
+	try {
+		// Execute the provided task function
+		emit progressUpdated(0);
+		result = task(); // Execute the generic task
+	} catch (const std::exception &e) {
+		// Optionally, wrap the error message in the QVariant
+		result = QVariant("Error: " + QString(e.what()));
+	} catch (...) {
+		// Optionally, wrap the error message in the QVariant
+		result = QVariant("Error: Unknown exception");
+	}
+	emit resultReady(result);
+	emit workFinished();
+}

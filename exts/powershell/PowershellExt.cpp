@@ -247,10 +247,6 @@ public:
 
 				processedData.resultValue = std::wstring(wide_result_from_cs);
 
-				if (processedData.resultValue.starts_with(reinterpret_cast<const wchar_t *>("Error"))) {
-					processedData.isProcessFailed = true;
-				}
-
 				// IMPORTANT: Free the memory allocated by the .NET marshaller
 				CoTaskMemFree((LPVOID) wide_result_from_cs); // Cast to LPVOID for CoTaskMemFree
 				wide_result_from_cs = nullptr; // Good practice to nullify after free

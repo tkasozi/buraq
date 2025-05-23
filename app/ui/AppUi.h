@@ -27,6 +27,9 @@
 class AppUi : public QMainWindow {
 Q_OBJECT
 
+public slots:
+	void processStatusSlot();
+
 private slots:
 
 	void onClicked();
@@ -47,7 +50,7 @@ public:
 
 	QStatusBar *getQStatusBar();
 
-	PluginManager *getPluginManager();
+	PluginManager *getLangPluginManager();
 
 private:
 	std::unique_ptr<PluginManager> pluginManager;

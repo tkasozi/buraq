@@ -72,15 +72,6 @@ Config::Config() :
 		exit(-1);
 	}
 
-	QDomNodeList powershellPathList = root.elementsByTagName("powershellPath");
-	if (powershellPathList.count() > 0) {
-		QDomElement powershellPathElement = powershellPathList.at(0).toElement();
-		this->powershellPath = QString(powershellPathElement.text());
-	} else {
-		qDebug() << "Error: Configuration is missing a 'powershellPath'.";
-		exit(-1);
-	}
-
 	QDomNodeList appLogoList = root.elementsByTagName("AppLogo");
 	if (appLogoList.count() > 0) {
 		QDomElement appLogoElement = appLogoList.at(0).toElement();

@@ -69,8 +69,11 @@ namespace ManagedLibrary
                         // Or, you can access its properties: result.Properties["PropertyName"].Value
                         if (result != null)
                         {
-                            sb.Append($"{result.ToString()}");
-                            sb.Append($"\\u2029");
+                            if (result.Properties.Count() > 0)
+                            {
+                                //
+                            }
+                            sb.AppendLine($"{result.ToString()}").Append($"\\u2029");
                             // Example of accessing a specific property if you know it exists
                             // if (result.Properties["ProcessName"] != null) {
                             //     Console.WriteLine($"  Process Name: {result.Properties["ProcessName"].Value}");
@@ -102,13 +105,6 @@ namespace ManagedLibrary
                 Console.WriteLine($"An exception occurred during PowerShell invocation: {ex.Message}");
                 return sb.Append($"An exception occurred during PowerShell invocation: {ex.Message}").ToString();
             }
-        }
-
-        // A simpler example without arguments for initial testing
-        [UnmanagedCallersOnly(EntryPoint = "SayHello")]
-        public static void SayHello()
-        {
-            Console.WriteLine("C#: Hello from ManagedLibrary.CSharpWorker.SayHello!");
         }
     }
 }

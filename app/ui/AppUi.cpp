@@ -191,6 +191,12 @@ QStatusBar *AppUi::getQStatusBar() {
 	return statusBar.get();
 }
 
-PluginManager *AppUi::getPluginManager() {
+PluginManager *AppUi::getLangPluginManager() {
 	return pluginManager.get();
+}
+
+void AppUi::processStatusSlot() {
+	outPutArea->show();
+	this->show();
+	statusBar->showMessage("Executing.. ", 50000);
 }

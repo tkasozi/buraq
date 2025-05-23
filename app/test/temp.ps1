@@ -5,11 +5,14 @@
 $name="tkasozi & Nihlah & sumi"
 Write-Output "This is an example script by $name."
  
-Get-ChildItem /
+Get-ChildItem . | Format-Table -Property Name, Length, LastWriteTime
+ 
+Get-ChildItem | Format-Table -Property Name, Length, LastWriteTime -AutoSize
  
 # new update.
  
 $idk = "what this is."
  
-Get-Process | Sort-Object CPU -Descending | Select-Object -First 5
+Get-Process | Sort-Object Memory -Descending | Select-Object -First 5
  
+cd C:\Users\talik && ls 

@@ -21,41 +21,43 @@
 // SOFTWARE.
 
 //
-// Created by talik on 5/15/2025.
+// Created by talik on 4/30/2024.
 //
 
-#ifndef PLUGIN_INTERFACE_H
-#define PLUGIN_INTERFACE_H
+#ifndef MINION_H
+#define MINION_H
 
-#include <string>
+#include <QObject>
+#include <QString>
 
-struct ProcessedData {
-	std::wstring resultValue;
-};
+class Minion : public QObject {
+Q_OBJECT
 
-class IPlugin {
+signals:
+
+	// Signal the final result.
+	void resultReady(const QVariant &result);
+
+	// Signal that work is being done. Show progress.
+	void progressUpdated(int percentage);
+
+	// Signal that all work is done
+	void workFinished();
+
+public slots:
+	// Slot to start the work
+	void doWork(const std::function<QVariant()>& task);
+
 public:
+	explicit Minion(QObject *qObject);
 
-	virtual ~IPlugin() = default;
+	Minion() = default;
 
-	virtual const char* getName() const = 0;
-	virtual void shutdown() = 0;
-	virtual void performAction() = 0;
-	virtual ProcessedData performAction(void *cmd) = 0;
+	~Minion() override = default;
 
-	/**
-	 *
-	 * @param app_context A pointer to an object or struct in the main thread that provides necessary data to
-	 * the plugin.
-	 * @return True if successfully initialized.
-	 */
-	virtual bool initialize(void* app_context) = 0;
+private:
+	// No members object is moved to a thread
 };
 
-// Avoid C++ name mangling
-extern "C" {
-typedef  IPlugin* (*CreatePluginFunc)();
-typedef void (*DestroyPluginFunc)(IPlugin*);
-}
 
-#endif //PLUGIN_INTERFACE_H
+#endif //MINION_H

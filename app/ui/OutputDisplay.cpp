@@ -139,8 +139,9 @@ void OutputDisplay::toggle() {
 
 void OutputDisplay::log(const QString &strOutput, const QString &errorOutput) {
 	QStringList list = strOutput.split("\\u2029");
+	QStringList errorsList = errorOutput.split("\\u2029");
 
-	main->setFixedHeight(main->height() + std::max((int) (list.size() * 1.3), 10));
+	main->setFixedHeight(main->height() + std::max(((int) (list.size()* 1.3), (int) (errorsList.size()* 1.3)), 10));
 
 	QLabel *error = createLabel(errorOutput, "error");
 	auto layout = new QVBoxLayout;
@@ -155,6 +156,10 @@ void OutputDisplay::log(const QString &strOutput, const QString &errorOutput) {
 	main->appendHtml("<div style={\"background-color: inherit;\"}>");
 	for (const QString &qString: list) {
 		main->appendHtml("<p>" + qString + "</p>");
+	}
+	for (const QString &qString: errorsList) {
+		// error logs
+		main->appendHtml("<p style=\"color: #FF6347;\">" + qString + "</p>");
 	}
 	main->appendHtml("</div>");
 

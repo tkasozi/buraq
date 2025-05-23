@@ -21,7 +21,7 @@ $targetDirectory = $env:USERPROFILE + "\Documents" # Defaulting to the current u
 # Define the file extension to search for (e.g., ".txt", ".log", ".jpg").
 # Make sure to include the dot.
 $fileExtension = ".txt"
- 
+ asas
 # --- Script Logic ---
  
 # Check if the target directory exists

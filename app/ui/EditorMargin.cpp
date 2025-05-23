@@ -163,7 +163,14 @@ void EditorMargin::setupWorkerThread() {
 void EditorMargin::handleTaskResults(const QVariant &result) {
 	if (result.isValid() && result.canConvert<std::wstring>()) {
 		const auto data = result.value<std::wstring>();
-		updateOutputResult(0, QString::fromStdWString(data), "");
+		QString error = "", resultString = QString::fromStdWString(data);
+		int statusCode = 0;
+		if (!resultString.isEmpty() && resultString.contains("exception", Qt::CaseInsensitive)) {
+			error = resultString;
+			resultString = "";
+			statusCode = 1;
+		}
+		updateOutputResult(statusCode, resultString, error);
 	} else {
 		updateOutputResult(1, "", "Error failed to execute task.");
 	}

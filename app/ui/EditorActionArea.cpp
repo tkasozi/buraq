@@ -85,16 +85,18 @@ void EditorActionArea::runCode() {
 	this->setupWorkerThread();
 
 	std::function<QVariant()> task =  [this]() -> QVariant {
-		if(!((AppUi *)appUi)->getEditor()) {
+		auto *appUi_ = dynamic_cast<AppUi *>(appUi);
+
+		if(!appUi_->getEditor()) {
 			// editor must be defined
 			return {};
 		}
 
 		// Run selected code
-		QString script = ((AppUi *)appUi)->getEditor()->textCursor().selectedText();
+		QString script = appUi_->getEditor()->textCursor().selectedText();
 		if (script.isEmpty()) {
 			// run entire file
-			script = ((AppUi *)appUi)->getEditor()->toPlainText();
+			script = appUi_->getEditor()->toPlainText();
 		}
 
 		if (script.isEmpty()) {
@@ -104,34 +106,17 @@ void EditorActionArea::runCode() {
 		// Removes Paragraph Separator (PS) character
 		auto cleaned = script.replace("\u2029", "\n");
 
-		if(!((AppUi *)appUi)->getLangPluginManager()) {
+		if(!appUi_->getLangPluginManager()) {
 			// LangPluginManager must be defined
 			return {};
 		}
-		const ProcessedData processedData = ((AppUi *)appUi)->getLangPluginManager()->callPerformAction(
+		const ProcessedData processedData = appUi_->getLangPluginManager()->callPerformAction(
 				(void *) cleaned.toStdString().c_str());
 
 		return QVariant::fromValue(processedData.resultValue);
 	};
 
 	QMetaObject::invokeMethod(minion, "doWork", Qt::QueuedConnection, Q_ARG(const std::function<QVariant()>, task));
-}
-
-void EditorActionArea::updateOutputResult(int exitCode, const QString &output, const QString &error) {
-	OutputDisplay *outputDisplay = ((AppUi *)appUi)->getOutputDisplay();
-
-	outputDisplay->show();
-
-	if (exitCode == 0) {
-
-		outputDisplay->log(output, error);
-
-		emit statusUpdate(error.isEmpty() ? "Completed!" : "Completed with errors.");
-
-	} else {
-		emit statusUpdate("Process failed!");
-		outputDisplay->log("", error);
-	}
 }
 
 void EditorActionArea::setupWorkerThread() {
@@ -177,19 +162,17 @@ void EditorActionArea::handleTaskResults(const QVariant &result) {
 			resultString = "";
 			statusCode = 1;
 		}
-		updateOutputResult(statusCode, resultString, error);
+		emit updateOutputResult(statusCode, resultString, error);
 	} else {
-		updateOutputResult(1, "", "Error failed to execute task.");
+		emit updateOutputResult(1, "", "Error failed to execute task.");
 	}
 }
 
 void EditorActionArea::handleProgress(int i) {
-	((AppUi *)appUi)->getOutputDisplay();
 	emit statusUpdate("Executing...");
 }
 
 void EditorActionArea::handleWorkerFinished() {
-	((AppUi *)appUi)->getOutputDisplay();
 	emit statusUpdate("Completed");
 
 	workerThread = nullptr;
@@ -215,7 +198,10 @@ void EditorActionArea::setupSignals() const {
 	// Signal to execute the code
 	connect(runCode_.get(), &IconButton::clicked, this, &EditorActionArea::runCode);
 
-	// Signal to update status bar in AppUI component for the running process
 	auto *appUi_ = dynamic_cast<AppUi *>(appUi);
+	// Signal to update status bar in AppUI component for the running process
 	connect(this, &EditorActionArea::statusUpdate, appUi_, &AppUi::processStatusSlot);
+
+	// Signal to update the out component in AppUI component for the completed process
+	connect(this, &EditorActionArea::updateOutputResult, appUi_, &AppUi::processResultSlot);
 }

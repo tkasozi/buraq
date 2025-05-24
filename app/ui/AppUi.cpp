@@ -178,16 +178,8 @@ void AppUi::onShowOutputButtonClicked() {
 	}
 }
 
-OutputDisplay *AppUi::getOutputDisplay() {
-	return outPutArea.get();
-}
-
 Editor *AppUi::getEditor() {
 	return itoolsEditor.get();
-}
-
-QStatusBar *AppUi::getQStatusBar() {
-	return statusBar.get();
 }
 
 PluginManager *AppUi::getLangPluginManager() {
@@ -196,4 +188,19 @@ PluginManager *AppUi::getLangPluginManager() {
 
 void AppUi::processStatusSlot(const QString &message, const int timeout) {
 	statusBar->showMessage(message, timeout);
+}
+
+void AppUi::processResultSlot(int exitCode, const QString &output, const QString &error) {
+	outPutArea->show();
+
+	if (exitCode == 0) {
+
+		outPutArea->log(output, error);
+
+		processStatusSlot(error.isEmpty() ? "Completed!" : "Completed with errors.");
+
+	} else {
+		processStatusSlot("Process failed!");
+		outPutArea->log("", error);
+	}
 }

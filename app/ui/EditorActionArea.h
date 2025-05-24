@@ -19,6 +19,7 @@ class EditorActionArea : public CommonWidget {
 Q_OBJECT
 
 private slots:
+
 	void handleProgress(int);
 
 	void handleTaskResults(const QVariant &result); // Modified to take QVariant
@@ -26,6 +27,8 @@ private slots:
 	void runCode();
 
 	void handleWorkerFinished();
+
+signals:
 
 	void updateOutputResult(int exitCode, const QString &output, const QString &error);
 
@@ -49,6 +52,7 @@ private:
 	Minion *minion;
 
 	void setupWorkerThread();
+
 	void setupSignals() const override;
 };
 

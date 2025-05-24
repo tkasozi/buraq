@@ -30,6 +30,7 @@ Q_OBJECT
 
 public slots:
 	void processStatusSlot(const QString &, int timeout = 5000);
+	void processResultSlot(int exitCode, const QString &output, const QString &error);
 
 private slots:
 
@@ -48,8 +49,6 @@ public:
 	OutputDisplay *getOutputDisplay();
 
 	Editor *getEditor();
-
-	QStatusBar *getQStatusBar();
 
 	PluginManager *getLangPluginManager();
 

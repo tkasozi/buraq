@@ -46,8 +46,6 @@ public:
 	// No manual delete, no manual nullptr.
 	~AppUi() override = default;
 
-	OutputDisplay *getOutputDisplay();
-
 	Editor *getEditor();
 
 	PluginManager *getLangPluginManager();

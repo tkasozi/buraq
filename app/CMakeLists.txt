@@ -47,6 +47,7 @@ add_executable(ITools main.cpp
 		PluginManager.cpp
 		PluginManager.h
 		IToolsAPI.h
+		ui/CommonWidget.h
 )
 
 target_link_libraries(ITools

@@ -13,26 +13,21 @@
 #include "IconButton.h"
 #include "AppUi.h"
 #include "../utils/Minion.h"
+#include "CommonWidget.h"
 
-class EditorActionArea : public QWidget {
+class EditorActionArea : public CommonWidget {
 Q_OBJECT
 
-public slots:
-
-	void handleTaskResults(const QVariant &result); // Modified to take QVariant
+private slots:
 	void handleProgress(int);
 
-private slots:
+	void handleTaskResults(const QVariant &result); // Modified to take QVariant
 
 	void runCode();
 
 	void handleWorkerFinished();
 
 	void updateOutputResult(int exitCode, const QString &output, const QString &error);
-
-signals:
-
-	void processStarted();
 
 public:
 	explicit EditorActionArea(QWidget *appUi);
@@ -54,6 +49,7 @@ private:
 	Minion *minion;
 
 	void setupWorkerThread();
+	void setupSignals() const override;
 };
 
 

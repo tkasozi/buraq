@@ -36,7 +36,7 @@
 #include "AppUi.h"
 
 EditorActionArea::EditorActionArea(QWidget *appUi) :
-		QWidget(nullptr),
+		CommonWidget(appUi),
 		appUi(appUi),
 		minion(nullptr),
 		workerThread(nullptr) {
@@ -64,11 +64,12 @@ EditorActionArea::EditorActionArea(QWidget *appUi) :
 	layout->setContentsMargins(0, 4, 8, 0);
 	layout->addWidget(runCode_.get());
 
-	connect(runCode_.get(), &IconButton::clicked, this, &EditorActionArea::runCode);
-
 	setLayout(layout);
 	setFixedWidth(playButtonSize);
 	setStyleSheet("border-left: 1px solid #383838;");
+
+	// setup signals & slots connection
+	EditorActionArea::setupSignals();
 }
 
 void EditorActionArea::paintEvent(QPaintEvent *event) {
@@ -118,7 +119,6 @@ void EditorActionArea::runCode() {
 
 void EditorActionArea::updateOutputResult(int exitCode, const QString &output, const QString &error) {
 	OutputDisplay *outputDisplay = ((AppUi *)appUi)->getOutputDisplay();
-	QStatusBar * statusBar = ((AppUi *)appUi)->getQStatusBar();
 
 	outputDisplay->show();
 
@@ -126,9 +126,10 @@ void EditorActionArea::updateOutputResult(int exitCode, const QString &output, c
 
 		outputDisplay->log(output, error);
 
-		statusBar->showMessage(error.isEmpty() ? "Completed!" : "Completed with errors.", 2000);
+		emit statusUpdate(error.isEmpty() ? "Completed!" : "Completed with errors.");
+
 	} else {
-		statusBar->showMessage("Process failed!");
+		emit statusUpdate("Process failed!");
 		outputDisplay->log("", error);
 	}
 }
@@ -145,7 +146,7 @@ void EditorActionArea::setupWorkerThread() {
 	// 4. Connect Signals and Slots
 	//    When thread starts, tell minion to start working
 	connect(workerThread, &QThread::started, minion, [this]() {
-		((AppUi *)appUi)->getQStatusBar()->showMessage("Executing..");
+		emit statusUpdate("Executing..");
 	});
 
 	// Connect minion signals to MainWindow slots
@@ -184,20 +185,18 @@ void EditorActionArea::handleTaskResults(const QVariant &result) {
 
 void EditorActionArea::handleProgress(int i) {
 	((AppUi *)appUi)->getOutputDisplay();
-	((AppUi *)appUi)->getQStatusBar()->showMessage("Executing...", 5000);
+	emit statusUpdate("Executing...");
 }
 
 void EditorActionArea::handleWorkerFinished() {
 	((AppUi *)appUi)->getOutputDisplay();
-	((AppUi *)appUi)->getQStatusBar()->showMessage("Completed", 5000);
+	emit statusUpdate("Completed");
 
 	workerThread = nullptr;
 	minion = nullptr;
 }
 
 EditorActionArea::~EditorActionArea() {
-	qDebug() << "Executing: ~EditorActionArea()";
-
 	// smart pointers are deleted automatically
 	// editor pointer should be deleted elsewhere
 	appUi = nullptr;
@@ -210,4 +209,13 @@ EditorActionArea::~EditorActionArea() {
 			workerThread->wait();      // Wait for termination
 		}
 	}
+}
+
+void EditorActionArea::setupSignals() const {
+	// Signal to execute the code
+	connect(runCode_.get(), &IconButton::clicked, this, &EditorActionArea::runCode);
+
+	// Signal to update status bar in AppUI component for the running process
+	auto *appUi_ = dynamic_cast<AppUi *>(appUi);
+	connect(this, &EditorActionArea::statusUpdate, appUi_, &AppUi::processStatusSlot);
 }

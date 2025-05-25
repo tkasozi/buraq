@@ -47,7 +47,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "Release\bin\*.*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
+Source: "build\bin\*.*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

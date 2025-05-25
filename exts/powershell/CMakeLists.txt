@@ -14,14 +14,7 @@ set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
 set(PLUGIN_SUBDIR "ext")
 set(PLUGIN_FULL_OUTPUT_DIR "${PLUGIN_BASE_OUTPUT_DIR}/${PLUGIN_SUBDIR}")
 
-# CMAKE_SOURCE_DIR refers to the top-level source directory (MyCppApplication/)
-# when this CMakeLists.txt is included by add_subdirectory() from the top-level CMakeLists.txt.
-set(CMAKE_DOTNET_TARGET_FRAMEWORK "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64\\9.0.5\\runtimes\\win-x64\\native")
-
 # --- Include Directories ---
-# Tell CMake where to find header files.
-message("***** Should set dynamically ***** ${CMAKE_DOTNET_TARGET_FRAMEWORK}")
-
 target_include_directories(PowershellExt PUBLIC
 		"${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 		"${CMAKE_SOURCE_DIR}/include"
@@ -29,13 +22,17 @@ target_include_directories(PowershellExt PUBLIC
 
 #    CMake can usually handle the .lib extension directly.
 #    Provide the full path to nethost.lib.
-set(NET_HOST_DLL "${CMAKE_DOTNET_TARGET_FRAMEWORK}/nethost.dll")
-set(NET_HOST_LIB "${CMAKE_DOTNET_TARGET_FRAMEWORK}/nethost.lib")
+set(NET_HOST_DLL "${CMAKE_DOTNET_TARGET_FRAMEWORK}\\nethost.dll")
 
-if (EXISTS "${NET_HOST_LIB}")
-	target_link_libraries(PowershellExt PRIVATE "${NET_HOST_LIB}")
+message("***** NET_HOST_DLL: ${NET_HOST_DLL} *****")
+message("***** NET_HOST_LIB: ${NET_HOST_LIB} *****")
+
+if (EXISTS "${CMAKE_DOTNET_TARGET_FRAMEWORK}\\nethost.lib")
+	string(REPLACE "\\" "/" FRAMEWORK_LINK_DIR "${CMAKE_DOTNET_TARGET_FRAMEWORK}")
+	target_link_directories(PowershellExt PRIVATE "${FRAMEWORK_LINK_DIR}")
+	target_link_libraries(PowershellExt PRIVATE nethost)
 else ()
-	message(FATAL_ERROR "${NET_HOST_DLL}not found. Please check your .NET SDK installation.")
+	message(FATAL_ERROR "nethost.lib not found. Please check your .NET SDK installation.")
 endif ()
 
 # Check if the library file exists

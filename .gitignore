@@ -61,3 +61,4 @@ ManagedLibrary/ManagedLibraryPublish/
 TestManagedApp/bin/
 TestManagedApp/obj/
 
+.idea/

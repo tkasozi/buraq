@@ -1,5 +1,9 @@
 # README #
 
+To build the project:
+
+rm -rf build && ./build.sh --clean
+
 This README would normally document whatever steps are necessary to get your application up and running.
 
 ### What is this repository for? ###

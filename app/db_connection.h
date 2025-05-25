@@ -86,7 +86,7 @@ static QList<FileObject *> findPreviouslyOpenedFiles() {
 }
 
 static bool db_conn() {
-	const char * dbName = "0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db";
+	const char * dbName = ".data/Itools.db";
 
 	std::fstream db(dbName, std::ios::in);
 

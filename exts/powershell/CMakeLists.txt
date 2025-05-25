@@ -25,7 +25,6 @@ target_include_directories(PowershellExt PUBLIC
 set(NET_HOST_DLL "${CMAKE_DOTNET_TARGET_FRAMEWORK}\\nethost.dll")
 
 message("***** NET_HOST_DLL: ${NET_HOST_DLL} *****")
-message("***** NET_HOST_LIB: ${NET_HOST_LIB} *****")
 
 if (EXISTS "${CMAKE_DOTNET_TARGET_FRAMEWORK}\\nethost.lib")
 	string(REPLACE "\\" "/" FRAMEWORK_LINK_DIR "${CMAKE_DOTNET_TARGET_FRAMEWORK}")

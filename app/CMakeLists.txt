@@ -1,4 +1,4 @@
-project(MainProject)
+project(ITools)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -74,6 +74,26 @@ add_custom_target(theme_icons ALL COMMAND
 
 # Add resources
 qt6_add_resources(ITools RESOURCES resources.qrc)
+
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/.data")
+set(DB_OUTPUT_FILE "${CMAKE_BINARY_DIR}/bin/.data/${PROJECT_NAME}.db")
+
+add_custom_command(
+		OUTPUT ${DB_OUTPUT_FILE}
+		COMMAND ${CMAKE_COMMAND} -E touch ${DB_OUTPUT_FILE}
+		COMMENT "Generating ${DB_OUTPUT_FILE}."
+		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin/.data"
+)
+
+# 2. Define a custom target
+add_custom_target(generate_db_file ALL
+		DEPENDS ${DB_OUTPUT_FILE}
+		COMMENT "Ensuring ${DB_OUTPUT_FILE} is up-to-date"
+)
+
+if(TARGET generate_db_file)
+	add_dependencies(ITools generate_db_file)
+endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
 	foreach (QT_LIB Core Gui Widgets Sql Xml)

@@ -45,44 +45,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-      - name: LS files
-        run: ls "C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64\9.0.5\runtimes\win-x64\native"
-        shell: bash
-      - name: Find nethost.dll for .NET 9.0.5
-        id: find_nethost # Give an ID to this step so we can reference its output
-        run: |
-          echo "Searching for nethost.dll under DOTNET_ROOT: ${{ env.DOTNET_ROOT }}"
-          # The nethost.dll is usually in a subdirectory like host/fxr/<some_version_number>/
-          # The <some_version_number> will correspond to the hostfxr version, which is tied to the runtime.
-          # For .NET 9.0, we expect this version to start with '9.0.'
-          
-          # For Linux and macOS runners (bash):
-          if [[ "$RUNNER_OS" == "Linux" || "$RUNNER_OS" == "macOS" ]]; then
-            NETHOST_PATH=$(find "${{ env.DOTNET_ROOT }}" -type f -name "nethost.dll" -path "*/host/fxr/9.0.5/nethost.dll" | head -n 1)
-          fi
-          
-          # For Windows runners (PowerShell):
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            # PowerShell syntax for finding the file
-            # Note: Adjust wildcard for version path if necessary
-            $nethost_files = Get-ChildItem -Path "${{ env.DOTNET_ROOT }}" -Filter "nethost.dll" -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.FullName -like "*\host\fxr\9.0.5\nethost.dll" }
-            if ($nethost_files) {
-              $NETHOST_PATH = $nethost_files[0].FullName
-            } else {
-              $NETHOST_PATH = ""
-            }
-          fi
-          
-          if [[ -n "$NETHOST_PATH" ]]; then
-            echo "Found nethost.dll at: $NETHOST_PATH"
-            echo "nethost_path=$NETHOST_PATH" >> $GITHUB_OUTPUT
-          else
-            echo "nethost.dll for .NET 9.0.x host/fxr not found under ${{ env.DOTNET_ROOT }} with the specified pattern."
-            echo "Please check the 'dotnet --info' output and adjust the search path if needed."
-            # Optionally, you might want to fail the step if it's critical to find this file
-            # exit 1 
-          fi
-        shell: bash
 
       - name: Build Managed project
         id: dotnet-project
@@ -92,7 +54,7 @@ jobs:
       - name: Build project
         run: ./build.sh --clean
         env:
-          CMAKE_DOTNET_TARGET_FRAMEWORK: ${env.DOTNET_ROOT}
+          CMAKE_DOTNET_TARGET_FRAMEWORK: "C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64\9.0.5\runtimes\win-x64\native"
         shell: bash
 
       - name: Logging

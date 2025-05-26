@@ -66,7 +66,7 @@ set(ITOOLS_HEADERS
 )
 
 if (WIN32)
-	add_executable(ITools WIN32 ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS})
+	add_executable(ITools WIN32 ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
 endif ()
 
 target_include_directories(ITools PRIVATE
@@ -100,6 +100,7 @@ add_custom_target(conf_file ALL COMMAND
 
 # Embed resources into the executable
 qt6_add_resources(ITools RESOURCES resources.qrc)
+
 set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
 if (WIN32)
 	foreach (QT_LIB Core Gui Widgets Sql Xml)

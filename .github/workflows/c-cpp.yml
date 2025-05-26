@@ -46,17 +46,20 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Display .NET SDK Path
+      - name: Logging step 1
         run: |
-            echo "The DOTNET_ROOT environment variable is: ${{ env.DOTNET_ROOT }}"
-            echo "The 'dotnet' command is found at: $(which dotnet)"
+          echo "**********1***************"
+          Get-ChildItem "${{ env.DOTNET_VERSION }}" -R
+          echo "**********1***************"
 
-      - name: set dotnet target framework
-        id: dotnet-path
-        run: echo "CMAKE_DOTNET_TARGET_FRAMEWORK=$(which dotnet)" >> $GITHUB_ENV
+      - name: Build Managed project
+        id: dotnet-project
+        run: ./ManagedLibrary/build.sh
 
       - name: Build project
         run: ./build.sh
+        env:
+          CMAKE_DOTNET_TARGET_FRAMEWORK: ${env.DOTNET_ROOT}
 
       - name: Logging
         run: |
@@ -65,24 +68,8 @@ jobs:
           echo "**********1***************"
 
           echo "**********2***************"
-          Get-ChildItem "build/bin"
+          Get-ChildItem "build" -R
           echo "**********2***************"
-
-          echo "***********3**************"
-          Get-ChildItem "build/bin/plugins/sqldrivers"
-          echo "**********3***************"
-          
-          echo "***********4**************"
-          Get-ChildItem "build/bin/plugins/platforms"
-          echo "**********4***************"
-
-          echo "***********5**************"
-          Get-ChildItem "build/bin/plugins/ext"
-          echo "**********3***************"
-          
-          echo "***********6**************"
-          Get-ChildItem "build/plugins/managed"
-          echo "**********3***************"
 
         shell: powershell
 

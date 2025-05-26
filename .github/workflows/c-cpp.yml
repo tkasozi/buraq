@@ -37,7 +37,7 @@ jobs:
         run: |
           Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
           Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
-        shell: powershell
+        shell: powershellc
 
       - name: Setup .NET SDK ${{ env.DOTNET_VERSION }}
         uses: actions/setup-dotnet@v4
@@ -54,10 +54,19 @@ jobs:
 
       - name: Build project
         run: |
+          # Optional: Verify environment for debugging
+          echo "Current PATH: $PATH"
+          echo "CMake version: $(cmake --version)"
+          echo "GCC version: $(gcc --version)"
+          echo "Looking for Qt6 CMake files in /mingw64/lib/cmake/Qt6..."
+          ls -Al /mingw64/lib/cmake/Qt6 || echo "Qt6 CMake directory not found or empty."
+          
+          echo "CMAKE_PREFIX_PATH is set to: $CMAKE_PREFIX_PATH"
+          
           ./build.sh --clean
         env:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native
-        shell: bash
+        shell: msys2 {0}
 
       - name: Logging
         run: |

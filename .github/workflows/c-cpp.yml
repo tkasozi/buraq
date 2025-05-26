@@ -80,7 +80,7 @@ jobs:
             # Optionally, you might want to fail the step if it's critical to find this file
             # exit 1 
           fi
-        #shell: bash # Ensures bash is used for cross-platform consistency in the if/then logic, even on Windows for the overall script structure
+        shell: bash
 
       - name: Build Managed project
         id: dotnet-project

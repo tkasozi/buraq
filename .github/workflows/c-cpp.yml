@@ -49,7 +49,6 @@ jobs:
       - name: Logging step 1
         run: |
           echo "**********1***************"
-#          Get-ChildItem "${{ env.DOTNET_ROOT }}"
           Get-ChildItem "C:\Program Files\dotnet\host\fxr\9.0.5\"
           echo "**********1***************"
 

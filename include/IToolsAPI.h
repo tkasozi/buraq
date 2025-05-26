@@ -21,35 +21,20 @@
 // SOFTWARE.
 
 //
-// Created by talik on 4/19/2024.
+// Created by talik on 5/16/2025.
 //
 
-#ifndef OUTPUT_DISPLAY_H
-#define OUTPUT_DISPLAY_H
+#ifndef ITOOLS_API_H
+#define ITOOLS_API_H
 
-#include <QWidget>
-#include <QGridLayout>
-#include <QLabel>
-#include <QPlainTextEdit>
-#include <QScrollArea>
+#include <filesystem>
+#include <string>
+#include <map>
 
-class OutputDisplay : public QWidget {
-Q_OBJECT
-
-public:
-	~OutputDisplay() override = default;
-
-	explicit OutputDisplay(QWidget *appUi = nullptr);
-
-	void toggle();
-
-	void log(const QString &output, const QString &error);
-
-private:
-	// state is "error" or "default"
-	static QLabel *createLabel(const QString &text, QString state = "default");
-	std::unique_ptr<QPlainTextEdit> main;
-	QWidget *appUi;
+// Example of an application context you might pass to plugins
+struct IToolsApi {
+	std::filesystem::path searchPath;
+	std::map<std::string, std::string> plugins;
 };
 
-#endif //OUTPUT_DISPLAY_H
+#endif //ITOOLS_API_H

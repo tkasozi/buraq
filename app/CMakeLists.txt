@@ -1,10 +1,10 @@
-project(MainProject)
+project(ITools)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 COMPONENTS
+find_package(Qt6 REQUIRED COMPONENTS
 		Core
 		Gui
 		Widgets
@@ -12,41 +12,68 @@ find_package(Qt6 COMPONENTS
 		Xml
 		REQUIRED)
 
-add_executable(ITools main.cpp
-		resources.qrc
+set(ITOOLS_MAIN_SOURCES
+		main.cpp
+		PluginManager.cpp
+		PluginManager.h
+		FileObject.cpp
+		ui/CommonWidget.h
+)
+
+set(ITOOLS_UI_SOURCES
 		ui/AppUi.cpp
-		ui/AppUi.h
 		ui/ToolBarEventFilter.cpp
+		ui/ToolBar.cpp
+		ui/Editor.cpp
+		ui/CustomDrawer.cpp
+		ui/OutputDisplay.cpp
+		ui/CustomLabel.cpp
+		ui/EditorActionArea.cpp
+)
+
+set(ITOOLS_UTILS_SOURCES
+		utils/Minion.cpp
+		utils/Config.cpp
+		utils/Utils.cpp
+)
+
+set(ITOOLS_RESOURCES resources.qrc)
+
+set(ITOOLS_ALL_SOURCES
+		${ITOOLS_MAIN_SOURCES}
+		${ITOOLS_UI_SOURCES}
+		${ITOOLS_UTILS_SOURCES}
+		${ITOOLS_RESOURCES}
+)
+
+set(ITOOLS_HEADERS
+		PluginManager.h
+		FileObject.h
+		ui/AppUi.h
 		ui/ToolBarEventFilter.h
 		ui/ToolButton.h
-		ui/ToolBar.cpp
 		ui/ToolBar.h
 		ui/IconButton.h
-		ui/Editor.cpp
 		ui/Editor.h
 		ui/LineNumberArea.h
-		ui/CustomDrawer.cpp
 		ui/CustomDrawer.h
 		ui/FilePathLabel.h
 		ui/OutputDisplay.h
-		ui/CustomLabel.cpp
 		ui/CustomLabel.h
-		ui/EditorMargin.cpp
-		ui/EditorMargin.h
-		db_connection.h
-		FileObject.h
-		FileObject.cpp
-		utils/Minion.cpp
+		ui/EditorActionArea.h
+		ui/CommonWidget.h
 		utils/Minion.h
-		ui/OutputDisplay.cpp
-		utils/Config.h
-		utils/Config.cpp
-		utils/Utils.cpp
-		utils/Utils.h
-		../include/PluginInterface.h
-		PluginManager.cpp
-		PluginManager.h
-		IToolsAPI.h
+)
+
+if (WIN32)
+	add_executable(ITools WIN32 ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
+endif ()
+
+target_include_directories(ITools PRIVATE
+		"${CMAKE_CURRENT_SOURCE_DIR}/ui"      # For ui headers
+		"${CMAKE_CURRENT_SOURCE_DIR}/utils"   # For utils headers
+		"${CMAKE_CURRENT_SOURCE_DIR}/../include" # For PluginInterface.h, IToolsAPI.h
+		"${CMAKE_CURRENT_SOURCE_DIR}"         # For headers in the current source dir
 )
 
 target_link_libraries(ITools
@@ -57,35 +84,35 @@ target_link_libraries(ITools
 		Qt::Xml
 )
 
-add_dependencies(ITools theme_icons_32x32)
-add_custom_target(theme_icons_32x32 ALL COMMAND
-		${CMAKE_COMMAND} -E copy_directory
-		${PROJECT_SOURCE_DIR}/icons/dark/svg
-		"${CMAKE_BINARY_DIR}/resources/themes/32x32/actions"
+add_dependencies(ITools app_icon)
+add_custom_target(app_icon ALL COMMAND
+		${CMAKE_COMMAND} -E copy
+		${PROJECT_SOURCE_DIR}/icons/workflow.ico
+		"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 )
 
-add_dependencies(ITools theme_icons)
-add_custom_target(theme_icons ALL COMMAND
-		${CMAKE_COMMAND} -E copy_directory
-		${PROJECT_SOURCE_DIR}/icons
-		"${CMAKE_BINARY_DIR}/resources"
+add_dependencies(ITools conf_file)
+add_custom_target(conf_file ALL COMMAND
+		${CMAKE_COMMAND} -E copy
+		${PROJECT_SOURCE_DIR}/qt.conf
+		"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 )
 
-# Add resources
+# Embed resources into the executable
 qt6_add_resources(ITools RESOURCES resources.qrc)
 
-if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
+set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
+if (WIN32)
 	foreach (QT_LIB Core Gui Widgets Sql Xml)
 		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION)
 		get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
-		#		message(STATUS, "*******************${QT_BIN_DIR}***************")
 
 		message(STATUS, "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
 		if (EXISTS "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
 			add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
 					COMMAND ${CMAKE_COMMAND} -E copy
 					"${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll"
-					"$<TARGET_FILE_DIR:${CMAKE_ROOT_PROJECT_POSTFIX}>")
+					"${PLUGIN_BASE_OUTPUT_DIR}")
 		endif ()
 	endforeach (QT_LIB)
 
@@ -117,4 +144,4 @@ if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
 				"$<TARGET_FILE_DIR:${CMAKE_ROOT_PROJECT_POSTFIX}>/plugins/sqldrivers/")
 	endif ()
 	# Add similar logic for other necessary plugin types (e.g., sqldrivers)
-endif()
+endif ()

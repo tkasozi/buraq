@@ -24,8 +24,8 @@
 // Created by talik on 3/9/2024.
 //
 
-#ifndef IT_TOOLS_CUSTOMDRAWER_H
-#define IT_TOOLS_CUSTOMDRAWER_H
+#ifndef CUSTOM_DRAWER_H
+#define CUSTOM_DRAWER_H
 
 
 #include <QWidget>
@@ -54,18 +54,20 @@ public:
 		width = 256,
 	};
 
-	explicit CustomDrawer(Editor *editorPtr, QWidget *parent = nullptr);
+	explicit CustomDrawer(Editor *editor);
 
 	void toggle();
 
+	// smart pointer will be cleaned up.
 	~CustomDrawer() override = default;
 
 	void showPreviouslyOpenedFiles();
 
 private:
 	Editor *editor;
-	IconButton *addScript;
-	QVBoxLayout *pLayout;
+	std::unique_ptr<IconButton> addFile;
+	std::unique_ptr<QVBoxLayout> pLayout;
+
 	struct drawerState state = {.activeFileLabel = nullptr};
 
 	static void openFilePath(FilePathLabel *label, const QString &filePath, const QString &fileName);
@@ -74,4 +76,4 @@ private:
 };
 
 
-#endif //IT_TOOLS_CUSTOMDRAWER_H
+#endif //CUSTOM_DRAWER_H

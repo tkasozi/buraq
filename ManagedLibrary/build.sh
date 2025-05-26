@@ -1,9 +1,21 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-rm -r ./ManagedLibraryPublish ../Release/bin/plugins/ext/ManagedLibraryPublish
+# Exit immediately if a command exits with a non-zero status.
+set -e
 
 # clean
 dotnet clean
 
-# In the ManagedLibrary project directory
-dotnet publish -c Release -r win-x64 --no-self-contained -o ".\ManagedLibraryPublish"
+# Restore dependencies
+dotnet restore ./ManagedLibrary.sln
+
+# Build project
+dotnet build ./ManagedLibrary.sln --configuration Release --no-restore
+
+# Publish project
+dotnet publish -c Release -r win-x64 --no-self-contained -o "./publish"
+
+
+echo "2"
+
+ls -l ./publish

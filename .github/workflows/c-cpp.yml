@@ -4,10 +4,13 @@ on:
    types: [published]
 #  push:
 #    branches:
-#     - fix-cmake-file
+#     - 19-prepare-a-pre-release-v0012
 
 env:
   APP_NAME: "ITools"
+  CI: True
+  DOTNET_VERSION: 9.0
+  CMAKE_EXE: "cmake"
   
 permissions:
   contents: write
@@ -19,8 +22,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up MSVC environment
-        uses: microsoft/setup-msbuild@v2
+      - name: Setup MSYS2 (for MinGW) and Install Qt
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64 # Or MINGW32
+          update: true
+          install: >- # Install specific MinGW packages if needed
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-qt6-base
 
       - name: Download Inno Setup
         run: |
@@ -28,47 +39,47 @@ jobs:
           Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
         shell: powershell
 
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
+      - name: Setup .NET SDK ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
         with:
-          version: '6.8.3'
-          target: 'desktop'
-          arch: 'win64_msvc2022_64'
-          use-official: false
-          # Should be set when "use-official" is true
-          # email: ${{ secrets.QT_EMAIL }}
-          # pw: ${{ secrets.QT_PW }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Configure CMake
-        run: cmake -B ${{ github.workspace }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6"
+      - name: Build Managed project
+        id: dotnet-project
+        run: |
+         cd ManagedLibrary
+          
+         ./build.sh
+        shell: bash
 
       - name: Build project
-        run: cmake --build "${{ github.workspace }}" --config Release --parallel ${{ env.PROCESSOR_NUMBER }}
+        run: |
+          # Optional: Verify environment for debugging
+          echo "Current PATH: $PATH"
+          echo "CMake version: $(cmake --version)"
+          echo "GCC version: $(gcc --version)"
+          echo "Looking for Qt6 CMake files in /mingw64/lib/cmake/Qt6..."
+          ls -Al /mingw64/lib/cmake/Qt6 || echo "Qt6 CMake directory not found or empty."
+          
+          echo "CMAKE_PREFIX_PATH is set to: $CMAKE_PREFIX_PATH"
+          
+          ./build.sh --clean
+        env:
+          CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native
+        shell: msys2 {0}
 
       - name: Logging
         run: |
-          echo "**********1***************"
-          Get-ChildItem "${{ env.QT_ROOT_DIR }}/bin"
-          echo "**********1***************"
-
           echo "**********2***************"
-          Get-ChildItem "Release"
+          Get-ChildItem "build" -R
           echo "**********2***************"
-
-          echo "***********3**************"
-          Get-ChildItem "Release/plugins/sqldrivers"
-          echo "**********3***************"
-          
-          echo "***********4**************"
-          Get-ChildItem "Release/plugins/platforms"
-          echo "**********4***************"
 
         shell: powershell
 
       - name: Find application executable
         id: find-exe
         run: |
-          Get-ChildItem -Path "${{ github.workspace }}/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+          Get-ChildItem -Path "${{ github.workspace }}/build" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
         shell: powershell
 
       - name: Read application executable name
@@ -81,7 +92,7 @@ jobs:
         env:
           APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
-          APP_BINARY: ${{ github.workspace }}/Release/${{ secrets.APP_NAME }}
+          APP_BINARY: ${{ github.workspace }}/build/${{ secrets.APP_NAME }}
         shell: powershell
 
       - name: Create release archive

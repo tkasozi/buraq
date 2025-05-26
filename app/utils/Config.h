@@ -78,20 +78,14 @@ class Config {
 public:
 	explicit Config();
 
-	virtual ~Config() {
-		delete windowConfig;
-		windowConfig = nullptr;
-		delete appIcons;
-		appIcons = nullptr;
-		delete mainStyles;
-		mainStyles = nullptr;
-	};
+	// smart pointer tobe cleaned up
+	virtual ~Config() = default;
 
 	[[nodiscard]] const QString &getTitle() const {
 		return title;
 	}
 
-	[[nodiscard]] const QString &getVersion() const {
+	[[nodiscard]] QString getVersion() const {
 		return version;
 	}
 
@@ -103,16 +97,16 @@ public:
 		return appLogo;
 	}
 
-	[[nodiscard]] const WindowConfig &getWindow() const {
-		return *windowConfig;
+	[[nodiscard]] const WindowConfig *getWindow() const {
+		return windowConfig.get();
 	}
 
-	[[nodiscard]] const AppIcons &getAppIcons() const {
-		return *appIcons;
+	[[nodiscard]] const AppIcons *getAppIcons() const {
+		return appIcons.get();
 	}
 
-	[[nodiscard]] const MainStyles &getMainStyles() const {
-		return *mainStyles;
+	[[nodiscard]] const MainStyles *getMainStyles() const {
+		return mainStyles.get();
 	}
 
 private:
@@ -120,9 +114,9 @@ private:
 	QString version;
 	QString powershellPath;
 	QIcon appLogo;
-	WindowConfig *windowConfig;
-	AppIcons *appIcons;
-	MainStyles *mainStyles;
+	std::unique_ptr<WindowConfig> windowConfig;
+	std::unique_ptr<AppIcons> appIcons;
+	std::unique_ptr<MainStyles> mainStyles;
 
 	void processWindowAttr(const QDomElement &);
 

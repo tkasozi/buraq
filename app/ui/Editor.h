@@ -30,6 +30,7 @@ protected:
 	void mousePressEvent(QMouseEvent *e) override;
 
 signals:
+	void statusUpdate(QString status, int timeout = 10000);
 
 	void readyToSaveEvent();
 
@@ -38,9 +39,9 @@ signals:
 	void inlineSyntaxtHighlightingEvent();
 
 public:
-	explicit Editor(QWidget *parent = nullptr);
+	explicit Editor(QWidget *appUi = nullptr);
 
-	~Editor() override = default;
+	~Editor() override  = default;
 
 	void openAndParseFile(const QString &filePath, QFile::OpenModeFlag modeFlag = QFile::OpenModeFlag::ReadOnly);
 
@@ -49,6 +50,7 @@ public:
 	int lineNumberAreaWidth();
 
 private slots:
+	void setupSignals();
 
 	void updateLineNumberAreaWidth(int newBlockCount);
 
@@ -66,13 +68,14 @@ private:
 	static QString convertTextToHtml(QString &);
 	static QString convertRhsTextToHtml(const QString &);
 
+	std::unique_ptr<QWidget> lineNumberArea;
+	QWidget *appUi;
 	QStack<QString> history;
-	QWidget *lineNumberArea;
-	QWidget *parent;
 	QIcon play;
 	QString currentFile;
 	QString previousText;
 	QTimer autoSaveTimer;
+
 };
 
 #endif //IT_TOOLS_EDITOR_H2

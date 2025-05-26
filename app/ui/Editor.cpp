@@ -39,8 +39,21 @@ static QRegularExpression variablesRegex(
 		QStringLiteral("^\\s*(\\$\\w+\\s*)=(.*?)$"),
 		QRegularExpression::CaseInsensitiveOption);
 
-Editor::Editor(QWidget *parent) : QPlainTextEdit(parent), parent(parent) {
-	lineNumberArea = new LineNumberArea(this);
+#define EDITOR_STYLES R"(
+	Editor {
+			/*  font-family: monospace;*/
+			border: 0;
+			color: #c0c0c0;
+			margin-left: 60px;
+			font-size: 18px;
+			show-decoration-selected;
+			selection-color: #232323;
+			selection-background-color: #87CEEB; /* lightblue - same as variabled */
+	}
+)"
+
+Editor::Editor(QWidget *ptr) : QPlainTextEdit(nullptr), appUi(ptr) {
+	lineNumberArea = std::make_unique<LineNumberArea>(this);
 
 	// setting up the editor's layout.
 	auto *layoutC = new QGridLayout;
@@ -59,20 +72,15 @@ Editor::Editor(QWidget *parent) : QPlainTextEdit(parent), parent(parent) {
 		file.close();
 	}
 
-	connect(this, &Editor::cursorPositionChanged, this, &Editor::highlightCurrentLine);
-	connect(this, &Editor::updateRequest, this, &Editor::updateLineNumberArea);
+	setupSignals();
 
-	// Enables syntaxHighlighting i.e. showing keywords, comments, variables etc.
-	connect(this, &Editor::syntaxtHighlightingEvent, this, &Editor::documentSyntaxHighlighting);
-	connect(this, &Editor::inlineSyntaxtHighlightingEvent, this, &Editor::inlineSyntaxHighlighting);
+	QString stylesStr = QString(SCROLL_BAR_STYLES) + QString(EDITOR_STYLES);
 
-	// Enables auto saving the document
-	connect(this, &Editor::readyToSaveEvent, this, &Editor::autoSave);
+	setStyleSheet(stylesStr);
 
-	setStyleSheet("border: 0; color: #c0c0c0; margin-left: 60px; Editor.test {};");
 	updateLineNumberAreaWidth(0);
 
-	play = QIcon(QIcon(ItoolsNS::main_config.getAppIcons().playCode));
+	play = QIcon(QIcon(ItoolsNS::main_config.getAppIcons()->playCode));
 	play.actualSize(QSize(64, 64));
 }
 
@@ -87,7 +95,7 @@ void Editor::updateLineNumberArea(const QRect &rect, int dy) {
 }
 
 void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
-	QPainter painter(lineNumberArea);
+	QPainter painter(lineNumberArea.get());
 	painter.setBackgroundMode(Qt::BGMode::TransparentMode);
 
 	QTextBlock block = firstVisibleBlock();
@@ -250,25 +258,39 @@ void Editor::openAndParseFile(const QString &filePath, QFile::OpenModeFlag modeF
 	emit syntaxtHighlightingEvent();
 }
 
+void Editor::setupSignals() {
+	connect(this, &Editor::cursorPositionChanged, this, &Editor::highlightCurrentLine);
+	connect(this, &Editor::updateRequest, this, &Editor::updateLineNumberArea);
+
+	// Enables syntaxHighlighting i.e. showing keywords, comments, variables etc.
+	connect(this, &Editor::syntaxtHighlightingEvent, this, &Editor::documentSyntaxHighlighting);
+	connect(this, &Editor::inlineSyntaxtHighlightingEvent, this, &Editor::inlineSyntaxHighlighting);
+
+	// Enables auto saving the document
+	connect(this, &Editor::readyToSaveEvent, this, &Editor::autoSave);
+
+	// Update status bar in AppUI component
+	auto *appUi_ = dynamic_cast<AppUi *>(appUi);
+	QObject::connect(this, &Editor::statusUpdate, appUi_, &AppUi::processStatusSlot);
+}
+
 void Editor::autoSave() {
-	auto appUi = dynamic_cast<AppUi *>(parent);
 
 	// auto save works only if the file had been saved before
 	// therefore currentFile should have been set
-	if (appUi != nullptr && !currentFile.isEmpty()) {
-		auto statusBar = appUi->getQStatusBar();
+	if (!currentFile.isEmpty()) {
 
 		// Open the file for writing
 		QFile file(currentFile);
 		if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-			statusBar->showMessage(file.errorString());
+			emit statusUpdate(file.errorString());
 		}
 
 		// Write data to the file (using QTextStream for text files)
 		QTextStream out(&file);
 		out << toPlainText();
 
-		statusBar->showMessage("Auto Saving..", 2000);
+		emit statusUpdate("Auto Saving..", 5000);
 
 		// Close the file (important to flush data to disk)
 		file.close();

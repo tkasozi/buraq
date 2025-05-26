@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ITools"
-#define MyAppVersion "0.0.1"
+#define MyAppVersion "0.0.12"
 #define MyAppPublisher "ITools Projectxx, Inc."
 #define MyAppURL "https://www.example.com/"
 #define MyAppExeName "ITools.exe"
@@ -36,7 +36,7 @@ DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
 OutputBaseFilename=IToolsSetup
-SetupIconFile="icons\workflow.ico"
+SetupIconFile="app\icons\workflow.ico"
 SolidCompression=yes
 WizardStyle=modern
 
@@ -46,17 +46,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
-[Dirs]
-Name: "plugins\sqldrivers";
-Name: "plugins\platforms";
-
 [Files]
-Source: "Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "Release\*.dll "; DestDir: "{app}"; Flags: ignoreversion
-Source: "Release\plugins\sqldrivers\*.dll"; DestDir: "{app}\plugins\sqldrivers"; Flags: ignoreversion
-Source: "Release\plugins\platforms\*.dll"; DestDir: "{app}\plugins\platforms"; Flags: ignoreversion
-Source: "Release\resources\*.ico"; DestDir: "{app}"; Flags: ignoreversion
-
+Source: "build\bin\*.*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

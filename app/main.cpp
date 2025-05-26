@@ -28,12 +28,12 @@ int main(int argc, char *argv[]) {
 	styleFile.open(QIODevice::ReadOnly);
 	app.setStyleSheet(styleFile.readAll());
 
-	std::unique_ptr<AppUi> ui = std::make_unique<AppUi>(nullptr);
-	ui->show();
-
 	// user's home dir should be the default location when the app starts.
 	// In the later release, save user's last dir/path
 	std::filesystem::current_path(ItoolsNS::get_user_home_directory());
+
+	std::unique_ptr<AppUi> ui = std::make_unique<AppUi>(nullptr);
+	ui->show();
 
 	return QApplication::exec();
 }

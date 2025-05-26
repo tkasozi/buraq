@@ -30,18 +30,12 @@
 #include "Editor.h"
 #include "CustomDrawer.h"
 #include "EditorActionArea.h"
-#include "../IToolsAPI.h"
 #include <sstream>
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
+#include <QCoreApplication>
+#include <map>
 
-namespace fs = std::filesystem;
-
-AppUi::AppUi(QWidget *parent)
-		: QMainWindow(parent), pluginManager(new PluginManager(new IToolsApi)) {
-
-	// Load plugins from the specified directory
-	fs::path powershell_plugin = fs::current_path().parent_path() / "bin"/ "libPowershellExt.dll";
-	pluginManager->loadPlugin(powershell_plugin.string());
+AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
 	// Other UI
 	setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
@@ -156,6 +150,8 @@ AppUi::AppUi(QWidget *parent)
 	centralWidgetLayout->addWidget(editorAndDrawerAreaPanel, 0, 2, 12, 12);
 	centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
 
+	configureAppContext();
+
 	// Add a temporary message that disappears after 5 seconds
 	processStatusSlot("Ready.", 2000);
 }
@@ -203,4 +199,19 @@ void AppUi::processResultSlot(int exitCode, const QString &output, const QString
 		processStatusSlot("Process failed!");
 		outPutArea->log("", error);
 	}
+}
+
+void AppUi::configureAppContext() {
+// app search_path for plugins
+	std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
+	// Add required plugins
+	std::map<std::string, std::string> plugins_{
+			{"power_shell", searchPath.string() + "/libPowershellExt.dll"}
+	};
+
+	auto api_context = new IToolsApi(searchPath, plugins_);
+	pluginManager = std::make_unique<PluginManager>(api_context);
+
+	// Load plugins from the specified directory
+	pluginManager->loadPlugin("power_shell");
 }

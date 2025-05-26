@@ -28,6 +28,7 @@
 #define ITOOLS_PLUGIN_MANAGER_H
 
 #include "../include/PluginInterface.h"
+#include "../include/IToolsAPI.h"
 #include <string>
 #include <vector>
 #include <memory> // For std::unique_ptr or managing plugin instances
@@ -43,12 +44,12 @@
 
 class PluginManager {
 public:
-	explicit PluginManager(void *app_context); // Application context to pass to plugins
+	explicit PluginManager(IToolsApi *app_context); // Application context to pass to plugins
 
 	~PluginManager();
 
 	// Loads a plugin from the given file path.
-	bool loadPlugin(const std::string &plugin_path);
+	bool loadPlugin(const std::string &plugin_name);
 
 	// Unloads all loaded plugins.
 	void unloadAllPlugins();
@@ -79,7 +80,7 @@ private:
 	};
 
 	std::vector<LoadedPlugin> plugins_;
-	void *application_context_; // Store the application context
+	IToolsApi *application_context_; // Store the application context
 
 #ifdef _WIN32
 

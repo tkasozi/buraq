@@ -27,24 +27,14 @@
 #ifndef ITOOLS_API_H
 #define ITOOLS_API_H
 
-#include <iostream>
-#include <memory>
-//#include "ui/AppUi.h"
+#include <filesystem>
+#include <string>
+#include <map>
 
 // Example of an application context you might pass to plugins
 struct IToolsApi {
-//	std::unique_ptr<AppUi> ui_ptr;
-
-//	AppUi* ui_ptr;
-
-	IToolsApi() {}
-
-//	explicit IToolsApi(AppUi* ptr) : ui_ptr(ptr) {}
-
-	void someApplicationFunction() {
-		std::cout << "[ApplicationAPI] Some application function was called by a plugin." << std::endl;
-	}
-	// Add more functions or data members that plugins might need
+	std::filesystem::path searchPath;
+	std::map<std::string, std::string> plugins;
 };
 
 #endif //ITOOLS_API_H

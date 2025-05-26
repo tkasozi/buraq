@@ -22,13 +22,10 @@ namespace ManagedLibrary
         [UnmanagedCallersOnly(EntryPoint = "Execute")]
         public static IntPtr Execute(IntPtr args, int argSizeBytes)
         {
-            Console.WriteLine("C#: Hello from ManagedLibrary.CSharpWorker.Execute!");
-
             IntPtr unmanagedStringErrPtr = Marshal.StringToCoTaskMemUni("Null arguments pointer received");
 
             if (args == IntPtr.Zero)
             {
-                Console.WriteLine("C#: Received null arguments pointer.");
                 return unmanagedStringErrPtr;
             }
 
@@ -43,7 +40,6 @@ namespace ManagedLibrary
                 ps.AddScript(message);
 
                 IntPtr unmanagedStringPtr = Marshal.StringToCoTaskMemUni(CSharpWorker.ExecuteAndDisplayResults(ps, message));
-                Console.WriteLine("Returning: " + unmanagedStringPtr);
 
                 return unmanagedStringPtr;
             }
@@ -102,7 +98,7 @@ namespace ManagedLibrary
             {
                 // This catches exceptions from the Invoke() call itself,
                 // not necessarily script errors which go to psInstance.Streams.Error
-                Console.WriteLine($"An exception occurred during PowerShell invocation: {ex.Message}");
+                // Console.WriteLine($"An exception occurred during PowerShell invocation: {ex.Message}");
                 return sb.Append($"An exception occurred during PowerShell invocation: {ex.Message}").ToString();
             }
         }

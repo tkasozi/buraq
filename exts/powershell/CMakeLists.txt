@@ -26,8 +26,9 @@ set(NET_HOST_DLL "${CMAKE_DOTNET_TARGET_FRAMEWORK}\\nethost.dll")
 
 message("***** NET_HOST_DLL: ${NET_HOST_DLL} *****")
 
+string(REPLACE "\\" "/" FRAMEWORK_LINK_DIR "${CMAKE_DOTNET_TARGET_FRAMEWORK}")
+
 if (EXISTS "${CMAKE_DOTNET_TARGET_FRAMEWORK}\\nethost.lib")
-	string(REPLACE "\\" "/" FRAMEWORK_LINK_DIR "${CMAKE_DOTNET_TARGET_FRAMEWORK}")
 	target_link_directories(PowershellExt PRIVATE "${FRAMEWORK_LINK_DIR}")
 	target_link_libraries(PowershellExt PRIVATE nethost)
 else ()
@@ -35,19 +36,22 @@ else ()
 endif ()
 
 # Check if the library file exists
-if (EXISTS "${NET_HOST_DLL}")
-	# Link the nethost library to your PowershellExt target
+foreach (NET_LIB nethost.lib nethost.dll)
+	if (EXISTS "${FRAMEWORK_LINK_DIR}/${NET_LIB}")
+		# Link the nethost library to your PowershellExt target
+		message("${FRAMEWORK_LINK_DIR}/${NET_LIB}")
+		add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E make_directory "${PLUGIN_FULL_OUTPUT_DIR}" # Ensure directory exists
+				COMMAND ${CMAKE_COMMAND} -E copy
+				"${FRAMEWORK_LINK_DIR}/${NET_LIB}"
+				"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+				COMMENT "Copying ${NET_HOST_DLL} to ${PLUGIN_SUBDIR}"
+				VERBATIM)
+	else ()
+		message(FATAL_ERROR "nethost.dll not found at ${NET_HOST_DLL}. Please check CMAKE_DOTNET_TARGET_FRAMEWORK and your .NET SDK installation.")
+	endif ()
+endforeach (NET_LIB)
 
-	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E make_directory "${PLUGIN_FULL_OUTPUT_DIR}" # Ensure directory exists
-			COMMAND ${CMAKE_COMMAND} -E copy
-			"${NET_HOST_DLL}"
-			"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-			COMMENT "Copying ${NET_HOST_DLL} to ${PLUGIN_SUBDIR}"
-			VERBATIM)
-else ()
-	message(FATAL_ERROR "nethost.dll not found at ${NET_HOST_DLL}. Please check CMAKE_DOTNET_TARGET_FRAMEWORK and your .NET SDK installation.")
-endif ()
 
 # On Windows, this ensures that the functions are exported from the DLL.
 # On other platforms (Linux, macOS), __attribute__((visibility("default"))) is typically used.
@@ -62,9 +66,9 @@ file(GLOB ASSET_FILES "${MANAGED_LIBRARY_PUBLISH_DIR}/*") # Gets files directly 
 file(MAKE_DIRECTORY "${PLUGIN_FULL_OUTPUT_DIR}/ManagedLibraryPublish")
 
 # Loop through the globbed files and copy them
-foreach(ASSET_FILE ${ASSET_FILES})
+foreach (ASSET_FILE ${ASSET_FILES})
 	file(COPY "${ASSET_FILE}" DESTINATION "${PLUGIN_FULL_OUTPUT_DIR}/ManagedLibraryPublish")
-endforeach()
+endforeach ()
 
 # On Windows, also place the PDB (Program Database for debugging) file alongside the DLL.
 if (MSVC)

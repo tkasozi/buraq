@@ -18,7 +18,8 @@ int main(int argc, char *argv[]) {
 	// Initialize the database:
 	QSqlError err = init_db();
 	if (err.type() != QSqlError::NoError) {
-		qDebug() << "Error executing initializing db:" << err.text();
+		db_log("Error executing initializing db: " + QString(err.text()));
+
 		return EXIT_FAILURE;
 	}
 
@@ -29,6 +30,10 @@ int main(int argc, char *argv[]) {
 
 	std::unique_ptr<AppUi> ui = std::make_unique<AppUi>(nullptr);
 	ui->show();
+
+	// user's home dir should be the default location when the app starts.
+	// In the later release, save user's last dir/path
+	std::filesystem::current_path(ItoolsNS::get_user_home_directory());
 
 	return QApplication::exec();
 }

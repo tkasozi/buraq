@@ -61,6 +61,8 @@ private:
 	std::unique_ptr<QWidget> editorMargin;
 	std::unique_ptr<ToolBar> toolBar;
 	std::unique_ptr<QStatusBar> statusBar;
+
+	void configureAppContext();
 };
 
 

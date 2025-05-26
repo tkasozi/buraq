@@ -28,9 +28,6 @@
 #include <iostream>
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 
-namespace fs = std::filesystem;
-
-
 #ifdef _WIN32
 
 void PluginManager::logWindowsError(const std::string &action) {
@@ -50,15 +47,15 @@ void PluginManager::logWindowsError(const std::string &action) {
 
 #endif
 
-PluginManager::PluginManager(void *app_context) : application_context_(app_context) {}
+PluginManager::PluginManager(IToolsApi *app_context) : application_context_(app_context) {}
 
 PluginManager::~PluginManager() {
-	std::cout << "~PluginManager()" << std::endl;
+//	std::cout << "~PluginManager()" << std::endl;
 	unloadAllPlugins();
 }
 
-bool PluginManager::loadPlugin(const std::string &plugin_path) {
-	std::cout << "Attempting to load plugin: " << plugin_path << std::endl;
+bool PluginManager::loadPlugin(const std::string &plugin_name) {
+	std::string plugin_path = application_context_->plugins.at(plugin_name);
 
 #ifdef _WIN32
 	HMODULE plugin_handle = LoadLibraryA(plugin_path.c_str());
@@ -87,7 +84,6 @@ bool PluginManager::loadPlugin(const std::string &plugin_path) {
 		CreatePluginFunc create_func = (CreatePluginFunc)dlsym(plugin_handle, "create_plugin");
 		const char* dlsym_error = dlerror();
 		if (dlsym_error) {
-			std::cerr << "Failed to find 'create_plugin' in " << plugin_path << ". Error: " << dlsym_error << std::endl;
 #ifdef _WIN32
 				FreeLibrary(plugin_handle);
 #else
@@ -99,7 +95,6 @@ bool PluginManager::loadPlugin(const std::string &plugin_path) {
 		destroy_func = (DestroyPluginFunc)dlsym(plugin_handle, "destroy_plugin");
 		dlsym_error = dlerror();
 		if (dlsym_error) {
-			std::cerr << "Failed to find 'destroy_plugin' in " << plugin_path << ". Error: " << dlsym_error << std::endl;
 #ifdef _WIN32
 				FreeLibrary(plugin_handle);
 #else
@@ -110,7 +105,6 @@ bool PluginManager::loadPlugin(const std::string &plugin_path) {
 #endif
 
 	if (!create_func || !destroy_func) {
-		std::cerr << "Failed to get factory functions from plugin: " << plugin_path << std::endl;
 #ifdef _WIN32
 		if (!create_func) logWindowsError("GetProcAddress for create_plugin");
 		if (!destroy_func) logWindowsError("GetProcAddress for destroy_plugin");
@@ -121,9 +115,8 @@ bool PluginManager::loadPlugin(const std::string &plugin_path) {
 		return false;
 	}
 
-	IPlugin *plugin_instance = create_func();
+	IPlugin *plugin_instance = create_func(application_context_);
 	if (!plugin_instance) {
-		std::cerr << "Plugin factory function 'create_plugin' failed for: " << plugin_path << std::endl;
 #ifdef _WIN32
 		FreeLibrary(plugin_handle);
 #else
@@ -146,17 +139,14 @@ bool PluginManager::loadPlugin(const std::string &plugin_path) {
 	}
 
 	plugins_.emplace_back(plugin_handle, plugin_instance, destroy_func);
-	std::cout << "Successfully loaded and initialized plugin: " << plugin_instance->getName() << " from " << plugin_path
-			  << std::endl;
+
 	return true;
 }
 
 void PluginManager::unloadAllPlugins() {
-	std::cout << "Unloading all plugins..." << std::endl;
 	// Unload in reverse order of loading (optional, but sometimes good practice)
 	for (auto it = plugins_.rbegin(); it != plugins_.rend(); ++it) {
 		if (it->instance) {
-			std::cout << "Shutting down plugin: " << it->instance->getName() << std::endl;
 			it->instance->shutdown(); // Call plugin's shutdown method
 			it->destroy_func(it->instance); // Call plugin's destroy function
 			it->instance = nullptr;
@@ -171,7 +161,6 @@ void PluginManager::unloadAllPlugins() {
 		}
 	}
 	plugins_.clear();
-	std::cout << "All plugins unloaded." << std::endl;
 }
 
 void PluginManager::loadPluginsFromDirectory(const std::string &directory_path) {
@@ -190,9 +179,7 @@ void PluginManager::loadPluginsFromDirectory(const std::string &directory_path) 
 		printf("Error in LoadLibraryA for %s (Code %lu)\n", pluginPath, GetLastError());
 	}
 	// ----------------------------------------------------------------------------------
-
-
-
+	namespace fs = std::filesystem;
 
 	if (!fs::exists(directory_path) || !fs::is_directory(directory_path)) {
 		std::cerr << "Plugin directory does not exist or is not a directory: " << directory_path << std::endl;
@@ -224,42 +211,12 @@ void PluginManager::loadPluginsFromDirectory(const std::string &directory_path) 
 	}
 }
 
-void PluginManager::callPerformActionOnAll() {
-	if (plugins_.empty()) {
-		std::cout << "No plugins loaded to perform actions." << std::endl;
-		return;
-	}
-	std::cout << "\n--- Calling performAction() on all plugins ---" << std::endl;
-	for (const auto &p_info: plugins_) {
-		if (p_info.instance) {
-			std::cout << "Plugin [" << p_info.instance->getName() << "]: ";
-			p_info.instance->performAction();
-		}
-	}
-	std::cout << "--- Finished calling performAction() ---" << std::endl;
-}
-
-void PluginManager::callGetNameOnAll() {
-	if (plugins_.empty()) {
-		std::cout << "No plugins loaded." << std::endl;
-		return;
-	}
-	std::cout << "\n--- Listing all loaded plugins by name ---" << std::endl;
-	for (const auto &p_info: plugins_) {
-		if (p_info.instance) {
-			std::cout << "Found plugin: " << p_info.instance->getName() << std::endl;
-		}
-	}
-	std::cout << "--- End of plugin list ---" << std::endl;
-}
-
-ProcessedData PluginManager::callPerformAction(void * cmd) {
+ProcessedData PluginManager::callPerformAction(void *cmd) {
 	if (plugins_.empty()) {
 		return {};
 	}
 	auto p_info = plugins_.front();
 	if (p_info.instance) {
-		std::cout << "Plugin [" << p_info.instance->getName() << "]";
 		return p_info.instance->performAction(cmd);
 	}
 	return {};

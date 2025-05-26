@@ -46,7 +46,7 @@ add_executable(ITools main.cpp
 		../include/PluginInterface.h
 		PluginManager.cpp
 		PluginManager.h
-		IToolsAPI.h
+		../include/IToolsAPI.h
 		ui/CommonWidget.h
 )
 
@@ -58,44 +58,24 @@ target_link_libraries(ITools
 		Qt::Xml
 )
 
-add_dependencies(ITools theme_icons_32x32)
-add_custom_target(theme_icons_32x32 ALL COMMAND
-		${CMAKE_COMMAND} -E copy_directory
-		${PROJECT_SOURCE_DIR}/icons/dark/svg
-		"${CMAKE_BINARY_DIR}/resources/themes/32x32/actions"
+add_dependencies(ITools app_icon)
+add_custom_target(app_icon ALL COMMAND
+		${CMAKE_COMMAND} -E copy
+		${PROJECT_SOURCE_DIR}/icons/workflow.ico
+		"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 )
 
-add_dependencies(ITools theme_icons)
-add_custom_target(theme_icons ALL COMMAND
-		${CMAKE_COMMAND} -E copy_directory
-		${PROJECT_SOURCE_DIR}/icons
-		"${CMAKE_BINARY_DIR}/resources"
+add_dependencies(ITools conf_file)
+add_custom_target(conf_file ALL COMMAND
+		${CMAKE_COMMAND} -E copy
+		${PROJECT_SOURCE_DIR}/qt.conf
+		"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 )
 
-# Add resources
+# Embed resources into the executable
 qt6_add_resources(ITools RESOURCES resources.qrc)
 
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/.data")
-set(DB_OUTPUT_FILE "${CMAKE_BINARY_DIR}/bin/.data/${PROJECT_NAME}.db")
-
-add_custom_command(
-		OUTPUT ${DB_OUTPUT_FILE}
-		COMMAND ${CMAKE_COMMAND} -E touch ${DB_OUTPUT_FILE}
-		COMMENT "Generating ${DB_OUTPUT_FILE}."
-		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin/.data"
-)
-
-# 2. Define a custom target
-add_custom_target(generate_db_file ALL
-		DEPENDS ${DB_OUTPUT_FILE}
-		COMMENT "Ensuring ${DB_OUTPUT_FILE} is up-to-date"
-)
-
-if(TARGET generate_db_file)
-	add_dependencies(ITools generate_db_file)
-endif()
-
-if (CMAKE_BUILD_TYPE MATCHES "Release" AND WIN32)
+if (WIN32)
 	foreach (QT_LIB Core Gui Widgets Sql Xml)
 		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION)
 		get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)

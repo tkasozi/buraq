@@ -7,24 +7,27 @@
 #include "db_connection.h"
 #include <QtSql>
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 	QApplication app(argc, argv);
 
-	if(!db_conn()) {
+	if (!db_conn())
+	{
 		// failed to connect to the database
 		return EXIT_FAILURE;
 	}
 
 	// Initialize the database:
 	QSqlError err = init_db();
-	if (err.type() != QSqlError::NoError) {
+	if (err.type() != QSqlError::NoError)
+	{
 		db_log("Error executing initializing db: " + QString(err.text()));
 
 		return EXIT_FAILURE;
 	}
 
 	// configure default css
-	QFile styleFile(":/styles.qss");  // Assuming the file is a resource
+	QFile styleFile(":/styles.qss"); // Assuming the file is a resource
 	styleFile.open(QIODevice::ReadOnly);
 	app.setStyleSheet(styleFile.readAll());
 

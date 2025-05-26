@@ -22,9 +22,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up MSVC environment
-        uses: microsoft/setup-msbuild@v2
-
+#      - name: Set up MSVC environment
+#        uses: microsoft/setup-msbuild@v2
+      - name: Setup MSYS2 (for MinGW)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64 # Or MINGW32
+          update: true
+          install: >- # Install specific MinGW packages if needed
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-make
       - name: Download Inno Setup
         run: |
           Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
@@ -55,7 +63,8 @@ jobs:
         shell: bash
 
       - name: Build project
-        run: ./build.sh --clean
+        run: |
+          ./build.sh --clean
         env:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native
         shell: bash

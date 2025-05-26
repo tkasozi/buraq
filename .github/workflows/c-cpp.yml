@@ -46,7 +46,7 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Find nethost.dll for .NET 9.0
+      - name: Find nethost.dll for .NET 9.0.5
         id: find_nethost # Give an ID to this step so we can reference its output
         run: |
           echo "Searching for nethost.dll under DOTNET_ROOT: ${{ env.DOTNET_ROOT }}"
@@ -56,7 +56,7 @@ jobs:
           
           # For Linux and macOS runners (bash):
           if [[ "$RUNNER_OS" == "Linux" || "$RUNNER_OS" == "macOS" ]]; then
-            NETHOST_PATH=$(find "${{ env.DOTNET_ROOT }}" -type f -name "nethost.dll" -path "*/host/fxr/9.0.*/nethost.dll" | head -n 1)
+            NETHOST_PATH=$(find "${{ env.DOTNET_ROOT }}" -type f -name "nethost.dll" -path "*/host/fxr/9.0.5/nethost.dll" | head -n 1)
           fi
           
           # For Windows runners (PowerShell):

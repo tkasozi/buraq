@@ -1,6 +1,6 @@
 project(PowershellExt LANGUAGES CXX)
 
-set(MANAGED_LIBRARY_PUBLISH_DIR "${CMAKE_HOME_DIRECTORY}/ManagedLibrary/ManagedLibraryPublish") # Path from dotnet publish -o
+set(MANAGED_LIBRARY_PUBLISH_DIR "${CMAKE_HOME_DIRECTORY}/ManagedLibrary/publish") # Path from dotnet publish -o
 
 # --- Define the shared library target ---
 # The first argument is the target name. CMake will automatically name the file
@@ -63,16 +63,16 @@ endif ()
 file(GLOB ASSET_FILES "${MANAGED_LIBRARY_PUBLISH_DIR}/*") # Gets files directly in the folder
 
 # Ensure destination directory exists
-file(MAKE_DIRECTORY "${PLUGIN_FULL_OUTPUT_DIR}/ManagedLibraryPublish")
+file(MAKE_DIRECTORY "${PLUGIN_BASE_OUTPUT_DIR}/managed")
 
 # Loop through the globbed files and copy them
 foreach (ASSET_FILE ${ASSET_FILES})
-	file(COPY "${ASSET_FILE}" DESTINATION "${PLUGIN_FULL_OUTPUT_DIR}/ManagedLibraryPublish")
+	file(COPY "${ASSET_FILE}" DESTINATION "${PLUGIN_BASE_OUTPUT_DIR}/managed")
 endforeach ()
 
 # On Windows, also place the PDB (Program Database for debugging) file alongside the DLL.
-if (MSVC)
-	set_target_properties(PowershellExt PROPERTIES
-			PDB_OUTPUT_DIRECTORY "${PLUGIN_FULL_OUTPUT_DIR}/plugins/ext"
-	)
-endif ()
+set_target_properties(PowershellExt PROPERTIES
+		LIBRARY_OUTPUT_DIRECTORY "${PLUGIN_FULL_OUTPUT_DIR}"
+		RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_FULL_OUTPUT_DIR}"
+		PDB_OUTPUT_DIRECTORY "${PLUGIN_FULL_OUTPUT_DIR}"
+)

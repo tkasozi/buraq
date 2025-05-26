@@ -206,7 +206,7 @@ void AppUi::configureAppContext() {
 	std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
 	// Add required plugins
 	std::map<std::string, std::string> plugins_{
-			{"power_shell", searchPath.string() + "/libPowershellExt.dll"}
+			{"power_shell", searchPath.string() + "/plugins/ext/libPowershellExt.dll"}
 	};
 
 	auto api_context = new IToolsApi(searchPath, plugins_);

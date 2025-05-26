@@ -56,7 +56,7 @@ Release/
 build/
 ManagedLibrary/bin/
 ManagedLibrary/obj/
-ManagedLibrary/ManagedLibraryPublish/
+ManagedLibrary/publish/
 
 TestManagedApp/bin/
 TestManagedApp/obj/

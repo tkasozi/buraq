@@ -12,42 +12,68 @@ find_package(Qt6 COMPONENTS
 		Xml
 		REQUIRED)
 
-add_executable(ITools main.cpp
-		resources.qrc
+set(ITOOLS_MAIN_SOURCES
+		main.cpp
+		PluginManager.cpp
+		PluginManager.h
+		FileObject.cpp
+		ui/CommonWidget.h
+)
+
+set(ITOOLS_UI_SOURCES
 		ui/AppUi.cpp
-		ui/AppUi.h
 		ui/ToolBarEventFilter.cpp
+		ui/ToolBar.cpp
+		ui/Editor.cpp
+		ui/CustomDrawer.cpp
+		ui/OutputDisplay.cpp
+		ui/CustomLabel.cpp
+		ui/EditorActionArea.cpp
+)
+
+set(ITOOLS_UTILS_SOURCES
+		utils/Minion.cpp
+		utils/Config.cpp
+		utils/Utils.cpp
+)
+
+set(ITOOLS_RESOURCES resources.qrc)
+
+set(ITOOLS_ALL_SOURCES
+		${ITOOLS_MAIN_SOURCES}
+		${ITOOLS_UI_SOURCES}
+		${ITOOLS_UTILS_SOURCES}
+		${ITOOLS_RESOURCES}
+)
+
+set(ITOOLS_HEADERS
+		PluginManager.h
+		FileObject.h
+		ui/AppUi.h
 		ui/ToolBarEventFilter.h
 		ui/ToolButton.h
-		ui/ToolBar.cpp
 		ui/ToolBar.h
 		ui/IconButton.h
-		ui/Editor.cpp
 		ui/Editor.h
 		ui/LineNumberArea.h
-		ui/CustomDrawer.cpp
 		ui/CustomDrawer.h
 		ui/FilePathLabel.h
 		ui/OutputDisplay.h
-		ui/CustomLabel.cpp
 		ui/CustomLabel.h
-		ui/EditorActionArea.cpp
 		ui/EditorActionArea.h
-		db_connection.h
-		FileObject.h
-		FileObject.cpp
-		utils/Minion.cpp
-		utils/Minion.h
-		ui/OutputDisplay.cpp
-		utils/Config.h
-		utils/Config.cpp
-		utils/Utils.cpp
-		utils/Utils.h
-		../include/PluginInterface.h
-		PluginManager.cpp
-		PluginManager.h
-		../include/IToolsAPI.h
 		ui/CommonWidget.h
+		utils/Minion.h
+)
+
+if (WIN32)
+	add_executable(ITools WIN32 ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS})
+endif ()
+
+target_include_directories(ITools PRIVATE
+		"${CMAKE_CURRENT_SOURCE_DIR}/ui"      # For ui headers
+		"${CMAKE_CURRENT_SOURCE_DIR}/utils"   # For utils headers
+		"${CMAKE_CURRENT_SOURCE_DIR}/../include" # For PluginInterface.h, IToolsAPI.h
+		"${CMAKE_CURRENT_SOURCE_DIR}"         # For headers in the current source dir
 )
 
 target_link_libraries(ITools
@@ -74,19 +100,18 @@ add_custom_target(conf_file ALL COMMAND
 
 # Embed resources into the executable
 qt6_add_resources(ITools RESOURCES resources.qrc)
-
+set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
 if (WIN32)
 	foreach (QT_LIB Core Gui Widgets Sql Xml)
 		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION)
 		get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
-		#		message(STATUS, "*******************${QT_BIN_DIR}***************")
 
 		message(STATUS, "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
 		if (EXISTS "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
 			add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
 					COMMAND ${CMAKE_COMMAND} -E copy
 					"${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll"
-					"$<TARGET_FILE_DIR:${CMAKE_ROOT_PROJECT_POSTFIX}>")
+					"${PLUGIN_BASE_OUTPUT_DIR}")
 		endif ()
 	endforeach (QT_LIB)
 
@@ -118,4 +143,4 @@ if (WIN32)
 				"$<TARGET_FILE_DIR:${CMAKE_ROOT_PROJECT_POSTFIX}>/plugins/sqldrivers/")
 	endif ()
 	# Add similar logic for other necessary plugin types (e.g., sqldrivers)
-endif()
+endif ()

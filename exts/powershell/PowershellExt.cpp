@@ -156,7 +156,7 @@ public:
 
 		// --- 2. Prepare paths and arguments ---
 		// Should be relative to your executable
-		fs::path managed_assembly_dir = app_api_->searchPath / "plugins" / "ext" / "ManagedLibraryPublish";
+		fs::path managed_assembly_dir = app_api_->searchPath / "plugins" / "managed";
 		fs::path config_path = managed_assembly_dir / "ManagedLibrary.runtimeconfig.json";
 		assembly_path = managed_assembly_dir / "ManagedLibrary.dll";
 

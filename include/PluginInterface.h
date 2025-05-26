@@ -28,6 +28,7 @@
 #define PLUGIN_INTERFACE_H
 
 #include <string>
+#include "IToolsAPI.h"
 
 struct ProcessedData {
 	std::wstring resultValue;
@@ -36,11 +37,12 @@ struct ProcessedData {
 class IPlugin {
 public:
 
+	explicit IPlugin(IToolsApi *api_context) : api_context(api_context){};
+
 	virtual ~IPlugin() = default;
 
 	virtual const char* getName() const = 0;
 	virtual void shutdown() = 0;
-	virtual void performAction() = 0;
 	virtual ProcessedData performAction(void *cmd) = 0;
 
 	/**
@@ -49,12 +51,14 @@ public:
 	 * the plugin.
 	 * @return True if successfully initialized.
 	 */
-	virtual bool initialize(void* app_context) = 0;
+	virtual bool initialize(IToolsApi* app_context) = 0;
+private:
+	IToolsApi *api_context;
 };
 
 // Avoid C++ name mangling
 extern "C" {
-typedef  IPlugin* (*CreatePluginFunc)();
+typedef  IPlugin* (*CreatePluginFunc)(IToolsApi *);
 typedef void (*DestroyPluginFunc)(IPlugin*);
 }
 

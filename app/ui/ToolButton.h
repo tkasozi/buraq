@@ -65,17 +65,17 @@ public:
 	};
 
 	void leaveEvent(QEvent *p) override {
-		setStyleSheet(ItoolsNS::main_config.getMainStyles().toolBar.styleSheet);
+		setStyleSheet(ItoolsNS::main_config.getMainStyles()->toolBar.styleSheet);
 	}
 
 	void enterEvent(QEnterEvent *event) override {
 		if (customHoverColor != nullptr) {
 			setStyleSheet(
-					ItoolsNS::main_config.getMainStyles().toolBar.styleSheet +
+					ItoolsNS::main_config.getMainStyles()->toolBar.styleSheet +
 					"background-color: " + customHoverColor
 			);
 		} else {
-			setStyleSheet(ItoolsNS::main_config.getMainStyles().toolBarHover.styleSheet);
+			setStyleSheet(ItoolsNS::main_config.getMainStyles()->toolBarHover.styleSheet);
 		}
 	}
 

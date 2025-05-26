@@ -28,37 +28,41 @@
 #define ITOOLS_PLUGIN_MANAGER_H
 
 #include "../include/PluginInterface.h"
+#include "../include/IToolsAPI.h"
 #include <string>
 #include <vector>
 #include <memory> // For std::unique_ptr or managing plugin instances
 
 // Platform-specific includes for dynamic library loading
 #ifdef _WIN32
+
 #include <windows.h>
+
 #else // POSIX (Linux, macOS)
 #include <dlfcn.h>
 #endif
 
 class PluginManager {
 public:
-	PluginManager(void* app_context); // Application context to pass to plugins
+	explicit PluginManager(IToolsApi *app_context); // Application context to pass to plugins
+
 	~PluginManager();
 
 	// Loads a plugin from the given file path.
-	bool loadPlugin(const std::string& plugin_path);
+	bool loadPlugin(const std::string &plugin_name);
 
 	// Unloads all loaded plugins.
 	void unloadAllPlugins();
 
 	// Scans a directory for plugins and attempts to load them.
-	void loadPluginsFromDirectory(const std::string& directory_path = ".\\..\\Release\\plugins\\ext");
+	void loadPluginsFromDirectory(const std::string &directory_path);
 
 	ProcessedData callPerformAction(void *);
 
 	// Example function to interact with all loaded plugins.
 	void callPerformActionOnAll();
-	void callGetNameOnAll();
 
+	void callGetNameOnAll();
 
 private:
 	// Structure to hold information about a loaded plugin
@@ -68,18 +72,20 @@ private:
 #else
 		void* handle;   // Library handle on POSIX
 #endif
-		IPlugin* instance;
+		IPlugin *instance;
 		DestroyPluginFunc destroy_func; // Store the destroy function
 
-		LoadedPlugin(decltype(handle) h, IPlugin* inst, DestroyPluginFunc df)
+		LoadedPlugin(decltype(handle) h, IPlugin *inst, DestroyPluginFunc df)
 				: handle(h), instance(inst), destroy_func(df) {}
 	};
 
 	std::vector<LoadedPlugin> plugins_;
-	void* application_context_; // Store the application context
+	IToolsApi *application_context_; // Store the application context
 
 #ifdef _WIN32
-	void logWindowsError(const std::string& action);
+
+	void logWindowsError(const std::string &action);
+
 #endif
 };
 

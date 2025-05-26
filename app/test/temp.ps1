@@ -1,6 +1,6 @@
 # This ie example #1 (original)
 #You can add your script code here.
-# For example:
+# For example:.
  
 $name="tkasozi & Nihlah & sumi"
 Write-Output "This is an example script by $name."

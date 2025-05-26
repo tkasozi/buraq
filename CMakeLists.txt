@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.27)
 
-project(ITools)
+project(MainProject)
 
 set(CMAKE_ROOT_PROJECT_POSTFIX ITools)
 

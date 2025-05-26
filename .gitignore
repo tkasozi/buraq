@@ -53,10 +53,14 @@ Thumbs.db
 cmake-build-debug/
 cmake-build-release/
 Release/
+build/
 ManagedLibrary/bin/
 ManagedLibrary/obj/
-ManagedLibrary/ManagedLibraryPublish/
+ManagedLibrary/publish/
 
 TestManagedApp/bin/
 TestManagedApp/obj/
 
+.idea/
+
+*.bat

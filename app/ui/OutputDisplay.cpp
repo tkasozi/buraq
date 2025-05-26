@@ -26,6 +26,8 @@
 #include <QScrollArea>
 #include <QDateTime>
 #include "OutputDisplay.h"
+#include "../utils/Utils.h"
+
 
 #define OUTPUT_DISPLAY_STYLES R"(
 	QWidget {
@@ -34,97 +36,44 @@
 	}
 )"
 
-#define SCROLL_BAR_STYLES R"(
-        QPlainTextEdit {
-            /* Add padding so text doesn't touch the scrollbar directly if scrollbar is inside */
-            padding-right: 5px;
-            padding-bottom: 5px;
-			font-family: Arial;
-			font-size: 14px;
-			color: #ffffff;
-			height: 100vh;
-			width: 100%;
-			background-color: #232323;
-        }
-
-        /* Style for BOTH horizontal and vertical scrollbars */
-        QScrollBar:vertical {
-            background: #232323; /* Scrollbar track color */
-            width: 15px;         /* Width of the vertical scr  ollbar */
-            margin: 0px 0px 0px 0px; /* Top, Right, Bottom, Left margins */
-        }
-        QScrollBar::handle:vertical {
-            background: #606060; /* Handle color */
-            min-height: 20px;    /* Minimum height of the handle */
-            border-radius: 7px;  /* Rounded corners for the handle */
-        }
-        QScrollBar::handle:vertical:hover {
-            background: #707070; /* Handle color on hover */
-        }
-        QScrollBar::add-line:vertical { /* Up arrow button */
-            background: #232323;
-            height: 14px;
-            subcontrol-position: bottom;
-            subcontrol-origin: margin;
-        }
-        QScrollBar::sub-line:vertical { /* Down arrow button */
-            background: #232323;
-            height: 14px;
-            subcontrol-position: top;
-            subcontrol-origin: margin;
-        }
-        /* You can use an image for the arrows: */
-        /*
-        QScrollBar::up-arrow:vertical {
-            image: url(:/icons/up_arrow.png);
-        }
-        QScrollBar::down-arrow:vertical {
-            image: url(:/icons/down_arrow.png);
-        }
-        */
-        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-            background: none; /* Area between handle and arrows */
-        }
-    )"
-
-OutputDisplay::OutputDisplay(QWidget *parent) : QWidget(parent) {
+OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
 	setStyleSheet(OUTPUT_DISPLAY_STYLES);
 
-	auto layout = new QGridLayout;
+	auto layout = new QVBoxLayout;
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 0, 0, 0);
 
 	// TODO This will eventually become a tool bar
 	auto pMainLabel = new QLabel;
+	pMainLabel->setFixedHeight(25);
 	pMainLabel->setText("Output:");
 	pMainLabel->setStyleSheet(
 			"color: #fff;"
-			"padding: 8px;"
 			"border-bottom: 1px solid #000;"
 	);
-	layout->addWidget(pMainLabel, 0, 0, 1, 12);
+	layout->addWidget(pMainLabel);
 
 	// For displaying the output
 	main = std::make_unique<QPlainTextEdit>();
-
-	layout->addWidget(main.get(), 1, 0, 11, 12);
-	setLayout(layout);
+	layout->addWidget(main.get());
 
 	main->setReadOnly(true);
 	main->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
 
 	main->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	if (parent != nullptr) {
-		// main->setFixedHeight(100);
-		main->setMinimumWidth(parent->width());
+	if (appUi != nullptr) { // TODO just use the width value
+		main->setMinimumWidth(appUi->width());
 	}
 
 	// --- QSS for Custom Scrollbar ---
 	// Apply the stylesheet directly to the textEdit widget
 	// This ensures only this textEdit's scrollbars are affected (and its children if any)
-	main->setStyleSheet(SCROLL_BAR_STYLES);
+	main->setStyleSheet(QString(SCROLL_BAR_STYLES) + QString("background: #FF0000"));
 	main->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+	main->setFixedHeight(550);
+
+	setLayout(layout);
 
 	hide();
 }
@@ -140,8 +89,6 @@ void OutputDisplay::toggle() {
 void OutputDisplay::log(const QString &strOutput, const QString &errorOutput) {
 	QStringList list = strOutput.split("\\u2029");
 	QStringList errorsList = errorOutput.split("\\u2029");
-
-	main->setFixedHeight(main->height() + std::max(((int) (list.size()* 1.3), (int) (errorsList.size()* 1.3)), 10));
 
 	QLabel *error = createLabel(errorOutput, "error");
 	auto layout = new QVBoxLayout;

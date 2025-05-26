@@ -34,6 +34,9 @@
 #include <QSqlQuery>
 #include "FileObject.h"
 #include <fstream>
+#include <QStandardPaths> // For user-writable locations
+#include <QCoreApplication>
+#include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 
 const auto FILES_SQL = QLatin1String(R"(
     CREATE TABLE IF NOT EXISTS files(id INTEGER PRIMARY KEY, file_path VARCHAR UNIQUE, file_name VARCHAR);
@@ -85,30 +88,56 @@ static QList<FileObject *> findPreviouslyOpenedFiles() {
 	return files;
 }
 
+// Function to log messages (example)
+static void db_log(const QString& message) {
+	// Optionally, log to a file in a writable location:
+	QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "\\ITools\\log.txt";
+	QFile logFile(logFilePath);
+	if (logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+		QTextStream stream(&logFile);
+		stream << QDateTime::currentDateTime().toString(Qt::ISODate) << ": " << message << Qt::endl;
+	}
+}
+
 static bool db_conn() {
-	const char * dbName = "0a97fd39-aac6-463c-9b91-a3f8a7649ef0.db";
+	// Database will be created in a writable location for example, "C:\Users\john\AppData\Local\Temp\"
+	std::filesystem::current_path(std::filesystem::temp_directory_path());
 
-	std::fstream db(dbName, std::ios::in);
-
-	if (db.is_open()) {
-		// db file exists
-		db.close();
-	} else {
-		std::ofstream outputFile(dbName, std::ios::out);
+	QString dirName =  "ITools\\.data\\";
+	if(!std::filesystem::create_directories(dirName.toStdString())) {
+		db_log("Dir " + dirName + " already exists.");
 	}
 
+	std::filesystem::current_path(std::filesystem::temp_directory_path() / "ITools" / ".data");
+	std::string dbName = "itools.db";
+
+	db_log("DB name: "+ QString::fromStdString(dbName));
+
 	try {
+		std::fstream db(dbName, std::ios::in);
+
+		if (db.is_open()) {
+			// db file exists
+			db.close();
+		} else {
+			std::ofstream outputFile(dbName, std::ios::out);
+			outputFile.close();
+		}
+
 		QSqlDatabase dbEngine = QSqlDatabase::addDatabase("QSQLITE");
-		dbEngine.setDatabaseName(dbName);
+		dbEngine.setDatabaseName(QString::fromStdString(dbName));
 
 		if (!dbEngine.open()) {
 			QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),
 								  "Unable to establish a database connection.\n"
 								  "Click Cancel to exit.", QMessageBox::Cancel);
+			db_log("Failed to open DB connection.");
 			return false;
+		} else {
+			db_log("DB connection is good!");
 		}
-	} catch (_exception exception) {
-		qDebug() << "Failed";
+	} catch (_exception e) {
+		db_log(QString(e.name) + QString("Exception in try-catch"));
 		return false;
 	}
 

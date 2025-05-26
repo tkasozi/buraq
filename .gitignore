@@ -62,3 +62,5 @@ TestManagedApp/bin/
 TestManagedApp/obj/
 
 .idea/
+
+*.bat

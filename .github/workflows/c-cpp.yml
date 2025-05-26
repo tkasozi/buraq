@@ -48,7 +48,10 @@ jobs:
 
       - name: Build Managed project
         id: dotnet-project
-        run: ./ManagedLibrary/build.sh
+        run: |
+         cd ManagedLibrary
+          
+         ./build.sh
         shell: bash
 
       - name: Build project

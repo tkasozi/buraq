@@ -37,7 +37,7 @@ jobs:
         run: |
           Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
           Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
-        shell: powershellc
+        shell: powershell
 
       - name: Setup .NET SDK ${{ env.DOTNET_VERSION }}
         uses: actions/setup-dotnet@v4

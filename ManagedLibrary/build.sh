@@ -1,9 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-rm -r publish bin obj ../Release/bin/plugins/managed
+#rm -r publish bin obj ../Release/bin/plugins/managed
 
 # clean
 dotnet clean

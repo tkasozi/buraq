@@ -57,7 +57,7 @@ jobs:
         run: ./ManagedLibrary/build.sh
 
       - name: Build project
-        run: ./build.sh
+        run: ./build.sh --clean
         env:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${env.DOTNET_ROOT}
 

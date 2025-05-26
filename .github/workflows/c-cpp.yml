@@ -45,7 +45,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-
+      - name: LS files
+        run: ls "C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64\9.0.5\runtimes\win-x64\native"
+        shell: bash
       - name: Find nethost.dll for .NET 9.0.5
         id: find_nethost # Give an ID to this step so we can reference its output
         run: |

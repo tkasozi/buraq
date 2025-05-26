@@ -102,17 +102,19 @@ add_custom_target(conf_file ALL COMMAND
 qt6_add_resources(ITools RESOURCES resources.qrc)
 
 set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
+
 if (WIN32)
 	foreach (QT_LIB Core Gui Widgets Sql Xml)
-		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION)
+		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION_RELEASE)
 		get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
 
-		message(STATUS, "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
-		if (EXISTS "${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll")
+		message(STATUS, " ${QT_BINARY_DIR}")
+
+		if (EXISTS "${QT_BINARY_DIR}")
 			add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
 					COMMAND ${CMAKE_COMMAND} -E copy
-					"${QT_BIN_DIR}/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll"
-					"${PLUGIN_BASE_OUTPUT_DIR}")
+					"${QT_BINARY_DIR}"
+					"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 		endif ()
 	endforeach (QT_LIB)
 

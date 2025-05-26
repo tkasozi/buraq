@@ -52,10 +52,12 @@ const auto SELECT_FILES_SQL = QLatin1String(R"(
 
 const auto SELECT_FILE_BY_FILE_PATH_SQL = QLatin1String(R"(SELECT * FROM files WHERE file_path = ?;)");
 
-static QVariant insertFile(const QString &filePath, const QString &title) {
+static QVariant insertFile(const QString &filePath, const QString &title)
+{
 	QSqlQuery query;
-	if (!query.prepare(INSERT_FILE_SQL)) {
-		qDebug() << "Error executing query:" << query.lastError().text();
+	if (!query.prepare(INSERT_FILE_SQL))
+	{
+		// "Error executing query:" << query.lastError().text();
 	}
 
 	query.addBindValue(filePath);
@@ -65,20 +67,23 @@ static QVariant insertFile(const QString &filePath, const QString &title) {
 	return query.lastInsertId();
 }
 
-static QList<FileObject *> findPreviouslyOpenedFiles() {
+static QList<FileObject *> findPreviouslyOpenedFiles()
+{
 	QSqlQuery query;
 
-	if (!query.exec(SELECT_FILES_SQL)) {
-		qDebug() << "Error executing query:" << query.lastError().text();
+	if (!query.exec(SELECT_FILES_SQL))
+	{
+		// qDebug() << "Error executing query:" << query.lastError().text();
 	}
 
 	QList<FileObject *> files;
-	while (query.next()) {
+	while (query.next())
+	{
 		auto file = new FileObject;
 
 		int id = query.value(0).toInt();
 		QString filePath = query.value(1).toString(); // column file_path
-		QString title = query.value(2).toString(); // column title
+		QString title = query.value(2).toString();	  // column title
 
 		file->setFilePath(filePath);
 		file->setFileName(title);
@@ -89,37 +94,45 @@ static QList<FileObject *> findPreviouslyOpenedFiles() {
 }
 
 // Function to log messages (example)
-static void db_log(const QString& message) {
+static void db_log(const QString &message)
+{
 	// Optionally, log to a file in a writable location:
 	QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "\\ITools\\log.txt";
 	QFile logFile(logFilePath);
-	if (logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+	if (logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+	{
 		QTextStream stream(&logFile);
 		stream << QDateTime::currentDateTime().toString(Qt::ISODate) << ": " << message << Qt::endl;
 	}
 }
 
-static bool db_conn() {
+static bool db_conn()
+{
 	// Database will be created in a writable location for example, "C:\Users\john\AppData\Local\Temp\"
 	std::filesystem::current_path(std::filesystem::temp_directory_path());
 
-	QString dirName =  "ITools\\.data\\";
-	if(!std::filesystem::create_directories(dirName.toStdString())) {
+	QString dirName = "ITools\\.data\\";
+	if (!std::filesystem::create_directories(dirName.toStdString()))
+	{
 		db_log("Dir " + dirName + " already exists.");
 	}
 
 	std::filesystem::current_path(std::filesystem::temp_directory_path() / "ITools" / ".data");
 	std::string dbName = "itools.db";
 
-	db_log("DB name: "+ QString::fromStdString(dbName));
+	db_log("DB name: " + QString::fromStdString(dbName));
 
-	try {
+	try
+	{
 		std::fstream db(dbName, std::ios::in);
 
-		if (db.is_open()) {
+		if (db.is_open())
+		{
 			// db file exists
 			db.close();
-		} else {
+		}
+		else
+		{
 			std::ofstream outputFile(dbName, std::ios::out);
 			outputFile.close();
 		}
@@ -127,16 +140,22 @@ static bool db_conn() {
 		QSqlDatabase dbEngine = QSqlDatabase::addDatabase("QSQLITE");
 		dbEngine.setDatabaseName(QString::fromStdString(dbName));
 
-		if (!dbEngine.open()) {
+		if (!dbEngine.open())
+		{
 			QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),
 								  "Unable to establish a database connection.\n"
-								  "Click Cancel to exit.", QMessageBox::Cancel);
+								  "Click Cancel to exit.",
+								  QMessageBox::Cancel);
 			db_log("Failed to open DB connection.");
 			return false;
-		} else {
+		}
+		else
+		{
 			db_log("DB connection is good!");
 		}
-	} catch (_exception e) {
+	}
+	catch (_exception e)
+	{
 		db_log(QString(e.name) + QString("Exception in try-catch"));
 		return false;
 	}
@@ -144,15 +163,17 @@ static bool db_conn() {
 	return true;
 }
 
-static QSqlError init_db() {
+static QSqlError init_db()
+{
 
 	QSqlQuery query;
-	if (!query.exec(FILES_SQL)) {
-		qDebug() << "Error executing query:" << query.lastError().text();
+	if (!query.exec(FILES_SQL))
+	{
+		// qDebug() << "Error executing query:" << query.lastError().text();
 		return query.lastError();
 	}
 
 	return {};
 }
 
-#endif //IT_TOOLS_DB_CONN_H
+#endif // IT_TOOLS_DB_CONN_H

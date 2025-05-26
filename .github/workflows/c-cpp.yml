@@ -63,7 +63,7 @@ jobs:
           if [[ "$RUNNER_OS" == "Windows" ]]; then
             # PowerShell syntax for finding the file
             # Note: Adjust wildcard for version path if necessary
-            $nethost_files = Get-ChildItem -Path "${{ env.DOTNET_ROOT }}" -Filter "nethost.dll" -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.FullName -like "*\host\fxr\9.0.*\nethost.dll" }
+            $nethost_files = Get-ChildItem -Path "${{ env.DOTNET_ROOT }}" -Filter "nethost.dll" -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.FullName -like "*\host\fxr\9.0.5\nethost.dll" }
             if ($nethost_files) {
               $NETHOST_PATH = $nethost_files[0].FullName
             } else {

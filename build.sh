@@ -29,11 +29,15 @@ set -e
 
 # Compile C# ManagedLibrary code
 
-pushd ManagedLibrary
+if [[ ! -n "${CI}" ]]; then
+  echo "CI variable is not set."
 
-./build.sh
+  pushd ManagedLibrary
 
-popd
+  ./build.sh
+
+  popd
+fi
 
 CMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 

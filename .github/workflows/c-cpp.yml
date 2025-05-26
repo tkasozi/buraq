@@ -57,7 +57,7 @@ jobs:
       - name: Build project
         run: ./build.sh --clean
         env:
-          CMAKE_DOTNET_TARGET_FRAMEWORK: ${env.DOTNET_ROOT}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native
+          CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native
         shell: bash
 
       - name: Logging

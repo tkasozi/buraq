@@ -36,8 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Clear the "Loading releases..." message
-        releasesContainer.innerHTML = '';
+        releasesContainer.innerHTML = ''; // Clear loading message
 
         releases.forEach(release => {
             const releaseElement = document.createElement('div');
@@ -52,6 +51,30 @@ document.addEventListener('DOMContentLoaded', function() {
             const releaseDate = document.createElement('p');
             releaseDate.textContent = `Published: ${new Date(release.published_at).toLocaleDateString()}`;
 
+            releaseElement.appendChild(releaseTitle);
+            releaseElement.appendChild(releaseTag);
+            releaseElement.appendChild(releaseDate);
+
+            if (release.body) {
+                const releaseNotesContainer = document.createElement('div');
+                releaseNotesContainer.classList.add('release-notes');
+
+                const releaseNotesTitle = document.createElement('h4'); // Changed from <p><strong>...</strong></p>
+                releaseNotesTitle.textContent = 'Release Notes:';
+                releaseNotesContainer.appendChild(releaseNotesTitle);
+
+                const releaseNotesContent = document.createElement('div');
+                // Use marked.parse() to convert Markdown to HTML
+                releaseNotesContent.innerHTML = marked.parse(release.body);
+                releaseNotesContainer.appendChild(releaseNotesContent);
+
+                releaseElement.appendChild(releaseNotesContainer);
+            }
+
+            const downloadsTitle = document.createElement('h4');
+            downloadsTitle.textContent = 'Downloads:';
+            releaseElement.appendChild(downloadsTitle);
+
             const assetsList = document.createElement('ul');
             if (release.assets.length > 0) {
                 release.assets.forEach(asset => {
@@ -59,8 +82,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const assetLink = document.createElement('a');
                     assetLink.href = asset.browser_download_url;
                     assetLink.textContent = asset.name;
-                    assetLink.setAttribute('target', '_blank'); // Open in new tab
-                    assetLink.setAttribute('download', ''); // Suggests to browser to download
+                    assetLink.setAttribute('target', '_blank');
+                    assetLink.setAttribute('download', '');
 
                     const assetSize = document.createElement('span');
                     assetSize.textContent = ` (${(asset.size / (1024 * 1024)).toFixed(2)} MB)`;
@@ -77,32 +100,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 assetsList.appendChild(noAssetsItem);
             }
 
-            releaseElement.appendChild(releaseTitle);
-            releaseElement.appendChild(releaseTag);
-            releaseElement.appendChild(releaseDate);
-
-            if (release.body) {
-                const releaseNotes = document.createElement('div');
-                releaseNotes.classList.add('release-notes');
-                releaseNotes.innerHTML = `<p><strong>Release Notes:</strong></p><div>${formatReleaseBody(release.body)}</div>`; // Use a helper to format if needed
-                releaseElement.appendChild(releaseNotes);
-            }
-
-            releaseElement.appendChild(document.createElement('h4')).textContent = 'Downloads:';
             releaseElement.appendChild(assetsList);
             releasesContainer.appendChild(releaseElement);
         });
     }
 
-    // Basic formatter for release body (GitHub uses Markdown)
-    // For a more robust solution, you might use a Markdown library
-    function formatReleaseBody(body) {
-        // Replace newlines with <br> for HTML display
-        // This is a very basic conversion. Markdown has more features.
-        return body.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
-    }
+    // The old formatReleaseBody function is no longer needed as marked.parse() handles Markdown conversion.
+    // function formatReleaseBody(body) { ... } // REMOVE THIS FUNCTION
 
-    // Fetch releases when the page loads
     if (releasesContainer) {
         fetchReleases();
     }

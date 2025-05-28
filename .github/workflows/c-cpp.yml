@@ -74,7 +74,7 @@ jobs:
           cp ./build/bin/ITools.exe ./build/Release
           cp ./build/bin/qt.conf ./build/Release
           cp ./build/bin/workflow.ico ./build/Release
-          cp -r ./build/bin/plugins/ext ./build/Release/plugins/ext
+          cp -r ./build/bin/plugins/ext ./build/Release/plugins
           cp -r ./build/bin/plugins/managed ./build/Release/plugins
           cp -r ./build/bin/plugins/bundle/* ./build/Release
           

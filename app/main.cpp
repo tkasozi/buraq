@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 
 	if (!db_conn())
 	{
+		db_log("db_conn() EXIT_FAILURE..");
 		// failed to connect to the database
 		return EXIT_FAILURE;
 	}

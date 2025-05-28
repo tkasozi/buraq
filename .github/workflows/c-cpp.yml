@@ -76,7 +76,8 @@ jobs:
           cp ./build/bin/qt.conf ./build/Release
           cp ./build/bin/workflow.ico ./build/Release
           
-          cp -r ./build/bin/plugins/managed ./build/Release/plugins
+          mkdir ./build/Release/plugins/managed
+          cp -r ./build/bin/plugins/managed/* ./build/Release/plugins/managed
           
           mkdir ./build/Release/plugins/ext
           cp ./build/bin/plugins/ext/* ./build/Release/plugins/ext

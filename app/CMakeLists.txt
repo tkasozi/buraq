@@ -133,8 +133,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
 			add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
 					COMMAND ${CMAKE_COMMAND} -E copy_if_different
 					"${PTHREAD_DLL_SOURCE_PATH}"
-					"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-					COMMENT "Manually copying Qt third-party dependency: ${PTHREAD_DLL_FILENAME}"
+					"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/bundle"
+					COMMENT "Manually copying Qt third-party dependency: ${PTHREAD_DLL_SOURCE_PATH}"
 			)
 		else ()
 			message(WARNING "${PTHREAD_DLL_SOURCE_PATH} not found. You might need to bundle it manually or adjust the path.")

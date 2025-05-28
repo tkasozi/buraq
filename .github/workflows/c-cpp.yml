@@ -70,6 +70,8 @@ jobs:
           # ls -Al "D:/a/_temp/msys64/mingw64/bin/"
           
           mkdir ./build/Release
+          mkdir ./build/Release/plugins
+
           cp ./build/bin/ITools.exe ./build/Release
           
           cp ./build/bin/*.dll ./build/Release

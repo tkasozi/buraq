@@ -77,7 +77,7 @@ jobs:
           cp -r ./build/bin/plugins/ext ./build/Release
           cp -r ./build/bin/plugins/managed ./build/Release
           
-          D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/ReleaseRelease/ITools.exe"
+          D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/Release/ITools.exe"
           
           echo "--- Listing deployment directory contents ---"
           ls -alh ./build/Release

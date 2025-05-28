@@ -70,13 +70,16 @@ jobs:
           # ls -Al "D:/a/_temp/msys64/mingw64/bin/"
           
           mkdir ./build/Release
-          
           cp ./build/bin/ITools.exe ./build/Release
+          
           cp ./build/bin/*.dll ./build/Release
           cp ./build/bin/qt.conf ./build/Release
           cp ./build/bin/workflow.ico ./build/Release
-          cp -r ./build/bin/plugins/ext ./build/Release/plugins
+          
           cp -r ./build/bin/plugins/managed ./build/Release/plugins
+          
+          mkdir ./build/Release/plugins/ext
+          cp -r ./build/bin/plugins/ext ./build/Release/plugins
           
           D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/Release/ITools.exe"
           

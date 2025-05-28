@@ -120,6 +120,12 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
 			"libharfbuzz-0.dll"
 			"libmd4c.dll"
 			"libpng16-16.dll"
+			"libstdc++-6.dll"
+			"libzlib1.dll"
+			"libbrotlidec.dll"
+			"libicuuc77.dll"
+			"libicuin77.dll"
+			"libpcre2-16-0.dll"
 	)
 
 	# --- Bundle i.e. libwinpthread-1.dll ---

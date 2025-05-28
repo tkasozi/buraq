@@ -69,7 +69,7 @@ jobs:
           
           # ls -Al "D:/a/_temp/msys64/mingw64/bin/"
           
-          mkdir ./build/Release/plugins/ext
+          mkdir ./build/Release
           
           cp ./build/bin/ITools.exe ./build/Release
           cp ./build/bin/qt.conf ./build/Release

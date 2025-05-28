@@ -127,6 +127,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
 			"libicuin77.dll"
 			"libicudt77.dll"
 			"libpcre2-16-0.dll"
+			"libpcre2-8-0.dll"
 			"libbz2-1.dll"
 			"libgraphite2.dll"
 			"libzstd.dll"

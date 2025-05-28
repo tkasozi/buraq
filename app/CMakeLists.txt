@@ -103,6 +103,64 @@ qt6_add_resources(ITools RESOURCES resources.qrc)
 
 set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
 
+# Conditionally add static linking flags for MinGW/GCC
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
+	# Get the directory of the C++ compiler. In an MSYS2 MinGW setup,
+	# this is typically where the required runtime DLLs are also located.
+	get_filename_component(MINGW_RUNTIME_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
+
+	message(STATUS "GCC detected, adding static linking flags for libgcc and libstdc++")
+	target_link_options(ITools PRIVATE -static-libgcc -static-libstdc++)
+
+	set(QT_THIRD_PARTY_DEPENDENCY_DLLS
+			"libb2-1.dll"
+			"libdouble-conversion.dll"
+			"libfreetype-6.dll"
+			"libwinpthread-1.dll"
+			"libharfbuzz-0.dll"
+			"libmd4c.dll"
+			"libpng16-16.dll"
+			"libstdc++-6.dll"
+			"libzlib1.dll"
+			"libbrotlidec.dll"
+			"libicuuc77.dll"
+			"libicuin77.dll"
+			"libicudt77.dll"
+			"libpcre2-16-0.dll"
+			"libpcre2-8-0.dll"
+			"libbz2-1.dll"
+			"libgraphite2.dll"
+			"libzstd.dll"
+			"zlib1.dll"
+			"libgcc_s_seh-1.dll"
+			"libglib-2.0-0.dll"
+			"libbrotlicommon.dll"
+			"libsqlite3-0.dll"
+	)
+
+	# --- Bundle i.e. libwinpthread-1.dll ---
+	foreach (DLL_FILENAME ${QT_THIRD_PARTY_DEPENDENCY_DLLS})
+		set(PTHREAD_DLL_SOURCE_PATH "${MINGW_COMPILER_BIN_DIR}\\${DLL_FILENAME}")
+
+		if (EXISTS "${PTHREAD_DLL_SOURCE_PATH}")
+			message(STATUS "Found ${DLL_FILENAME} at ${PTHREAD_DLL_SOURCE_PATH}")
+
+			# Add a custom command to copy the DLL after 'iTools' is built
+			add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
+					COMMAND ${CMAKE_COMMAND} -E copy_if_different
+					"${PTHREAD_DLL_SOURCE_PATH}"
+					"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+					COMMENT "Manually copying Qt third-party dependency: ${PTHREAD_DLL_SOURCE_PATH}"
+			)
+		else ()
+			message(WARNING "${PTHREAD_DLL_SOURCE_PATH} not found. You might need to bundle it manually or adjust the path.")
+		endif ()
+	endforeach ()
+
+else ()
+	message(STATUS "Compiler is not GCC, skipping static linking flags for libgcc and libstdc++ (${CMAKE_CXX_COMPILER_ID})")
+endif ()
+
 if (WIN32)
 	foreach (QT_LIB Core Gui Widgets Sql Xml)
 		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION_RELEASE)

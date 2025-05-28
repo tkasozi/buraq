@@ -59,27 +59,44 @@ jobs:
           echo "CMake version: $(cmake --version)"
           echo "GCC version: $(gcc --version)"
           echo "Looking for Qt6 CMake files in /mingw64/lib/cmake/Qt6..."
-          ls -Al /mingw64/lib/cmake/Qt6 || echo "Qt6 CMake directory not found or empty."
+          # ls -Al /mingw64/lib/cmake/Qt6 || echo "Qt6 CMake directory not found or empty."
           
           echo "CMAKE_PREFIX_PATH is set to: $CMAKE_PREFIX_PATH"
           
           ./build.sh --clean
+          
+          echo "PATH: $PATH"
+          
+          # ls -Al "D:/a/_temp/msys64/mingw64/bin/"
+          
+          mkdir ./build/Release
+          mkdir ./build/Release/plugins
+
+          cp ./build/bin/ITools.exe ./build/Release
+          
+          cp ./build/bin/*.dll ./build/Release
+          cp ./build/bin/qt.conf ./build/Release
+          cp ./build/bin/workflow.ico ./build/Release
+          
+          mkdir ./build/Release/plugins/managed
+          cp -r ./build/bin/plugins/managed/* ./build/Release/plugins/managed
+          
+          mkdir ./build/Release/plugins/ext
+          cp ./build/bin/plugins/ext/* ./build/Release/plugins/ext
+          
+          D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/Release/ITools.exe"
+          
+          echo "--- Listing deployment directory contents ---"
+          ls -alh ./build/Release
         env:
+          MINGW_COMPILER_BIN_DIR: /mingw64/bin
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native
         shell: msys2 {0}
-
-      - name: Logging
-        run: |
-          echo "**********2***************"
-          Get-ChildItem "build" -R
-          echo "**********2***************"
-
-        shell: powershell
 
       - name: Find application executable
         id: find-exe
         run: |
-          Get-ChildItem -Path "${{ github.workspace }}/build" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+          Get-ChildItem -Path "${{ github.workspace }}/build/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
         shell: powershell
 
       - name: Read application executable name
@@ -92,7 +109,7 @@ jobs:
         env:
           APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
-          APP_BINARY: ${{ github.workspace }}/build/${{ secrets.APP_NAME }}
+          APP_BINARY: ${{ github.workspace }}/build/Release/${{ secrets.APP_NAME }}
         shell: powershell
 
       - name: Create release archive

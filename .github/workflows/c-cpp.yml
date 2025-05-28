@@ -84,18 +84,10 @@ jobs:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native
         shell: msys2 {0}
 
-      - name: Logging
-        run: |
-          echo "**********2***************"
-          Get-ChildItem "build" -R
-          echo "**********2***************"
-
-        shell: powershell
-
       - name: Find application executable
         id: find-exe
         run: |
-          Get-ChildItem -Path "${{ github.workspace }}/build" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+          Get-ChildItem -Path "${{ github.workspace }}/build/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
         shell: powershell
 
       - name: Read application executable name
@@ -108,7 +100,7 @@ jobs:
         env:
           APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
-          APP_BINARY: ${{ github.workspace }}/build/${{ secrets.APP_NAME }}
+          APP_BINARY: ${{ github.workspace }}/build/Release/${{ secrets.APP_NAME }}
         shell: powershell
 
       - name: Create release archive

@@ -62,6 +62,7 @@ jobs:
           ls -Al /mingw64/lib/cmake/Qt6 || echo "Qt6 CMake directory not found or empty."
           ls -Al /mingw64/bin || echo "mingw64 bin is empty"
           
+          export MINGW_COMPILER_BIN_DIR="/mingw64/bin"
           echo "MINGW_COMPILER_BIN_DIR is set to: $MINGW_COMPILER_BIN_DIR"
           
           ./build.sh --clean

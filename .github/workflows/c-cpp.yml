@@ -72,7 +72,7 @@ jobs:
           mkdir ./build/Release
           
           cp ./build/bin/ITools.exe ./build/Release
-          cp -r ./build/bin/*.dll ./build/Release
+          cp ./build/bin/*.dll ./build/Release
           cp ./build/bin/qt.conf ./build/Release
           cp ./build/bin/workflow.ico ./build/Release
           cp -r ./build/bin/plugins/ext ./build/Release/plugins

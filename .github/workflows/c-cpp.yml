@@ -67,24 +67,20 @@ jobs:
           
           echo "PATH: $PATH"
           
-          echo "which windeployqt-qt6.exe:"
-          which windeployqt-qt6.exe
-          
-          ls -Al "D:/a/_temp/msys64/mingw64/bin/"
-          
-          ls exit
+          # ls -Al "D:/a/_temp/msys64/mingw64/bin/"
           
           mkdir ./build/Release
           
           cp ./build/bin/ITools.exe ./build/Release
           cp ./build/bin/qt.conf ./build/Release
           cp ./build/bin/workflow.ico ./build/Release
+          cp ./build/bin/ext ./build/Release
+          cp ./build/bin/managed ./build/Release
           
           D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/ReleaseRelease/ITools.exe"
           
           echo "--- Listing deployment directory contents ---"
           ls -alh ./build/Release
-
         env:
           MINGW_COMPILER_BIN_DIR: /mingw64/bin
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native

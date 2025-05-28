@@ -110,12 +110,11 @@ static bool db_conn() {
 		db_log("Dir " + dirName + " already exists.");
 	}
 
-	std::filesystem::current_path(std::filesystem::temp_directory_path() / "ITools" / ".data");
-	std::string dbName = "itools.db";
+	auto dbPathName = std::filesystem::temp_directory_path() / "ITools" / ".data" / "itools.db";
+	std::string dbName = dbPathName.string();
 
 	db_log("current dir: " + QString::fromStdString(std::filesystem::current_path().string()));
-	db_log("DB dirName: " + dirName);
-	db_log("DB name: " + QString::fromStdString(dbName));
+	db_log("DB name path: " + QString::fromStdString(dbName));
 
 	try {
 		std::fstream db(dbName, std::ios::in);
@@ -144,6 +143,10 @@ static bool db_conn() {
 	}
 	catch (_exception e) {
 		db_log(QString(e.name) + QString("Exception in try-catch"));
+		return false;
+	}
+	catch (...) {
+		db_log("Exception catch all: db_conn failed!");
 		return false;
 	}
 

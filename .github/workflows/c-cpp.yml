@@ -67,14 +67,20 @@ jobs:
           
           echo "PATH: $PATH"
           # ls -l /mingw64/bin/windeployqt*
-
-          which windeployqt6
+          
+          ls -Al "D:\a\_temp\msys64\mingw64\bin"
+          
+          ls exit
+          
+          #which windeployqt6
           
           mkdir ./build/Release
           
           cp ./build/bin/ITools.exe ./build/Release
+          cp ./build/bin/qt.conf ./build/Release
+          cp ./build/bin/workflow.ico ./build/Release
           
-          windeployqt6 --verbose 2 --dir "./build/Release" "./build/Release/ITools.exe"
+          windeployqt6 --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/ReleaseRelease/ITools.exe"
           
           echo "--- Listing deployment directory contents ---"
           ls -alh ./build/Release

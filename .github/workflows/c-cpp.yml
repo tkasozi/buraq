@@ -66,13 +66,13 @@ jobs:
           ./build.sh --clean
           
           echo "PATH: $PATH"
-          # ls -l /mingw64/bin/windeployqt*
+          
+          echo "which windeployqt-qt6.exe:"
+          which windeployqt-qt6.exe
           
           ls -Al "D:/a/_temp/msys64/mingw64/bin/"
           
           ls exit
-          
-          #which windeployqt6
           
           mkdir ./build/Release
           
@@ -80,7 +80,7 @@ jobs:
           cp ./build/bin/qt.conf ./build/Release
           cp ./build/bin/workflow.ico ./build/Release
           
-          windeployqt6 --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/ReleaseRelease/ITools.exe"
+          D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/ReleaseRelease/ITools.exe"
           
           echo "--- Listing deployment directory contents ---"
           ls -alh ./build/Release

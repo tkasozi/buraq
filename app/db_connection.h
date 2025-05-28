@@ -131,11 +131,19 @@ static bool db_conn() {
 		dbEngine.setDatabaseName(QString::fromStdString(dbName));
 
 		if (!dbEngine.open()) {
+			QSqlError error = dbEngine.lastError();
+
 			QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),
 								  "Unable to establish a database connection.\n"
 								  "Click Cancel to exit.",
 								  QMessageBox::Cancel);
 			db_log("Failed to open DB connection.");
+			db_log("DATABASE OPEN FAILED!");
+			db_log("  Database file checked: " + QString::fromStdString(dbName));
+			db_log(&"  Error Type:" [error.type()]);
+			db_log("  Error (Driver Text):" + error.driverText());
+			db_log(&"  Driver available:" [QSqlDatabase::isDriverAvailable("QSQLITE")]);
+			db_log("  Error (Database Text):" + error.databaseText());
 			return false;
 		} else {
 			db_log("DB connection is good!");

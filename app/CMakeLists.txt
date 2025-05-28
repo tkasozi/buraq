@@ -125,7 +125,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
 					TARGET ${APP_TARGET_NAME} POST_BUILD
 					COMMAND ${CMAKE_COMMAND} -E copy_if_different
 					"${DLL_SOURCE_PATH}"
-					"${APP_OUTPUT_DIR}/${DLL_FILENAME}"
+					"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 					COMMENT "Manually copying Qt third-party dependency: ${DLL_FILENAME}"
 			)
 		endif()

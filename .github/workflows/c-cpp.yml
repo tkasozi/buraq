@@ -79,7 +79,7 @@ jobs:
           cp -r ./build/bin/plugins/managed ./build/Release/plugins
           
           mkdir ./build/Release/plugins/ext
-          cp -r ./build/bin/plugins/ext ./build/Release/plugins/ext
+          cp ./build/bin/plugins/ext/* ./build/Release/plugins/ext
           
           D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/Release/ITools.exe"
           

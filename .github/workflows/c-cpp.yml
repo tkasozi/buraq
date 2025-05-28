@@ -74,8 +74,8 @@ jobs:
           cp ./build/bin/ITools.exe ./build/Release
           cp ./build/bin/qt.conf ./build/Release
           cp ./build/bin/workflow.ico ./build/Release
-          cp ./build/bin/ext ./build/Release
-          cp ./build/bin/managed ./build/Release
+          cp ./build/bin/plugins/ext ./build/Release
+          cp ./build/bin/plugins/managed ./build/Release
           
           D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/ReleaseRelease/ITools.exe"
           

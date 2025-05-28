@@ -103,6 +103,36 @@ qt6_add_resources(ITools RESOURCES resources.qrc)
 
 set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
 
+# Conditionally add static linking flags for MinGW/GCC
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	message(STATUS "GCC detected, adding static linking flags for libgcc and libstdc++")
+	target_link_options(ITools PRIVATE -static-libgcc -static-libstdc++)
+
+	# --- Bundle libwinpthread-1.dll ---
+	set(PTHREAD_DLL_FILENAME "libwinpthread-1.dll")
+	set(PTHREAD_DLL_SOURCE_PATH "${MINGW_COMPILER_BIN_DIR}\\${PTHREAD_DLL_FILENAME}")
+
+	message("MINGW_COMPILER_BIN_DIR: ${MINGW_COMPILER_BIN_DIR}")
+	message("PTHREAD_DLL_SOURCE_PATH: ${PTHREAD_DLL_SOURCE_PATH}")
+
+	if(EXISTS "${PTHREAD_DLL_SOURCE_PATH}")
+		message(STATUS "Found ${PTHREAD_DLL_FILENAME} at ${PTHREAD_DLL_SOURCE_PATH}")
+
+		# Add a custom command to copy the DLL after 'iTools' is built
+		add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different
+				"${PTHREAD_DLL_SOURCE_PATH}"
+				"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+				COMMENT "Copying ${PTHREAD_DLL_FILENAME} to output directory"
+		)
+	else()
+		message(WARNING "${PTHREAD_DLL_FILENAME} not found at expected location: ${PTHREAD_DLL_SOURCE_PATH}. You might need to bundle it manually or adjust the path.")
+	endif()
+
+else()
+	message(STATUS "Compiler is not GCC, skipping static linking flags for libgcc and libstdc++ (${CMAKE_CXX_COMPILER_ID})")
+endif()
+
 if (WIN32)
 	foreach (QT_LIB Core Gui Widgets Sql Xml)
 		get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION_RELEASE)

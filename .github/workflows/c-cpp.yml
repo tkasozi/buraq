@@ -60,11 +60,13 @@ jobs:
           echo "GCC version: $(gcc --version)"
           echo "Looking for Qt6 CMake files in /mingw64/lib/cmake/Qt6..."
           ls -Al /mingw64/lib/cmake/Qt6 || echo "Qt6 CMake directory not found or empty."
+          ls -Al /mingw64/bin || echo "mingw64 bin is empty"
           
-          echo "CMAKE_PREFIX_PATH is set to: $CMAKE_PREFIX_PATH"
+          echo "MINGW_COMPILER_BIN_DIR is set to: $MINGW_COMPILER_BIN_DIR"
           
           ./build.sh --clean
         env:
+          MINGW_COMPILER_BIN_DIR: /mingw64/bin
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native
         shell: msys2 {0}
 

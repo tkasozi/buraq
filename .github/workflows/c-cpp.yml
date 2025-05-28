@@ -68,7 +68,7 @@ jobs:
           echo "PATH: $PATH"
           # ls -l /mingw64/bin/windeployqt*
           
-          ls -Al "D:\a\_temp\msys64\mingw64\bin"
+          ls -Al "D:/a/_temp/msys64/mingw64/bin/"
           
           ls exit
           

@@ -26,7 +26,8 @@
 #include <QScrollArea>
 #include <QDateTime>
 #include "OutputDisplay.h"
-#include "../utils/Utils.h"
+#include "Utils.h"
+#include "AppUi.h"
 
 
 #define OUTPUT_DISPLAY_STYLES R"(
@@ -36,10 +37,12 @@
 	}
 )"
 
+void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int appWidth);
+
 OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
 	setStyleSheet(OUTPUT_DISPLAY_STYLES);
 
-	auto layout = new QVBoxLayout;
+	auto layout = new QVBoxLayout(this);
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 0, 0, 0);
 
@@ -53,31 +56,39 @@ OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
 	);
 	layout->addWidget(pMainLabel);
 
-	// For displaying the output
 	main = std::make_unique<QPlainTextEdit>();
-	layout->addWidget(main.get());
+	init_main_out_area(main.get(), layout, ((AppUi *) appUi)->width());
+
+	hide();
+}
+
+void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int appWidth = 0) {
+	// For displaying the output_display
+	layout->addWidget(main);
+
+	// Get the current palette
+	QPalette palette = main->palette();
+
+	// Set the color for the background of the selection
+	palette.setColor(QPalette::Highlight, QColor(0, 120, 215)); // A common blue selection background
+	palette.setColor(QPalette::Text, QColor(Qt::white)); // A common blue selection background
+	main->setPalette(palette);
 
 	main->setReadOnly(true);
 	main->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
 
 	main->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	if (appUi != nullptr) { // TODO just use the width value
-		main->setMinimumWidth(appUi->width());
+	if (appWidth > 0) {
+		main->setMinimumWidth(appWidth);
 	}
 
 	// --- QSS for Custom Scrollbar ---
 	// Apply the stylesheet directly to the textEdit widget
 	// This ensures only this textEdit's scrollbars are affected (and its children if any)
-	main->setStyleSheet("background: #FF0000");
 	main->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
-	main->setFixedHeight(550);
-
-	setLayout(layout);
-
-	hide();
+	main->setMinimumHeight(550);
 }
-
 void OutputDisplay::toggle() {
 	if (isVisible()) {
 		hide();

@@ -7,8 +7,8 @@
 
 #include <QWidget>
 #include <QPainter>
-#include "Editor.h"
-#include "CodeRunner.h"
+#include "editor/Editor.h"
+#include "editor/CodeRunner.h"
 #include "CommonWidget.h"
 #include "editor/LineNumberAreaWidget.h"
 

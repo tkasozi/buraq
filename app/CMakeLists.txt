@@ -24,11 +24,10 @@ set(ITOOLS_UI_SOURCES
 		ui/AppUi.cpp
 		ui/ToolBarEventFilter.cpp
 		ui/ToolBar.cpp
-		ui/Editor.cpp
+		ui/editor/Editor.cpp
 		ui/CustomDrawer.cpp
-		ui/OutputDisplay.cpp
+		ui/output_display/OutputDisplay.cpp
 		ui/CustomLabel.cpp
-		ui/EditorActionArea.cpp
 )
 
 set(ITOOLS_UTILS_SOURCES
@@ -54,17 +53,16 @@ set(ITOOLS_HEADERS
 		ui/ToolButton.h
 		ui/ToolBar.h
 		ui/IconButton.h
-		ui/Editor.h
+		ui/editor/Editor.h
 		ui/EditorMargin.h
 		ui/CustomDrawer.h
 		ui/FilePathLabel.h
-		ui/OutputDisplay.h
+		ui/output_display/OutputDisplay.h
 		ui/CustomLabel.h
-		ui/EditorActionArea.h
 		ui/CommonWidget.h
 		utils/Minion.h
-		ui/CodeRunner.cpp
-		ui/CodeRunner.h
+		ui/editor/CodeRunner.cpp
+		ui/editor/CodeRunner.h
 		ui/EditorMargin.cpp
 		ui/editor/LineNumberAreaWidget.cpp
 		ui/editor/LineNumberAreaWidget.h

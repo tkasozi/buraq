@@ -13,7 +13,6 @@
 #include <QRegularExpression>
 #include <QStack>
 
-#include "OutputDisplay.h"
 #include "IToolsAPI.h"
 
 class Editor : public QPlainTextEdit {

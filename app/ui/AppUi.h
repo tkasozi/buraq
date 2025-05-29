@@ -19,10 +19,9 @@
 #include "ToolButton.h"
 #include "CustomDrawer.h"
 #include "IconButton.h"
-#include "OutputDisplay.h"
+#include "output_display/OutputDisplay.h"
 #include "ToolBar.h"
 #include "../PluginManager.h"
-#include "EditorActionArea.h"
 #include "EditorMargin.h"
 
 

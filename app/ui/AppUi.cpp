@@ -27,7 +27,7 @@
 #include "AppUi.h"
 #include "ToolBar.h"
 #include "IconButton.h"
-#include "Editor.h"
+#include "editor/Editor.h"
 #include "CustomDrawer.h"
 #include "EditorMargin.h"
 #include <sstream>
@@ -126,7 +126,7 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 	layoutB->setSpacing(0);
 	layoutB->setContentsMargins(0, 0, 0, 0);
 
-	// This where the output generated after executing the script will be displayed
+	// This where the output_display generated after executing the script will be displayed
 	outPutArea = std::make_unique<OutputDisplay>(this);
 
 	// Editor helper component.

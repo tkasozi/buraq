@@ -38,6 +38,9 @@ signals:
 
 	void inlineSyntaxtHighlightingEvent();
 
+	void lineNumberAreaPaintEventSignal(QPaintEvent *event);
+
+
 public:
 	explicit Editor(QWidget *appUi = nullptr);
 
@@ -45,12 +48,10 @@ public:
 
 	void openAndParseFile(const QString &filePath, QFile::OpenModeFlag modeFlag = QFile::OpenModeFlag::ReadOnly);
 
-	void lineNumberAreaPaintEvent(QPaintEvent *event);
 
 	int lineNumberAreaWidth();
 
 private slots:
-	void setupSignals();
 
 	void updateLineNumberAreaWidth(int newBlockCount);
 
@@ -65,8 +66,6 @@ private slots:
 	void autoSave();
 
 private:
-	static QString convertTextToHtml(QString &);
-	static QString convertRhsTextToHtml(const QString &);
 
 	std::unique_ptr<QWidget> lineNumberArea;
 	QWidget *appUi;
@@ -76,6 +75,10 @@ private:
 	QString previousText;
 	QTimer autoSaveTimer;
 
+	static QString convertTextToHtml(QString &);
+	static QString convertRhsTextToHtml(const QString &);
+
+	void setupSignals();
 };
 
 #endif //IT_TOOLS_EDITOR_H2

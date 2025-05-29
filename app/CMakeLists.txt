@@ -55,7 +55,7 @@ set(ITOOLS_HEADERS
 		ui/ToolBar.h
 		ui/IconButton.h
 		ui/Editor.h
-		ui/LineNumberArea.h
+		ui/EditorMargin.h
 		ui/CustomDrawer.h
 		ui/FilePathLabel.h
 		ui/OutputDisplay.h
@@ -63,6 +63,9 @@ set(ITOOLS_HEADERS
 		ui/EditorActionArea.h
 		ui/CommonWidget.h
 		utils/Minion.h
+		ui/CodeRunner.cpp
+		ui/CodeRunner.h
+		ui/EditorMargin.cpp
 )
 
 if (WIN32)

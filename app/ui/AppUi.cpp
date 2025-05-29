@@ -29,7 +29,7 @@
 #include "IconButton.h"
 #include "Editor.h"
 #include "CustomDrawer.h"
-#include "EditorActionArea.h"
+#include "EditorMargin.h"
 #include <sstream>
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include <QCoreApplication>
@@ -131,8 +131,8 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 	outPutArea = std::make_unique<OutputDisplay>(this);
 
 	// The text or script editor.
-	editorMargin = std::make_unique<EditorActionArea>(this);
 	itoolsEditor = std::make_unique<Editor>(this);
+	editorMargin = std::make_unique<EditorMargin>(this);
 
 	drawer = std::make_unique<CustomDrawer>(itoolsEditor.get());
 
@@ -141,7 +141,7 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 	placeHolderLayout->setContentsMargins(0, 0, 0, 0);
 
 	placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
-	placeHolderLayout->addWidget(editorMargin.get(), 0, 2, Qt::AlignmentFlag::AlignTop);
+	placeHolderLayout->addWidget(editorMargin.get(), 0, 2, 12, 1, Qt::AlignmentFlag::AlignTop);
 	placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 10);
 
 	// add main content area

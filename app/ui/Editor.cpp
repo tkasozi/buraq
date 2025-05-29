@@ -14,9 +14,8 @@
 #include <QProcess>
 
 #include "Editor.h"
-#include "LineNumberArea.h"
+#include "EditorMargin.h"
 #include "AppUi.h"
-#include "../utils/Utils.h"
 
 #define string_equals(keyText, key) \
 (std::equal(keyText.begin(), keyText.end(), key));
@@ -44,7 +43,7 @@ static QRegularExpression variablesRegex(
 			/*  font-family: monospace;*/
 			border: 0;
 			color: #c0c0c0;
-			margin-left: 60px;
+			margin: 0px;
 			font-size: 18px;
 			show-decoration-selected;
 			selection-color: #232323;
@@ -53,8 +52,6 @@ static QRegularExpression variablesRegex(
 )"
 
 Editor::Editor(QWidget *ptr) : QPlainTextEdit(nullptr), appUi(ptr) {
-	lineNumberArea = std::make_unique<LineNumberArea>(this);
-
 	// setting up the editor's layout.
 	auto *layoutC = new QGridLayout;
 	layoutC->setSpacing(0);
@@ -84,54 +81,22 @@ Editor::Editor(QWidget *ptr) : QPlainTextEdit(nullptr), appUi(ptr) {
 	play.actualSize(QSize(64, 64));
 }
 
+//void Editor::setupSignals() {
+//
+//	auto *appUi_ = dynamic_cast<EditorMargin *>(appUi);
+//	// Signal to update status bar in AppUI component for the running process
+//	connect(this, &EditorActionArea::statusUpdate, appUi_, &AppUi::processStatusSlot);
+//}
+
 void Editor::updateLineNumberArea(const QRect &rect, int dy) {
-	if (dy)
-		lineNumberArea->scroll(0, dy);
-	else
-		lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
-
-	if (rect.contains(viewport()->rect()))
-		updateLineNumberAreaWidth(0);
-}
-
-void Editor::lineNumberAreaPaintEvent(QPaintEvent *event) {
-	QPainter painter(lineNumberArea.get());
-	painter.setBackgroundMode(Qt::BGMode::TransparentMode);
-
-	QTextBlock block = firstVisibleBlock();
-	int blockNumber = block.blockNumber();
-	int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
-	int bottom = top + qRound(blockBoundingRect(block).height());
-
-	QString editorText = toPlainText();
-	// don't set line numbers until the placeholder text is cleared.
-	while (block.isValid() && top <= event->rect().bottom() && !editorText.isEmpty()) {
-		if (block.isVisible() && bottom >= event->rect().top()) {
-
-			int i = blockNumber + 1;
-			QString number = QString::number(i);
-
-			// Set background color
-			QRect rect(0, top, lineNumberArea->width(), fontMetrics().height());
-			QColor lineColor = QColor(Qt::lightGray).lighter(25);
-
-			// Highlight the line number that is active
-			QTextCursor cursor = textCursor();
-			if (cursor.blockNumber() == block.blockNumber()) {
-				painter.fillRect(rect, lineColor);  // Fill with light gray
-			}
-
-			// Adds a margin-left to the line rectangle
-			rect.setLeft(4);
-
-			painter.drawText(rect, Qt::AlignLeft, number);
-		}
-
-		block = block.next();
-		top = bottom;
-		bottom = top + qRound(blockBoundingRect(block).height());
-		++blockNumber;
-	}
+	// TODO-------------
+//	if (dy)
+//		lineNumberArea->scroll(0, dy);
+//	else
+//		lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
+//
+//	if (rect.contains(viewport()->rect()))
+//		updateLineNumberAreaWidth(0);
 }
 
 int Editor::lineNumberAreaWidth() {

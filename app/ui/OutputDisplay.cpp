@@ -69,7 +69,7 @@ OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
 	// --- QSS for Custom Scrollbar ---
 	// Apply the stylesheet directly to the textEdit widget
 	// This ensures only this textEdit's scrollbars are affected (and its children if any)
-	main->setStyleSheet(QString(SCROLL_BAR_STYLES) + QString("background: #FF0000"));
+	main->setStyleSheet("background: #FF0000");
 	main->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 	main->setFixedHeight(550);
 

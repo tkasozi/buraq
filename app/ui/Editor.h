@@ -14,6 +14,7 @@
 #include <QStack>
 
 #include "OutputDisplay.h"
+#include "IToolsAPI.h"
 
 class Editor : public QPlainTextEdit {
 
@@ -38,7 +39,7 @@ signals:
 
 	void inlineSyntaxtHighlightingEvent();
 
-	void lineNumberAreaPaintEventSignal(QPaintEvent *event);
+	void lineNumberAreaPaintEventSignal(const EditorState &state);
 
 
 public:
@@ -48,16 +49,9 @@ public:
 
 	void openAndParseFile(const QString &filePath, QFile::OpenModeFlag modeFlag = QFile::OpenModeFlag::ReadOnly);
 
-
-	int lineNumberAreaWidth();
-
 private slots:
 
-	void updateLineNumberAreaWidth(int newBlockCount);
-
 	void highlightCurrentLine();
-
-	void updateLineNumberArea(const QRect &rect, int dy);
 
 	void documentSyntaxHighlighting();
 
@@ -70,10 +64,10 @@ private:
 	std::unique_ptr<QWidget> lineNumberArea;
 	QWidget *appUi;
 	QStack<QString> history;
-	QIcon play;
 	QString currentFile;
 	QString previousText;
 	QTimer autoSaveTimer;
+	EditorState state;
 
 	static QString convertTextToHtml(QString &);
 	static QString convertRhsTextToHtml(const QString &);

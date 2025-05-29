@@ -48,6 +48,7 @@ public:
 	~AppUi() override = default;
 
 	Editor *getEditor();
+	EditorMargin *getEditorMargin();
 
 	PluginManager *getLangPluginManager();
 

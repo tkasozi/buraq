@@ -38,26 +38,17 @@ static QRegularExpression variablesRegex(
 		QStringLiteral("^\\s*(\\$\\w+\\s*)=(.*?)$"),
 		QRegularExpression::CaseInsensitiveOption);
 
-#define EDITOR_STYLES R"(
-	Editor {
-			/*  font-family: monospace;*/
-			border: 0;
-			color: #c0c0c0;
-			margin: 0px;
-			font-size: 18px;
-			show-decoration-selected;
-			selection-color: #232323;
-			selection-background-color: #87CEEB; /* lightblue - same as variabled */
-	}
-)"
+#define EDITOR_STYLES R"()"
 
 Editor::Editor(QWidget *ptr) : QPlainTextEdit(nullptr), appUi(ptr) {
 	// setting up the editor's layout.
-	auto *layoutC = new QGridLayout;
-	layoutC->setSpacing(0);
-	layoutC->setContentsMargins(0, 0, 0, 0);
+	auto *layout = new QGridLayout(this);
+	layout->setSpacing(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
-	setLayout(layoutC);
+	setFrameShape(QFrame::NoFrame);
+	setLineWrapMode(QPlainTextEdit::NoWrap);
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
 	{ // update place holder text
 		QFile file(":/test/temp.ps1");
@@ -69,51 +60,19 @@ Editor::Editor(QWidget *ptr) : QPlainTextEdit(nullptr), appUi(ptr) {
 		file.close();
 	}
 
+	// Setup communication btn Widgets
 	setupSignals();
 
-	QString stylesStr = QString(SCROLL_BAR_STYLES) + QString(EDITOR_STYLES);
+	setStyleSheet(QString(EDITOR_STYLES));
 
-	setStyleSheet(stylesStr);
+	// Get the current palette
+	QPalette palette = QPlainTextEdit::palette();
 
-	updateLineNumberAreaWidth(0);
+	// Set the color for the background of the selection
+	palette.setColor(QPalette::Highlight, QColor(0, 120, 215)); // A common blue selection background
 
-	play = QIcon(QIcon(ItoolsNS::main_config.getAppIcons()->playCode));
-	play.actualSize(QSize(64, 64));
-}
-
-//void Editor::setupSignals() {
-//
-//	auto *appUi_ = dynamic_cast<EditorMargin *>(appUi);
-//	// Signal to update status bar in AppUI component for the running process
-//	connect(this, &EditorActionArea::statusUpdate, appUi_, &AppUi::processStatusSlot);
-//}
-
-void Editor::updateLineNumberArea(const QRect &rect, int dy) {
-	// TODO-------------
-//	if (dy)
-//		lineNumberArea->scroll(0, dy);
-//	else
-//		lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
-//
-//	if (rect.contains(viewport()->rect()))
-//		updateLineNumberAreaWidth(0);
-}
-
-int Editor::lineNumberAreaWidth() {
-	int digits = 1;
-	int max = qMax(1, blockCount());
-	while (max >= 10) {
-		max /= 10;
-		++digits;
-	}
-
-	int space = 64 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
-
-	return space;
-}
-
-void Editor::updateLineNumberAreaWidth(int /* newBlockCount */) {
-	setViewportMargins(0, 0, 0, 0);
+	// Apply the modified palette back to the widget
+	setPalette(palette);
 }
 
 void Editor::highlightCurrentLine() {
@@ -129,6 +88,25 @@ void Editor::highlightCurrentLine() {
 		selection.cursor = textCursor();
 
 		extraSelections.append(selection);
+
+		state.hasText = currentFile.isEmpty();
+		state.isBlockValid = false;
+		state.isSelected = false;
+		state.blockCount = blockCount();
+		state.cursorBlockNumber = textCursor().blockNumber(); // TODO not used
+		state.blockNumber = textCursor().blockNumber();
+		state.lineHeight = fontMetrics().height();
+		state.currentLineHeight = cursorRect().height();
+
+		if (selection.cursor.hasSelection()) {
+			state.isSelected = true;
+			state.selectedBlockNumbers.insert(selection.cursor.block().blockNumber());
+		} else {
+			state.isSelected = false;
+			state.selectedBlockNumbers.clear();
+		}
+
+		emit lineNumberAreaPaintEventSignal(state);
 	}
 
 	setExtraSelections(extraSelections);
@@ -152,8 +130,6 @@ QString Editor::convertRhsTextToHtml(const QString &qRhsLine) {
 
 QString Editor::convertTextToHtml(QString &line) {
 	QString lineBreak("<p> </p>");
-//	QString lineBreak("<br/>");
-//	QString lineBreak("\r");
 
 	if (line.isEmpty()) {
 		// FIXME what is the best way to add new lines? <br/> adds extra lines
@@ -225,7 +201,6 @@ void Editor::openAndParseFile(const QString &filePath, QFile::OpenModeFlag modeF
 
 void Editor::setupSignals() {
 	connect(this, &Editor::cursorPositionChanged, this, &Editor::highlightCurrentLine);
-	connect(this, &Editor::updateRequest, this, &Editor::updateLineNumberArea);
 
 	// Enables syntaxHighlighting i.e. showing keywords, comments, variables etc.
 	connect(this, &Editor::syntaxtHighlightingEvent, this, &Editor::documentSyntaxHighlighting);
@@ -237,6 +212,9 @@ void Editor::setupSignals() {
 	// Update status bar in AppUI component
 	auto *appUi_ = dynamic_cast<AppUi *>(appUi);
 	QObject::connect(this, &Editor::statusUpdate, appUi_, &AppUi::processStatusSlot);
+
+	// Signal to update status bar in AppUI component for the running process
+	connect(this, &Editor::lineNumberAreaPaintEventSignal, appUi_->getEditorMargin(), &EditorMargin::updateState);
 }
 
 void Editor::autoSave() {
@@ -263,7 +241,7 @@ void Editor::autoSave() {
 }
 
 void Editor::focusInEvent(QFocusEvent *e) {
-	// TODO -- perhaps can use this event to update and show the line number soon as focus is active.
+	qDebug() << "TODO: Do I need to override Editor::focusInEvent()??";
 	QPlainTextEdit::focusInEvent(e);
 }
 
@@ -356,5 +334,5 @@ void Editor::documentSyntaxHighlighting() {
 void Editor::keyPressEvent(QKeyEvent *e) {
 	previousText = toPlainText();
 
-	QPlainTextEdit::keyPressEvent(e);
+	QPlainTextEdit::keyPressEvent(e); // TODO bring back?
 }

@@ -66,10 +66,14 @@ set(ITOOLS_HEADERS
 		ui/CodeRunner.cpp
 		ui/CodeRunner.h
 		ui/EditorMargin.cpp
+		ui/editor/LineNumberAreaWidget.cpp
+		ui/editor/LineNumberAreaWidget.h
 )
 
-if (WIN32)
+if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
 	add_executable(ITools WIN32 ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
+elseif (CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
+	add_executable(ITools ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
 endif ()
 
 target_include_directories(ITools PRIVATE

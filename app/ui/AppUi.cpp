@@ -120,7 +120,6 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 	centralWidgetLayout->addWidget(centralWidgetControlPanel, 0, 0, 12, 1);
 
 	// Component
-//	centralWidgetLayout->setColumnMinimumWidth(1, 0);
 	connect(folderButton.get(), &IconButton::clicked, this, &AppUi::onClicked);
 
 	// layout c
@@ -130,9 +129,11 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 	// This where the output generated after executing the script will be displayed
 	outPutArea = std::make_unique<OutputDisplay>(this);
 
+	// Editor helper component.
+	editorMargin = std::make_unique<EditorMargin>(this);
+
 	// The text or script editor.
 	itoolsEditor = std::make_unique<Editor>(this);
-	editorMargin = std::make_unique<EditorMargin>(this);
 
 	drawer = std::make_unique<CustomDrawer>(itoolsEditor.get());
 
@@ -142,7 +143,7 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
 	placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
 	placeHolderLayout->addWidget(editorMargin.get(), 0, 2, 12, 1, Qt::AlignmentFlag::AlignTop);
-	placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 10);
+	placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 1);
 
 	// add main content area
 	auto editorAndDrawerAreaPanel = new QWidget;
@@ -214,4 +215,8 @@ void AppUi::configureAppContext() {
 
 	// Load plugins from the specified directory
 	pluginManager->loadPlugin("power_shell");
+}
+
+EditorMargin *AppUi::getEditorMargin() {
+	return editorMargin.get();
 }

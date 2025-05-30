@@ -4,5 +4,6 @@
   "releaseNotes": "Added new feature X, fixed bug Y.",
   "updaterVersion": "1.0.1",
   "updaterURL": "https://yourserver.com/updates/Updater_1.0.1.exe",
+  "sha256": "a1b2...",
   "inherit": true
 }

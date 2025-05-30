@@ -12,6 +12,9 @@ find_package(Qt6 REQUIRED COMPONENTS
 		Xml
 		REQUIRED)
 
+
+find_package(CURL REQUIRED)
+
 set(ITOOLS_MAIN_SOURCES
 		main.cpp
 		PluginManager.cpp
@@ -71,6 +74,8 @@ set(ITOOLS_HEADERS
 		../include/version.h
 		app_version.cpp
 		app_version.h
+		../include/network.cpp
+		../include/network.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
@@ -80,10 +85,10 @@ elseif (CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
 endif ()
 
 target_include_directories(ITools PRIVATE
-		"${CMAKE_CURRENT_SOURCE_DIR}/ui"      # For ui headers
-		"${CMAKE_CURRENT_SOURCE_DIR}/utils"   # For utils headers
+		"${CMAKE_CURRENT_SOURCE_DIR}/ui" # For ui headers
+		"${CMAKE_CURRENT_SOURCE_DIR}/utils" # For utils headers
 		"${CMAKE_CURRENT_SOURCE_DIR}/../include" # For PluginInterface.h, IToolsAPI.h
-		"${CMAKE_CURRENT_SOURCE_DIR}"         # For headers in the current source dir
+		"${CMAKE_CURRENT_SOURCE_DIR}" # For headers in the current source dir
 )
 
 target_link_libraries(ITools
@@ -92,6 +97,7 @@ target_link_libraries(ITools
 		Qt::Widgets
 		Qt::Sql
 		Qt::Xml
+		CURL::libcurl
 )
 
 add_dependencies(ITools app_icon)

@@ -152,6 +152,7 @@ echo ""
 echo "--- Configuring CMake project (Build Type: ${BUILD_TYPE}) ---"
 # The -S option specifies the source directory.
 # The -B option specifies the build directory (created if it doesn't exist).
+#-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake
 "$CMAKE_EXE" -S "${SOURCE_DIR}" -B "${BUILD_DIR}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
  -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" -DMINGW_COMPILER_BIN_DIR="${MINGW_COMPILER_BIN_DIR}" \
  -G "MinGW Makefiles"

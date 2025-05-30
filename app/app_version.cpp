@@ -2,11 +2,11 @@
 // Created by talik on 5/29/2025.
 //
 
-#include "../include/version.h"
 #include <boost/property_tree/json_parser.hpp>
-
 #include "app_version.h"
 
+#include "../include/version.h"
+#include "../include/network.h"
 
 std::string getCurrentAppVersion() {
 	return std::to_string(APP_VERSION_MAJOR)
@@ -18,7 +18,7 @@ UpdateInfo checkForUpdates() {
 	namespace pt = boost::property_tree;
 	pt::ptree loadPtreeRoot;
 
-	// std::string manifestContent = httpGet("https://yourserver.com/updates/version.json");
+	// std::string manifestContent = httpGet("file:///C:/Users/talik/workspace/ITools/app/version.json");
 	pt::read_json("version.json", loadPtreeRoot);
 	std::vector<std::tuple<std::string, std::string, std::string>> version;
 

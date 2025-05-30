@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ITools"
-#define MyAppVersion "0.0.13"
+#define MyAppVersion "0.0.15"
 #define MyAppPublisher "ITools Projectxx, Inc."
 #define MyAppURL "https://www.example.com/"
 #define MyAppExeName "ITools.exe"

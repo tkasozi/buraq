@@ -44,7 +44,7 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 	QIcon::setThemeName("dark");
 
 	// overall bgColor
-	setStyleSheet("background-color: #232323; color: #606060;");
+	setStyleSheet("background-color: #232323;");
 
 	// setting up default window size
 	const auto windowConfig = ItoolsNS::main_config.getWindow();
@@ -126,16 +126,14 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 	layoutB->setSpacing(0);
 	layoutB->setContentsMargins(0, 0, 0, 0);
 
-	// This where the output_display generated after executing the script will be displayed
-	outPutArea = std::make_unique<OutputDisplay>(this);
-
 	// Editor helper component.
 	editorMargin = std::make_unique<EditorMargin>(this);
-
 	// The text or script editor.
 	itoolsEditor = std::make_unique<Editor>(this);
-
+	// Handles file nav
 	drawer = std::make_unique<CustomDrawer>(itoolsEditor.get());
+	// This where the output_display generated after executing the script will be displayed
+	outPutArea = std::make_unique<OutputDisplay>(this);
 
 	placeHolderLayout = std::make_unique<QGridLayout>();
 	placeHolderLayout->setSpacing(0);

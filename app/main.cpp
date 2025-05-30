@@ -5,6 +5,7 @@
 #include <QStyleFactory>
 #include "ui/AppUi.h"
 #include "db_connection.h"
+#include "frameless_window/FramelessWindow.h"
 #include <QtSql>
 
 int main(int argc, char *argv[])

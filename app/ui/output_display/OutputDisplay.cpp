@@ -37,7 +37,7 @@
 	}
 )"
 
-void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int appWidth);
+void init_main_out_area(QPlainTextEdit *, QVBoxLayout *, int);
 
 OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
 	setStyleSheet(OUTPUT_DISPLAY_STYLES);
@@ -57,12 +57,12 @@ OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
 	layout->addWidget(pMainLabel);
 
 	main = std::make_unique<QPlainTextEdit>();
-	init_main_out_area(main.get(), layout, ((AppUi *) appUi)->width());
+	init_main_out_area(main.get(), layout, 0);
 
 	hide();
 }
 
-void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int appWidth = 0) {
+void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int editorWidth = 0) {
 	// For displaying the output_display
 	layout->addWidget(main);
 
@@ -79,8 +79,9 @@ void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int appWidth 
 
 	main->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	if (appWidth > 0) {
-		main->setMinimumWidth(appWidth);
+	qDebug() << "appWidth: " << editorWidth;
+	if (editorWidth > 0) {
+		main->setMinimumWidth(editorWidth);
 	}
 
 	// --- QSS for Custom Scrollbar ---
@@ -89,6 +90,7 @@ void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int appWidth 
 	main->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
 	main->setMinimumHeight(550);
 }
+
 void OutputDisplay::toggle() {
 	if (isVisible()) {
 		hide();
@@ -111,9 +113,9 @@ void OutputDisplay::log(const QString &strOutput, const QString &errorOutput) {
 					 formattedDateTime + "</h4>");
 	// End Adds timestamp
 
-	main->appendHtml("<div style={\"background-color: inherit;\"}>");
+	main->appendHtml("<div>");
 	for (const QString &qString: list) {
-		main->appendHtml("<p>" + qString + "</p>");
+		main->appendHtml("<p  style=\"color: #FFFFFF;\">" + qString + "</p>");
 	}
 	for (const QString &qString: errorsList) {
 		// error logs

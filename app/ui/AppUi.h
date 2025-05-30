@@ -19,10 +19,10 @@
 #include "ToolButton.h"
 #include "CustomDrawer.h"
 #include "IconButton.h"
-#include "OutputDisplay.h"
+#include "output_display/OutputDisplay.h"
 #include "ToolBar.h"
 #include "../PluginManager.h"
-#include "EditorActionArea.h"
+#include "EditorMargin.h"
 
 
 class AppUi : public QMainWindow {
@@ -47,6 +47,7 @@ public:
 	~AppUi() override = default;
 
 	Editor *getEditor();
+	EditorMargin *getEditorMargin();
 
 	PluginManager *getLangPluginManager();
 
@@ -58,7 +59,7 @@ private:
 	std::unique_ptr<OutputDisplay> outPutArea;
 	std::unique_ptr<QGridLayout> placeHolderLayout;
 	std::unique_ptr<Editor> itoolsEditor;
-	std::unique_ptr<QWidget> editorMargin;
+	std::unique_ptr<EditorMargin> editorMargin;
 	std::unique_ptr<ToolBar> toolBar;
 	std::unique_ptr<QStatusBar> statusBar;
 

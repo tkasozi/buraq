@@ -1,82 +1,38 @@
-// MIT License
-//
-// Copyright (c)  "2025" Talik A. Kasozi
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
 
 //
-// Created by talik on 4/20/2024.
+// Created by talik on 5/28/2025.
 //
 
-#include <QTextBlock>
+#include <QIcon>
+#include "CodeRunner.h"
 #include <QThread>
-#include <QString>
-#include <QTextStream>
-#include <QInputDialog> // For getting parameters for different tasks
-
-#include "EditorActionArea.h"
-#include "Editor.h"
+#include "CustomLabel.h"
 #include "IconButton.h"
 #include "AppUi.h"
 
-EditorActionArea::EditorActionArea(QWidget *appUi) :
-		CommonWidget(appUi),
+CodeRunner::CodeRunner(QWidget *appUi) :
+		IconButton(nullptr),
 		appUi(appUi),
 		minion(nullptr),
-		workerThread(nullptr) {
+		workerThread(nullptr){
 
-	const int playButtonSize = 32;
-
-	QString runBtnStyles(
-			"color: #FFF;"
+	setIcon(QIcon(ItoolsNS::main_config.getAppIcons()->executeIcon));
+	setFixedSize(32, 32);
+	setStyleSheet(
 			"border: 0px;"
-			"background-color: #232323;"
 	);
 
-	runCode_ = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons()->executeIcon),
-											playButtonSize, playButtonSize, runBtnStyles);
-
 	// set tooltip for the run buttons
-	runCode_->setToolTip(
+	setToolTip(
 			"Run code."
 			" & "
 			"Highlighted code."
 	);
 
-	auto layout = new QVBoxLayout;
-	layout->setSpacing(0);
-	layout->setContentsMargins(0, 4, 8, 0);
-	layout->addWidget(runCode_.get());
-
-	setLayout(layout);
-	setFixedWidth(playButtonSize);
-	setStyleSheet("border-left: 1px solid #383838;");
-
-	// setup signals & slots connection
-	EditorActionArea::setupSignals();
+	CodeRunner::setupSignals();
 }
 
-void EditorActionArea::paintEvent(QPaintEvent *event) {
-	QWidget::paintEvent(event);
-}
-
-void EditorActionArea::runCode() {
+void CodeRunner::runCode() {
 	if (workerThread && workerThread->isRunning()) {
 		// Work is already in progress. Please stop current work first.;
 		return;
@@ -119,7 +75,7 @@ void EditorActionArea::runCode() {
 	QMetaObject::invokeMethod(minion, "doWork", Qt::QueuedConnection, Q_ARG(const std::function<QVariant()>, task));
 }
 
-void EditorActionArea::setupWorkerThread() {
+void CodeRunner::setupWorkerThread() {
 	workerThread = new QThread(this);
 	workerThread->setObjectName("CodeRunner");
 
@@ -135,9 +91,9 @@ void EditorActionArea::setupWorkerThread() {
 	});
 
 	// Connect minion signals to MainWindow slots
-	connect(minion, &Minion::progressUpdated, this, &EditorActionArea::handleProgress);
-	connect(minion, &Minion::resultReady, this, &EditorActionArea::handleTaskResults);
-	connect(minion, &Minion::workFinished, this, &EditorActionArea::handleWorkerFinished, Qt::QueuedConnection);
+	connect(minion, &Minion::progressUpdated, this, &CodeRunner::handleProgress);
+	connect(minion, &Minion::resultReady, this, &CodeRunner::handleTaskResults);
+	connect(minion, &Minion::workFinished, this, &CodeRunner::handleWorkerFinished, Qt::QueuedConnection);
 
 	// When the worker signals it's done with its task
 	connect(minion, &Minion::workFinished, workerThread,
@@ -152,7 +108,7 @@ void EditorActionArea::setupWorkerThread() {
 	workerThread->start();
 }
 
-void EditorActionArea::handleTaskResults(const QVariant &result) {
+void CodeRunner::handleTaskResults(const QVariant &result) {
 	if (result.isValid() && result.canConvert<std::wstring>()) {
 		const auto data = result.value<std::wstring>();
 		QString error = "", resultString = QString::fromStdWString(data);
@@ -168,18 +124,18 @@ void EditorActionArea::handleTaskResults(const QVariant &result) {
 	}
 }
 
-void EditorActionArea::handleProgress(int i) {
+void CodeRunner::handleProgress(int i) {
 	emit statusUpdate("Executing...");
 }
 
-void EditorActionArea::handleWorkerFinished() {
+void CodeRunner::handleWorkerFinished() {
 	emit statusUpdate("Completed");
 
 	workerThread = nullptr;
 	minion = nullptr;
 }
 
-EditorActionArea::~EditorActionArea() {
+CodeRunner::~CodeRunner() {
 	// smart pointers are deleted automatically
 	// editor pointer should be deleted elsewhere
 	appUi = nullptr;
@@ -194,14 +150,14 @@ EditorActionArea::~EditorActionArea() {
 	}
 }
 
-void EditorActionArea::setupSignals() const {
+void CodeRunner::setupSignals() {
 	// Signal to execute the code
-	connect(runCode_.get(), &IconButton::clicked, this, &EditorActionArea::runCode);
+	connect(this, &IconButton::clicked, this, &CodeRunner::runCode);
 
 	auto *appUi_ = dynamic_cast<AppUi *>(appUi);
 	// Signal to update status bar in AppUI component for the running process
-	connect(this, &EditorActionArea::statusUpdate, appUi_, &AppUi::processStatusSlot);
+	connect(this, &CodeRunner::statusUpdate, appUi_, &AppUi::processStatusSlot);
 
 	// Signal to update the out component in AppUI component for the completed process
-	connect(this, &EditorActionArea::updateOutputResult, appUi_, &AppUi::processResultSlot);
+	connect(this, &CodeRunner::updateOutputResult, appUi_, &AppUi::processResultSlot);
 }

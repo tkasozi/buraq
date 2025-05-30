@@ -54,6 +54,7 @@ private:
 private slots:
 
 public:
+	explicit ToolButton(QWidget *ptr = nullptr) :  QToolButton(ptr) {};
 	explicit ToolButton(const QString &fileName, QString customHoverColor = nullptr)
 			: customHoverColor(std::move(customHoverColor)) {
 		applyIconStyles(QIcon::fromTheme(fileName));

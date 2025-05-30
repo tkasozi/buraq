@@ -31,7 +31,7 @@
 #include <QWidget>
 #include <QGridLayout>
 #include "IconButton.h"
-#include "Editor.h"
+#include "editor/Editor.h"
 #include "FilePathLabel.h"
 
 struct drawerState {

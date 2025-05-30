@@ -29,12 +29,37 @@
 
 #include <filesystem>
 #include <string>
+#include <set>
 #include <map>
 
 // Example of an application context you might pass to plugins
 struct IToolsApi {
 	std::filesystem::path searchPath;
 	std::map<std::string, std::string> plugins;
+};
+
+struct EditorState {
+
+	bool hasText;
+	bool isBlockValid;
+	bool isSelected;
+	int blockCount;
+	int cursorBlockNumber;
+	int blockNumber;
+	int lineHeight;
+	int currentLineHeight;
+	std::set<int> selectedBlockNumbers;
+
+	// For the updateEditorState check if states are different
+	bool operator!=(const EditorState &other) const {
+		return blockCount != other.blockCount ||
+			   blockNumber != other.blockNumber ||
+			   cursorBlockNumber != other.cursorBlockNumber;
+	}
+
+	bool operator==(const EditorState &other) const {
+		return !(*this != other);
+	}
 };
 
 #endif //ITOOLS_API_H

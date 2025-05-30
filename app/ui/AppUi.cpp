@@ -27,9 +27,9 @@
 #include "AppUi.h"
 #include "ToolBar.h"
 #include "IconButton.h"
-#include "Editor.h"
+#include "editor/Editor.h"
 #include "CustomDrawer.h"
-#include "EditorActionArea.h"
+#include "EditorMargin.h"
 #include <sstream>
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include <QCoreApplication>
@@ -44,7 +44,7 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 	QIcon::setThemeName("dark");
 
 	// overall bgColor
-	setStyleSheet("background-color: #232323; color: #606060;");
+	setStyleSheet("background-color: #232323;");
 
 	// setting up default window size
 	const auto windowConfig = ItoolsNS::main_config.getWindow();
@@ -120,29 +120,28 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 	centralWidgetLayout->addWidget(centralWidgetControlPanel, 0, 0, 12, 1);
 
 	// Component
-//	centralWidgetLayout->setColumnMinimumWidth(1, 0);
 	connect(folderButton.get(), &IconButton::clicked, this, &AppUi::onClicked);
 
 	// layout c
 	layoutB->setSpacing(0);
 	layoutB->setContentsMargins(0, 0, 0, 0);
 
-	// This where the output generated after executing the script will be displayed
-	outPutArea = std::make_unique<OutputDisplay>(this);
-
+	// Editor helper component.
+	editorMargin = std::make_unique<EditorMargin>(this);
 	// The text or script editor.
-	editorMargin = std::make_unique<EditorActionArea>(this);
 	itoolsEditor = std::make_unique<Editor>(this);
-
+	// Handles file nav
 	drawer = std::make_unique<CustomDrawer>(itoolsEditor.get());
+	// This where the output_display generated after executing the script will be displayed
+	outPutArea = std::make_unique<OutputDisplay>(this);
 
 	placeHolderLayout = std::make_unique<QGridLayout>();
 	placeHolderLayout->setSpacing(0);
 	placeHolderLayout->setContentsMargins(0, 0, 0, 0);
 
 	placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
-	placeHolderLayout->addWidget(editorMargin.get(), 0, 2, Qt::AlignmentFlag::AlignTop);
-	placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 10);
+	placeHolderLayout->addWidget(editorMargin.get(), 0, 2, 12, 1, Qt::AlignmentFlag::AlignTop);
+	placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 1);
 
 	// add main content area
 	auto editorAndDrawerAreaPanel = new QWidget;
@@ -214,4 +213,8 @@ void AppUi::configureAppContext() {
 
 	// Load plugins from the specified directory
 	pluginManager->loadPlugin("power_shell");
+}
+
+EditorMargin *AppUi::getEditorMargin() {
+	return editorMargin.get();
 }

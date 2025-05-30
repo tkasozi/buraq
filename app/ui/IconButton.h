@@ -35,6 +35,8 @@
 class IconButton : public ToolButton {
 
 public:
+	explicit IconButton(QWidget *ptr = nullptr) : ToolButton(ptr) {};
+	explicit IconButton(const QString &fileName) : ToolButton(fileName) {};
 	explicit IconButton(const QString &fileName, const int w = 32, int h = 32, const QString &customStyles = "")
 			: ToolButton(fileName) {
 		setFixedSize(w, h);

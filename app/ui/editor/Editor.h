@@ -13,7 +13,7 @@
 #include <QRegularExpression>
 #include <QStack>
 
-#include "OutputDisplay.h"
+#include "IToolsAPI.h"
 
 class Editor : public QPlainTextEdit {
 
@@ -38,6 +38,9 @@ signals:
 
 	void inlineSyntaxtHighlightingEvent();
 
+	void lineNumberAreaPaintEventSignal(const EditorState &state);
+
+
 public:
 	explicit Editor(QWidget *appUi = nullptr);
 
@@ -45,18 +48,9 @@ public:
 
 	void openAndParseFile(const QString &filePath, QFile::OpenModeFlag modeFlag = QFile::OpenModeFlag::ReadOnly);
 
-	void lineNumberAreaPaintEvent(QPaintEvent *event);
-
-	int lineNumberAreaWidth();
-
 private slots:
-	void setupSignals();
-
-	void updateLineNumberAreaWidth(int newBlockCount);
 
 	void highlightCurrentLine();
-
-	void updateLineNumberArea(const QRect &rect, int dy);
 
 	void documentSyntaxHighlighting();
 
@@ -65,17 +59,19 @@ private slots:
 	void autoSave();
 
 private:
-	static QString convertTextToHtml(QString &);
-	static QString convertRhsTextToHtml(const QString &);
 
 	std::unique_ptr<QWidget> lineNumberArea;
 	QWidget *appUi;
 	QStack<QString> history;
-	QIcon play;
 	QString currentFile;
 	QString previousText;
 	QTimer autoSaveTimer;
+	EditorState state;
 
+	static QString convertTextToHtml(QString &);
+	static QString convertRhsTextToHtml(const QString &);
+
+	void setupSignals();
 };
 
 #endif //IT_TOOLS_EDITOR_H2

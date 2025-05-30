@@ -26,7 +26,8 @@
 #include <QScrollArea>
 #include <QDateTime>
 #include "OutputDisplay.h"
-#include "../utils/Utils.h"
+#include "Utils.h"
+#include "AppUi.h"
 
 
 #define OUTPUT_DISPLAY_STYLES R"(
@@ -36,10 +37,12 @@
 	}
 )"
 
+void init_main_out_area(QPlainTextEdit *, QVBoxLayout *, int);
+
 OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
 	setStyleSheet(OUTPUT_DISPLAY_STYLES);
 
-	auto layout = new QVBoxLayout;
+	auto layout = new QVBoxLayout(this);
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 0, 0, 0);
 
@@ -53,29 +56,39 @@ OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
 	);
 	layout->addWidget(pMainLabel);
 
-	// For displaying the output
 	main = std::make_unique<QPlainTextEdit>();
-	layout->addWidget(main.get());
+	init_main_out_area(main.get(), layout, 0);
+
+	hide();
+}
+
+void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int editorWidth = 0) {
+	// For displaying the output_display
+	layout->addWidget(main);
+
+	// Get the current palette
+	QPalette palette = main->palette();
+
+	// Set the color for the background of the selection
+	palette.setColor(QPalette::Highlight, QColor(0, 120, 215)); // A common blue selection background
+	palette.setColor(QPalette::Text, QColor(Qt::white)); // A common blue selection background
+	main->setPalette(palette);
 
 	main->setReadOnly(true);
 	main->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
 
 	main->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	if (appUi != nullptr) { // TODO just use the width value
-		main->setMinimumWidth(appUi->width());
+	qDebug() << "appWidth: " << editorWidth;
+	if (editorWidth > 0) {
+		main->setMinimumWidth(editorWidth);
 	}
 
 	// --- QSS for Custom Scrollbar ---
 	// Apply the stylesheet directly to the textEdit widget
 	// This ensures only this textEdit's scrollbars are affected (and its children if any)
-	main->setStyleSheet(QString(SCROLL_BAR_STYLES) + QString("background: #FF0000"));
 	main->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
-	main->setFixedHeight(550);
-
-	setLayout(layout);
-
-	hide();
+	main->setMinimumHeight(550);
 }
 
 void OutputDisplay::toggle() {
@@ -100,9 +113,9 @@ void OutputDisplay::log(const QString &strOutput, const QString &errorOutput) {
 					 formattedDateTime + "</h4>");
 	// End Adds timestamp
 
-	main->appendHtml("<div style={\"background-color: inherit;\"}>");
+	main->appendHtml("<div>");
 	for (const QString &qString: list) {
-		main->appendHtml("<p>" + qString + "</p>");
+		main->appendHtml("<p  style=\"color: #FFFFFF;\">" + qString + "</p>");
 	}
 	for (const QString &qString: errorsList) {
 		// error logs

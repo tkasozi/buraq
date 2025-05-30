@@ -24,11 +24,10 @@ set(ITOOLS_UI_SOURCES
 		ui/AppUi.cpp
 		ui/ToolBarEventFilter.cpp
 		ui/ToolBar.cpp
-		ui/Editor.cpp
+		ui/editor/Editor.cpp
 		ui/CustomDrawer.cpp
-		ui/OutputDisplay.cpp
+		ui/output_display/OutputDisplay.cpp
 		ui/CustomLabel.cpp
-		ui/EditorActionArea.cpp
 )
 
 set(ITOOLS_UTILS_SOURCES
@@ -54,19 +53,27 @@ set(ITOOLS_HEADERS
 		ui/ToolButton.h
 		ui/ToolBar.h
 		ui/IconButton.h
-		ui/Editor.h
-		ui/LineNumberArea.h
+		ui/editor/Editor.h
+		ui/EditorMargin.h
 		ui/CustomDrawer.h
 		ui/FilePathLabel.h
-		ui/OutputDisplay.h
+		ui/output_display/OutputDisplay.h
 		ui/CustomLabel.h
-		ui/EditorActionArea.h
 		ui/CommonWidget.h
 		utils/Minion.h
+		ui/editor/CodeRunner.cpp
+		ui/editor/CodeRunner.h
+		ui/EditorMargin.cpp
+		ui/editor/LineNumberAreaWidget.cpp
+		ui/editor/LineNumberAreaWidget.h
+		ui/frameless_window/FramelessWindow.cpp
+		ui/frameless_window/FramelessWindow.h
 )
 
-if (WIN32)
+if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
 	add_executable(ITools WIN32 ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
+elseif (CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
+	add_executable(ITools ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
 endif ()
 
 target_include_directories(ITools PRIVATE

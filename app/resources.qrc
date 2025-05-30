@@ -25,6 +25,7 @@
 <RCC>
     <qresource prefix="/">
         <file>../config/main_config.xml</file>
+        <file>version.json</file>
         <file>styles.qss</file>
         <file>test/temp.ps1</file>
         <file>icons/dark/index.theme</file>

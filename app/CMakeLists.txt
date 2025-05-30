@@ -68,6 +68,9 @@ set(ITOOLS_HEADERS
 		ui/editor/LineNumberAreaWidget.h
 		ui/frameless_window/FramelessWindow.cpp
 		ui/frameless_window/FramelessWindow.h
+		../include/version.h
+		app_version.cpp
+		app_version.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)

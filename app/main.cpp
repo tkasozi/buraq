@@ -6,6 +6,7 @@
 #include "ui/AppUi.h"
 #include "db_connection.h"
 #include "frameless_window/FramelessWindow.h"
+#include "app_version.h"
 #include <QtSql>
 
 int main(int argc, char *argv[])
@@ -39,6 +40,8 @@ int main(int argc, char *argv[])
 
 	std::unique_ptr<AppUi> ui = std::make_unique<AppUi>(nullptr);
 	ui->show();
+
+	main_version_logic();
 
 	return QApplication::exec();
 }

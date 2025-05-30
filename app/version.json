@@ -1,0 +1,8 @@
+{
+  "latestVersion": "1.1.0",
+  "downloadUrl": "https://yourserver.com/updates/MyApp_1.1.0.zip",
+  "releaseNotes": "Added new feature X, fixed bug Y.",
+  "updaterVersion": "1.0.1",
+  "updaterURL": "https://yourserver.com/updates/Updater_1.0.1.exe",
+  "inherit": true
+}

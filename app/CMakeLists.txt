@@ -143,6 +143,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
 			"libglib-2.0-0.dll"
 			"libbrotlicommon.dll"
 			"libsqlite3-0.dll"
+			"libintl-8.dll"
 	)
 
 	# --- Bundle i.e. libwinpthread-1.dll ---

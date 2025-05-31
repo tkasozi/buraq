@@ -107,7 +107,7 @@ void FramelessWindow::mousePressEvent(QMouseEvent *event) {
 		}
 		if (!onButton) {
 			m_dragging = true;
-			m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+			m_dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
 			event->accept();
 			return;
 		}

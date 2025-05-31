@@ -76,6 +76,8 @@ set(ITOOLS_HEADERS
 		app_version.h
 		../include/network.cpp
 		../include/network.h
+		client/VersionRepository.cpp
+		client/VersionRepository.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
@@ -126,7 +128,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
 	get_filename_component(MINGW_RUNTIME_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
 
 	message(STATUS "GCC detected, adding static linking flags for libgcc and libstdc++")
-	target_link_options(ITools PRIVATE -static-libgcc -static-libstdc++)
+	target_link_options(ITools PRIVATE -static-libgcc -static-libstdc++ -lpthread)
 
 	set(QT_THIRD_PARTY_DEPENDENCY_DLLS
 			"libb2-1.dll"

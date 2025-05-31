@@ -180,7 +180,7 @@ void AppUi::onWindowFullyLoaded() {
 	QSqlError err = init_db();
 	if (err.type() != QSqlError::NoError)
 	{
-		db_log("Error executing initializing db: " + QString(err.text()));
+		db_log("Error executing initializing db: " + err.text().toStdString());
 
 		message.show();
 	}

@@ -34,6 +34,11 @@
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include <QCoreApplication>
 #include <map>
+#include <QtSql>
+
+#include "db_connection.h"
+#include "client/VersionRepository.h"
+#include "dialog/Dialog.h"
 
 AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
@@ -153,6 +158,48 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
 	// Add a temporary message that disappears after 5 seconds
 	processStatusSlot("Ready.", 2000);
+
+	// Schedule onWindowFullyLoaded to run after current event processing is done
+	QTimer::singleShot(0, this, &AppUi::onWindowFullyLoaded);
+}
+
+void AppUi::onWindowFullyLoaded() {
+	// Perform your actions here
+	// For example:
+	// - Load data from a database/network without blocking the UI initially
+	Dialog message(this);
+
+	if (!db_conn())
+	{
+		db_log("db_conn() EXIT_FAILURE..");
+		// failed to connect to the database
+		message.show();
+	}
+
+	// Initialize the database:
+	QSqlError err = init_db();
+	if (err.type() != QSqlError::NoError)
+	{
+		db_log("Error executing initializing db: " + QString(err.text()));
+
+		message.show();
+	}
+
+	message.show();
+
+	drawer->update();
+	// - Update status bar
+	// - Perform a check that requires the window to be visible
+
+	// MyCustomDialog customDlg(this); // 'this' would be the parent widget
+// if (customDlg.exec() == QDialog::Accepted) {
+//     qDebug("Custom dialog was accepted.");
+//     // Optionally retrieve data from the dialog if it has any input fields
+// } else {
+//     qDebug("Custom dialog was rejected or closed.");
+// }
+//	VersionRepository repo;
+//	repo.main_version_logic();
 }
 
 void AppUi::onClicked() {
@@ -201,14 +248,20 @@ void AppUi::processResultSlot(int exitCode, const QString &output, const QString
 }
 
 void AppUi::configureAppContext() {
-// app search_path for plugins
+	std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "ITools" / ".data";
+
+	// app search_path for plugins
 	std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
 	// Add required plugins
 	std::map<std::string, std::string> plugins_{
 			{"power_shell", searchPath.string() + "/plugins/ext/libPowershellExt.dll"}
 	};
 
-	auto api_context = new IToolsApi(searchPath, plugins_);
+	auto api_context = new IToolsApi;
+	api_context->searchPath = searchPath;
+	api_context->plugins = plugins_;
+	api_context->userPath = userDataPath;
+
 	pluginManager = std::make_unique<PluginManager>(api_context);
 
 	// Load plugins from the specified directory

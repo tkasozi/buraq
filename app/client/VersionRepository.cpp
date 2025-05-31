@@ -49,7 +49,7 @@ void VersionRepository::get_manifest_json(const std::string &endpoint, UpdateInf
 	info.releaseNotes = release_notes_node.get_value<std::string>();
 }
 
-int VersionRepository::main_version_logic() { // Renamed to avoid conflict with a real main
+UpdateInfo VersionRepository::main_version_logic() {
 
 	std::vector<std::thread> threads;
 	const int num_threads = 1;
@@ -72,7 +72,7 @@ int VersionRepository::main_version_logic() { // Renamed to avoid conflict with 
 			std::cerr << "No version" << std::endl;
 
 			// no version
-			return -1;
+			return {};
 		}
 
 		std::vector<std::string> ver = split_version(versionInfo.latestVersion);
@@ -81,7 +81,7 @@ int VersionRepository::main_version_logic() { // Renamed to avoid conflict with 
 			std::cerr << "Bad version format" << std::endl;
 
 			// invalid version
-			return -1;
+			return {};
 		}
 
 		if (std::stoi(ver[0]) > APP_VERSION_MAJOR
@@ -89,16 +89,16 @@ int VersionRepository::main_version_logic() { // Renamed to avoid conflict with 
 			|| std::stoi(ver[2]) > APP_VERSION_PATCH) {
 			std::cout << "A new version " << versionInfo.latestVersion << " is available!" << std::endl;
 			std::cout << "Release notes: " << versionInfo.releaseNotes << std::endl;
+			return versionInfo;
 		} else {
 			std::cout << "You have the latest version. " << currentVersion << std::endl;
+			return {};
 		}
 	} catch (...) {
 		std::cerr << "Exception while comparing versions" << std::endl;
 		// exceptions
-		return -1;
+		return {};
 	}
-
-	return 0;
 }
 
 

@@ -38,6 +38,12 @@
 #include <QCoreApplication>
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 
+
+#include <chrono>
+#include <iomanip> // For std::put_time
+#include <ctime>   // For std::localtime, std::time_t
+
+
 const auto FILES_SQL = QLatin1String(R"(
     CREATE TABLE IF NOT EXISTS files(id INTEGER PRIMARY KEY, file_path VARCHAR UNIQUE, file_name VARCHAR);
 )");
@@ -91,26 +97,39 @@ static QList<FileObject *> findPreviouslyOpenedFiles() {
 // Function to log messages (example)
 static void db_log(const QString &message) {
 	// Optionally, log to a file in a writable location:
-	QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "\\ITools\\log.txt";
+	std::filesystem::path logFilePath = std::filesystem::temp_directory_path() / "ITools" / ".data" / "log.txt";
 	QFile logFile(logFilePath);
-	if (logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
-		QTextStream stream(&logFile);
-		stream << QDateTime::currentDateTime().toString(Qt::ISODate) << ": " << message << Qt::endl;
+	try {
+		std::ofstream outputFile(logFilePath, std::ios::out);
+		outputFile.exceptions(std::ifstream::failbit);
+
+		// 1. Get the current time point from the system_clock
+		std::chrono::system_clock::time_point now_tp = std::chrono::system_clock::now();
+
+		// 2. Convert the time_point to a time_t (needed for some C-style functions like std::localtime)
+		std::time_t now_c = std::chrono::system_clock::to_time_t(now_tp);
+
+		// 3. Convert to a struct tm for more detailed fields (local time)
+		//    std::localtime is not thread-safe on all platforms without _s versions.
+		std::tm local_tm = *std::localtime(&now_c); // Dereference pointer returned by localtime
+
+		// Print the date and time using std::put_time (C++11)
+		outputFile << std::put_time(&local_tm, "%Y-%m-%d %H:%M:%S")  << ": " << message << std::endl;
+		outputFile.close();
+	} catch (const std::ios_base::failure &failure) {
+		qDebug() << "Fails" ;
 	}
 }
 
 static bool db_conn() {
 	db_log("Initiating DB connection..");
 
-	// Database will be created in a writable location for example, "C:\Users\john\AppData\Local\Temp\"
-	std::filesystem::current_path(std::filesystem::temp_directory_path());
-
-	QString dirName = "ITools\\.data\\";
-	if (!std::filesystem::create_directories(dirName.toStdString())) {
-		db_log("Dir " + dirName + " already exists.");
+	std::filesystem::path dirName = std::filesystem::temp_directory_path() / "ITools" / ".data";
+	if (!std::filesystem::create_directories(dirName)) {
+		db_log("Dir " + QString::fromStdString(dirName.string()) + " already exists.");
 	}
 
-	auto dbPathName = std::filesystem::temp_directory_path() / "ITools" / ".data" / "itools.db";
+	std::filesystem::path dbPathName = dirName / "itools.db";
 	std::string dbName = dbPathName.string();
 
 	db_log("current dir: " + QString::fromStdString(std::filesystem::current_path().string()));
@@ -165,7 +184,7 @@ static QSqlError init_db() {
 
 	QSqlQuery query;
 	if (!query.exec(FILES_SQL)) {
-		// qDebug() << "Error executing query:" << query.lastError().text();
+		db_log("Error executing query: " + query.lastError().text());
 		return query.lastError();
 	}
 

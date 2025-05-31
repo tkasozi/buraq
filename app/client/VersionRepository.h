@@ -21,7 +21,11 @@ public:
 
 	~VersionRepository() = default;
 
-	int main_version_logic();
+	/**
+	 * Determines if there is a new version
+	 * @return Returns the new version object or an empty version object otherwise.
+	 */
+	[[nodiscard]] UpdateInfo main_version_logic();
 
 private:
 	std::string endpoint;

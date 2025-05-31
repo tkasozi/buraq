@@ -35,6 +35,7 @@
 // Example of an application context you might pass to plugins
 struct IToolsApi {
 	std::filesystem::path searchPath;
+	std::filesystem::path userPath;
 	std::map<std::string, std::string> plugins;
 };
 

@@ -34,6 +34,10 @@
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include <QCoreApplication>
 #include <map>
+#include <QtSql>
+
+#include "client/VersionRepository.h"
+#include "dialog/VersionUpdateDialog.h"
 
 AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
@@ -151,8 +155,34 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
 	configureAppContext();
 
+	// Schedule onWindowFullyLoaded to run after current event processing is done
+	QTimer::singleShot(0, this, &AppUi::onWindowFullyLoaded);
+
 	// Add a temporary message that disappears after 5 seconds
 	processStatusSlot("Ready.", 2000);
+}
+
+void AppUi::onWindowFullyLoaded() {
+	// Perform your actions here
+	// For example:
+	// - Load data from a database/network without blocking the UI initially
+
+	// MyCustomDialog customDlg(this); // 'this' would be the parent widget
+	VersionUpdateDialog versionUpdateDialog(this);
+	VersionRepository repo;
+
+	UpdateInfo info = repo.main_version_logic();
+
+	if (!info.latestVersion.empty()) {
+		versionUpdateDialog.setWindowTitle("New Version " + QString::fromStdString(info.latestVersion) + " Available!");
+		versionUpdateDialog.setContent(QString::fromStdString(info.releaseNotes));
+
+		if (versionUpdateDialog.exec() == QDialog::Accepted) {
+			qDebug("exec.");
+		} else {
+			qDebug("Custom dialog was rejected or closed.");
+		}
+	}
 }
 
 void AppUi::onClicked() {
@@ -201,14 +231,20 @@ void AppUi::processResultSlot(int exitCode, const QString &output, const QString
 }
 
 void AppUi::configureAppContext() {
-// app search_path for plugins
+	std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "ITools" / ".data";
+
+	// app search_path for plugins
 	std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
 	// Add required plugins
 	std::map<std::string, std::string> plugins_{
 			{"power_shell", searchPath.string() + "/plugins/ext/libPowershellExt.dll"}
 	};
 
-	auto api_context = new IToolsApi(searchPath, plugins_);
+	auto api_context = new IToolsApi;
+	api_context->searchPath = searchPath;
+	api_context->plugins = plugins_;
+	api_context->userPath = userDataPath;
+
 	pluginManager = std::make_unique<PluginManager>(api_context);
 
 	// Load plugins from the specified directory

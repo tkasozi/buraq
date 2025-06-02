@@ -80,7 +80,7 @@ CustomDrawer::CustomDrawer(Editor *ptr) : editor(ptr), QWidget(ptr) {
 	showPreviouslyOpenedFiles();
 
 	// drawer is collapsed by default.
-	show();
+	// show();
 }
 
 void CustomDrawer::toggle() {

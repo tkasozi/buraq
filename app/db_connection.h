@@ -53,11 +53,9 @@ const auto SELECT_FILES_SQL = QLatin1String(R"(
 
 const auto SELECT_FILE_BY_FILE_PATH_SQL = QLatin1String(R"(SELECT * FROM files WHERE file_path = ?;)");
 
-static QVariant insertFile(const QString &filePath, const QString &title)
-{
+static QVariant insertFile(const QString &filePath, const QString &title) {
 	QSqlQuery query;
-	if (!query.prepare(INSERT_FILE_SQL))
-	{
+	if (!query.prepare(INSERT_FILE_SQL)) {
 		// "Error executing query:" << query.lastError().text();
 	}
 
@@ -68,23 +66,20 @@ static QVariant insertFile(const QString &filePath, const QString &title)
 	return query.lastInsertId();
 }
 
-static QList<FileObject *> findPreviouslyOpenedFiles()
-{
+static QList<FileObject *> findPreviouslyOpenedFiles() {
 	QSqlQuery query;
 
-	if (!query.exec(SELECT_FILES_SQL))
-	{
+	if (!query.exec(SELECT_FILES_SQL)) {
 		// qDebug() << "Error executing query:" << query.lastError().text();
 	}
 
 	QList<FileObject *> files;
-	while (query.next())
-	{
+	while (query.next()) {
 		auto file = new FileObject;
 
 		int id = query.value(0).toInt();
 		QString filePath = query.value(1).toString(); // column file_path
-		QString title = query.value(2).toString();	  // column title
+		QString title = query.value(2).toString();      // column title
 
 		file->setFilePath(filePath);
 		file->setFileName(title);
@@ -94,13 +89,22 @@ static QList<FileObject *> findPreviouslyOpenedFiles()
 	return files;
 }
 
-static bool db_conn()
-{
+static QSqlError init_db() {
+
+	QSqlQuery query;
+	if (!query.exec(FILES_SQL)) {
+		db_log("Error executing query: " + query.lastError().text().toStdString());
+		return query.lastError();
+	}
+
+	return {};
+}
+
+static bool db_conn() {
 	db_log("Initiating DB connection..");
 
 	std::filesystem::path dirName = std::filesystem::temp_directory_path() / "ITools" / ".data";
-	if (!std::filesystem::create_directories(dirName))
-	{
+	if (!std::filesystem::create_directories(dirName)) {
 		db_log("Dir " + dirName.string() + " already exists.");
 	}
 
@@ -110,17 +114,13 @@ static bool db_conn()
 	db_log("current dir: " + std::filesystem::current_path().string());
 	db_log("DB name path: " + dbName);
 
-	try
-	{
+	try {
 		std::fstream db(dbName, std::ios::in);
 
-		if (db.is_open())
-		{
+		if (db.is_open()) {
 			// db file exists
 			db.close();
-		}
-		else
-		{
+		} else {
 			std::ofstream outputFile(dbName, std::ios::out);
 			outputFile.close();
 		}
@@ -128,8 +128,7 @@ static bool db_conn()
 		QSqlDatabase dbEngine = QSqlDatabase::addDatabase("QSQLITE");
 		dbEngine.setDatabaseName(QString::fromStdString(dbName));
 
-		if (!dbEngine.open())
-		{
+		if (!dbEngine.open()) {
 			QSqlError error = dbEngine.lastError();
 
 			QMessageBox::critical(nullptr, QObject::tr("Cannot open database"),
@@ -144,37 +143,25 @@ static bool db_conn()
 			db_log(&"  Driver available:"[QSqlDatabase::isDriverAvailable("QSQLITE")]);
 			db_log("  Error (Database Text):" + error.databaseText().toStdString());
 			return false;
-		}
-		else
-		{
-			db_log("DB connection is good!");
+		} else {
+			db_log("DB connection is good!");    // Initialize the database:
+			QSqlError err = init_db();
+			if (err.type() != QSqlError::NoError) {
+				db_log("Error executing initializing db: " + err.text().toStdString());
+			}
+
 		}
 	}
-	catch (const std::ios_base::failure &failure)
-	{
+	catch (const std::ios_base::failure &failure) {
 		db_log("failed: ");
 		return false;
 	}
-	catch (...)
-	{
+	catch (...) {
 		db_log("Exception catch all: db_conn failed!");
 		return false;
 	}
 
 	return true;
-}
-
-static QSqlError init_db()
-{
-
-	QSqlQuery query;
-	if (!query.exec(FILES_SQL))
-	{
-		db_log("Error executing query: " + query.lastError().text().toStdString());
-		return query.lastError();
-	}
-
-	return {};
 }
 
 #endif // IT_TOOLS_DB_CONN_H

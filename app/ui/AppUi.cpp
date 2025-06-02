@@ -36,9 +36,8 @@
 #include <map>
 #include <QtSql>
 
-#include "db_connection.h"
 #include "client/VersionRepository.h"
-#include "dialog/Dialog.h"
+#include "dialog/VersionUpdateDialog.h"
 
 AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
@@ -156,50 +155,34 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
 	configureAppContext();
 
-	// Add a temporary message that disappears after 5 seconds
-	processStatusSlot("Ready.", 2000);
-
 	// Schedule onWindowFullyLoaded to run after current event processing is done
 	QTimer::singleShot(0, this, &AppUi::onWindowFullyLoaded);
+
+	// Add a temporary message that disappears after 5 seconds
+	processStatusSlot("Ready.", 2000);
 }
 
 void AppUi::onWindowFullyLoaded() {
 	// Perform your actions here
 	// For example:
 	// - Load data from a database/network without blocking the UI initially
-	Dialog message(this);
-
-	if (!db_conn())
-	{
-		db_log("db_conn() EXIT_FAILURE..");
-		// failed to connect to the database
-		message.show();
-	}
-
-	// Initialize the database:
-	QSqlError err = init_db();
-	if (err.type() != QSqlError::NoError)
-	{
-		db_log("Error executing initializing db: " + err.text().toStdString());
-
-		message.show();
-	}
-
-	message.show();
-
-	drawer->update();
-	// - Update status bar
-	// - Perform a check that requires the window to be visible
 
 	// MyCustomDialog customDlg(this); // 'this' would be the parent widget
-// if (customDlg.exec() == QDialog::Accepted) {
-//     qDebug("Custom dialog was accepted.");
-//     // Optionally retrieve data from the dialog if it has any input fields
-// } else {
-//     qDebug("Custom dialog was rejected or closed.");
-// }
-//	VersionRepository repo;
-//	repo.main_version_logic();
+	VersionUpdateDialog versionUpdateDialog(this);
+	VersionRepository repo;
+
+	UpdateInfo info = repo.main_version_logic();
+
+	if (!info.latestVersion.empty()) {
+		versionUpdateDialog.setWindowTitle("New Version " + QString::fromStdString(info.latestVersion) + " Available!");
+		versionUpdateDialog.setContent(QString::fromStdString(info.releaseNotes));
+
+		if (versionUpdateDialog.exec() == QDialog::Accepted) {
+			qDebug("exec.");
+		} else {
+			qDebug("Custom dialog was rejected or closed.");
+		}
+	}
 }
 
 void AppUi::onClicked() {

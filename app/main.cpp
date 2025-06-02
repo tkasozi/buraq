@@ -6,6 +6,7 @@
 
 #include "ui/AppUi.h"
 #include "network.h"
+#include "db_connection.h"
 
 int main(int argc, char *argv[]) {
 	// Ensure the singleton (and curl_global_init) is created before threads,
@@ -13,6 +14,11 @@ int main(int argc, char *argv[]) {
 	Network::singleton(); // Initialize network singleton if not already.
 
 	QApplication app(argc, argv);
+
+	if (!db_conn()) {
+		db_log("db_conn() EXIT_FAILURE..");
+		// failed to connect to the database
+	}
 
 	// configure default css
 	QFile styleFile(":/styles.qss"); // Assuming the file is a resource

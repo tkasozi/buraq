@@ -78,8 +78,8 @@ set(ITOOLS_HEADERS
 		../include/network.h
 		client/VersionRepository.cpp
 		client/VersionRepository.h
-		ui/dialog/Dialog.cpp
-		ui/dialog/Dialog.h
+		ui/dialog/VersionUpdateDialog.cpp
+		ui/dialog/VersionUpdateDialog.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)

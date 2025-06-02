@@ -9,10 +9,13 @@ Get-ChildItem . | Format-Table -Property Name, Length, LastWriteTime
  
 Get-ChildItem | Format-Table -Property Name, Length, LastWriteTime -AutoSize
  
-# new update.
- 
-$idk = "what this is."
+# new update. 
  
 Get-Process | Sort-Object Memory -Descending | Select-Object -First 5
  
 cd C:\Users\talik && ls  
+ 
+$idk = "what this is."
+if ("$idk") {
+Write-Output "This is an example script by $idk."
+}

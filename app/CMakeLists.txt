@@ -12,6 +12,9 @@ find_package(Qt6 REQUIRED COMPONENTS
 		Xml
 		REQUIRED)
 
+
+find_package(CURL REQUIRED)
+
 set(ITOOLS_MAIN_SOURCES
 		main.cpp
 		PluginManager.cpp
@@ -68,6 +71,15 @@ set(ITOOLS_HEADERS
 		ui/editor/LineNumberAreaWidget.h
 		ui/frameless_window/FramelessWindow.cpp
 		ui/frameless_window/FramelessWindow.h
+		../include/version.h
+		app_version.cpp
+		app_version.h
+		../include/network.cpp
+		../include/network.h
+		client/VersionRepository.cpp
+		client/VersionRepository.h
+		ui/dialog/VersionUpdateDialog.cpp
+		ui/dialog/VersionUpdateDialog.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
@@ -77,10 +89,10 @@ elseif (CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
 endif ()
 
 target_include_directories(ITools PRIVATE
-		"${CMAKE_CURRENT_SOURCE_DIR}/ui"      # For ui headers
-		"${CMAKE_CURRENT_SOURCE_DIR}/utils"   # For utils headers
+		"${CMAKE_CURRENT_SOURCE_DIR}/ui" # For ui headers
+		"${CMAKE_CURRENT_SOURCE_DIR}/utils" # For utils headers
 		"${CMAKE_CURRENT_SOURCE_DIR}/../include" # For PluginInterface.h, IToolsAPI.h
-		"${CMAKE_CURRENT_SOURCE_DIR}"         # For headers in the current source dir
+		"${CMAKE_CURRENT_SOURCE_DIR}" # For headers in the current source dir
 )
 
 target_link_libraries(ITools
@@ -89,6 +101,7 @@ target_link_libraries(ITools
 		Qt::Widgets
 		Qt::Sql
 		Qt::Xml
+		CURL::libcurl
 )
 
 add_dependencies(ITools app_icon)
@@ -117,7 +130,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
 	get_filename_component(MINGW_RUNTIME_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
 
 	message(STATUS "GCC detected, adding static linking flags for libgcc and libstdc++")
-	target_link_options(ITools PRIVATE -static-libgcc -static-libstdc++)
+	target_link_options(ITools PRIVATE -static-libgcc -static-libstdc++ -lpthread)
 
 	set(QT_THIRD_PARTY_DEPENDENCY_DLLS
 			"libb2-1.dll"

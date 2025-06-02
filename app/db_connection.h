@@ -32,11 +32,12 @@
 #include <QSqlError>
 #include <QDate>
 #include <QSqlQuery>
-#include "FileObject.h"
-#include <fstream>
-#include <QStandardPaths> // For user-writable locations
 #include <QCoreApplication>
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
+#include <fstream>
+
+#include "../include/IToolsAPI.h"
+#include "FileObject.h"
 
 const auto FILES_SQL = QLatin1String(R"(
     CREATE TABLE IF NOT EXISTS files(id INTEGER PRIMARY KEY, file_path VARCHAR UNIQUE, file_name VARCHAR);
@@ -88,33 +89,30 @@ static QList<FileObject *> findPreviouslyOpenedFiles() {
 	return files;
 }
 
-// Function to log messages (example)
-static void db_log(const QString &message) {
-	// Optionally, log to a file in a writable location:
-	QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "\\ITools\\log.txt";
-	QFile logFile(logFilePath);
-	if (logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
-		QTextStream stream(&logFile);
-		stream << QDateTime::currentDateTime().toString(Qt::ISODate) << ": " << message << Qt::endl;
+static QSqlError init_db() {
+
+	QSqlQuery query;
+	if (!query.exec(FILES_SQL)) {
+		db_log("Error executing query: " + query.lastError().text().toStdString());
+		return query.lastError();
 	}
+
+	return {};
 }
 
 static bool db_conn() {
 	db_log("Initiating DB connection..");
 
-	// Database will be created in a writable location for example, "C:\Users\john\AppData\Local\Temp\"
-	std::filesystem::current_path(std::filesystem::temp_directory_path());
-
-	QString dirName = "ITools\\.data\\";
-	if (!std::filesystem::create_directories(dirName.toStdString())) {
-		db_log("Dir " + dirName + " already exists.");
+	std::filesystem::path dirName = std::filesystem::temp_directory_path() / "ITools" / ".data";
+	if (!std::filesystem::create_directories(dirName)) {
+		db_log("Dir " + dirName.string() + " already exists.");
 	}
 
-	auto dbPathName = std::filesystem::temp_directory_path() / "ITools" / ".data" / "itools.db";
+	std::filesystem::path dbPathName = dirName / "itools.db";
 	std::string dbName = dbPathName.string();
 
-	db_log("current dir: " + QString::fromStdString(std::filesystem::current_path().string()));
-	db_log("DB name path: " + QString::fromStdString(dbName));
+	db_log("current dir: " + std::filesystem::current_path().string());
+	db_log("DB name path: " + dbName);
 
 	try {
 		std::fstream db(dbName, std::ios::in);
@@ -139,18 +137,23 @@ static bool db_conn() {
 								  QMessageBox::Cancel);
 			db_log("Failed to open DB connection.");
 			db_log("DATABASE OPEN FAILED!");
-			db_log("  Database file checked: " + QString::fromStdString(dbName));
-			db_log(&"  Error Type:" [error.type()]);
-			db_log("  Error (Driver Text):" + error.driverText());
-			db_log(&"  Driver available:" [QSqlDatabase::isDriverAvailable("QSQLITE")]);
-			db_log("  Error (Database Text):" + error.databaseText());
+			db_log("  Database file checked: " + dbName);
+			db_log(&"  Error Type:"[error.type()]);
+			db_log("  Error (Driver Text):" + error.driverText().toStdString());
+			db_log(&"  Driver available:"[QSqlDatabase::isDriverAvailable("QSQLITE")]);
+			db_log("  Error (Database Text):" + error.databaseText().toStdString());
 			return false;
 		} else {
-			db_log("DB connection is good!");
+			db_log("DB connection is good!");    // Initialize the database:
+			QSqlError err = init_db();
+			if (err.type() != QSqlError::NoError) {
+				db_log("Error executing initializing db: " + err.text().toStdString());
+			}
+
 		}
 	}
-	catch (_exception e) {
-		db_log(QString(e.name) + QString("Exception in try-catch"));
+	catch (const std::ios_base::failure &failure) {
+		db_log("failed: ");
 		return false;
 	}
 	catch (...) {
@@ -159,17 +162,6 @@ static bool db_conn() {
 	}
 
 	return true;
-}
-
-static QSqlError init_db() {
-
-	QSqlQuery query;
-	if (!query.exec(FILES_SQL)) {
-		// qDebug() << "Error executing query:" << query.lastError().text();
-		return query.lastError();
-	}
-
-	return {};
 }
 
 #endif // IT_TOOLS_DB_CONN_H

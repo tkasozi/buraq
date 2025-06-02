@@ -106,3 +106,121 @@ QScrollBar::add-line:horizontal {
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
     background: none; /* Makes these parts of the track transparent or use the QScrollBar:horizontal background */
 }
+
+/* General styling for both buttons - can be applied to the parent dialog or QApplication */
+/* Or, if you only want to style these specific buttons, incorporate into their specific rules */
+
+/* Primary Action Button: "Update" */
+QPushButton#updateButton {
+    background-color: #4A90E2; /* A welcoming blue - primary action color */
+    color: white;
+    border: 1px solid #4A90E2; /* Same as background or slightly darker for depth */
+    padding: 8px 16px; /* Adjust padding as needed for your text */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 14px; /* Adjust as needed */
+    font-weight: bold;
+}
+
+QPushButton#updateButton:hover {
+    background-color: #5AA0F2; /* Lighter blue on hover */
+    border-color: #5AA0F2;
+}
+
+QPushButton#updateButton:pressed {
+    background-color: #3A80D2; /* Darker blue when pressed */
+    border-color: #3A80D2;
+}
+
+QPushButton#updateButton:disabled {
+    background-color: #787878;
+    color: #A0A0A0;
+    border-color: #787878;
+}
+
+
+/* Secondary Action Button: "Later" */
+QPushButton#laterButton {
+    background-color: #555555; /* A neutral dark gray, less prominent */
+    color: #DDDDDD; /* Light gray text */
+    border: 1px solid #656565; /* Subtle border */
+    padding: 8px 16px; /* Consistent padding */
+    border-radius: 4px; /* Consistent rounded corners */
+    font-size: 14px; /* Consistent font size */
+    font-weight: normal; /* Normal weight to be less emphasized than Update */
+}
+
+QPushButton#laterButton:hover {
+    background-color: #606060; /* Slightly lighter gray on hover */
+    border-color: #707070;
+    color: #FFFFFF; /* Brighter text on hover */
+}
+
+QPushButton#laterButton:pressed {
+    background-color: #454545; /* Darker gray when pressed */
+    border-color: #555555;
+}
+
+QPushButton#laterButton:disabled {
+    background-color: #404040;
+    color: #808080;
+    border-color: #404040;
+}
+
+/* General styling for both buttons - can be applied to the parent dialog or QApplication */
+/* Or, if you only want to style these specific buttons, incorporate into their specific rules */
+
+/* Primary Action Button: "Update" */
+QPushButton#updateButton {
+    background-color: #4A90E2; /* A welcoming blue - primary action color */
+    color: white;
+    border: 1px solid #4A90E2; /* Same as background or slightly darker for depth */
+    padding: 8px 16px; /* Adjust padding as needed for your text */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 14px; /* Adjust as needed */
+    font-weight: bold;
+}
+
+QPushButton#updateButton:hover {
+    background-color: #5AA0F2; /* Lighter blue on hover */
+    border-color: #5AA0F2;
+}
+
+QPushButton#updateButton:pressed {
+    background-color: #3A80D2; /* Darker blue when pressed */
+    border-color: #3A80D2;
+}
+
+QPushButton#updateButton:disabled {
+    background-color: #787878;
+    color: #A0A0A0;
+    border-color: #787878;
+}
+
+
+/* Secondary Action Button: "Later" */
+QPushButton#laterButton {
+    background-color: #555555; /* A neutral dark gray, less prominent */
+    color: #DDDDDD; /* Light gray text */
+    border: 1px solid #656565; /* Subtle border */
+    padding: 8px 16px; /* Consistent padding */
+    border-radius: 4px; /* Consistent rounded corners */
+    font-size: 14px; /* Consistent font size */
+    font-weight: normal; /* Normal weight to be less emphasized than Update */
+}
+
+QPushButton#laterButton:hover {
+    background-color: #606060; /* Slightly lighter gray on hover */
+    border-color: #707070;
+    color: #FFFFFF; /* Brighter text on hover */
+}
+
+QPushButton#laterButton:pressed {
+    background-color: #454545; /* Darker gray when pressed */
+    border-color: #555555;
+}
+
+QPushButton#laterButton:disabled {
+    background-color: #404040;
+    color: #808080;
+    border-color: #404040;
+}

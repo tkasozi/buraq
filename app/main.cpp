@@ -3,29 +3,21 @@
 //
 #include <QApplication>
 #include <QStyleFactory>
-#include "ui/AppUi.h"
-#include "db_connection.h"
-#include "frameless_window/FramelessWindow.h"
-#include <QtSql>
 
-int main(int argc, char *argv[])
-{
+#include "ui/AppUi.h"
+#include "network.h"
+#include "db_connection.h"
+
+int main(int argc, char *argv[]) {
+	// Ensure the singleton (and curl_global_init) is created before threads,
+	// though Meyers singleton handles this.
+	Network::singleton(); // Initialize network singleton if not already.
+
 	QApplication app(argc, argv);
 
-	if (!db_conn())
-	{
+	if (!db_conn()) {
 		db_log("db_conn() EXIT_FAILURE..");
 		// failed to connect to the database
-		return EXIT_FAILURE;
-	}
-
-	// Initialize the database:
-	QSqlError err = init_db();
-	if (err.type() != QSqlError::NoError)
-	{
-		db_log("Error executing initializing db: " + QString(err.text()));
-
-		return EXIT_FAILURE;
 	}
 
 	// configure default css

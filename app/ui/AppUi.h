@@ -38,6 +38,8 @@ private slots:
 
 	void onShowOutputButtonClicked();
 
+	void onWindowFullyLoaded();
+
 public:
 	explicit AppUi(QWidget *parent = nullptr);
 

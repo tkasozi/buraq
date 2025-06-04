@@ -42,6 +42,7 @@
 {
     std::filesystem::path searchPath;
     std::filesystem::path userPath;
+    std::filesystem::path userDataPath;
     std::map<std::string, std::string> plugins;
 };
 

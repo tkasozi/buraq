@@ -15,7 +15,7 @@
 
 #include "Editor.h"
 #include "EditorMargin.h"
-#include "AppUi.h"
+#include "app_ui/AppUi.h"
 
 #define string_equals(keyText, key) \
 (std::equal(keyText.begin(), keyText.end(), key));

@@ -5,6 +5,7 @@
 #include <curl/curl.h>
 #include <iostream>
 #include "network.h"
+#include <fstream> // For std::ofstream
 
 Network::Network() {
 	// Initialize libcurl globally. Do this once at the start of your program.
@@ -29,6 +30,17 @@ Network::~Network() {
 	// Always cleanup the easy handle
 	curl_easy_cleanup(curl);
 	curl = nullptr;
+}
+
+
+// Callback for std::ofstream
+size_t write_data_to_ofstream(void *ptr, size_t size, size_t nmemb, void *userdata) {
+	std::ofstream *out_stream = static_cast<std::ofstream *>(userdata);
+	out_stream->write(static_cast<const char *>(ptr), size * nmemb);
+	if (out_stream->fail()) { // Check for write errors
+		return 0; // Signal error to libcurl
+	}
+	return size * nmemb; // Return number of bytes "written" (passed to stream)
 }
 
 // libcurl write callback function
@@ -80,6 +92,77 @@ std::string Network::http_get(const std::string &url) {
 Network &Network::singleton() {
 	static Network instance; // Created once, thread-safe since C++11
 	return instance;
+}
+
+int Network::downloadFile(const std::string &url, const char *output_filename) {
+	if (!curl) {
+		// ... cleanup curl ...
+		curl_global_cleanup();
+		return 1;
+	}
+
+	std::cout << "output_filename: " << output_filename << std::endl;
+	std::ofstream output_file_stream(output_filename, std::ios::binary);
+	if (!output_file_stream.is_open()) {
+		std::cerr << "Error: Cannot open file for writing: " << output_filename << std::endl;
+		// ... cleanup curl ...
+		curl_global_cleanup();
+		return 1;
+	}
+
+	// --- 4. Set libcurl options ---
+	// Set the URL
+	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+	// Set the callback function for writing data
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data_to_ofstream);
+
+	// Set the userdata pointer for the callback (our output file)
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &output_file_stream);
+
+	// Follow HTTP redirects (e.g., 301, 302)
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
+	// Fail verbosely if the HTTP code is >= 400
+	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
+
+	// Set a user agent (good practice)
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-c++-it-tools-editor/1.0");
+
+	output_file_stream.close(); // Close after download or on error
+
+
+	// --- 5. Perform the file transfer ---
+	CURLcode res = curl_easy_perform(curl);
+
+	// --- 6. Check for errors ---
+	if (res != CURLE_OK) {
+		std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+		// If FAILONERROR is set, this will also trigger for HTTP 4xx/5xx errors.
+	} else {
+		long http_code = 0;
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+		if (http_code == 200) {
+			std::cout << "Download successful!" << std::endl;
+		} else {
+			// This case might not be hit if FAILONERROR is effective,
+			// but good for completeness or if FAILONERROR is off.
+			std::cout << "Download completed with HTTP status code: " << http_code << std::endl;
+		}
+	}
+
+	// --- 7. Cleanup ---
+	// Close the output file
+	output_file_stream.close();
+
+	// Clean up the curl easy handle
+	curl_easy_cleanup(curl);
+
+	// Clean up the global libcurl environment
+	// This should be called once when the program is done with libcurl.
+	curl_global_cleanup();
+
+	return (res == CURLE_OK) ? 0 : 1;
 }
 
 void Network::http_post(const std::string &url) {

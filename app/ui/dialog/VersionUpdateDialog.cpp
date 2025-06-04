@@ -6,7 +6,8 @@
 
 #include <QLabel>
 #include <QPushButton>
-#include <QVBoxLayout> // For layout
+#include <QVBoxLayout>
+#include <iostream>
 
 VersionUpdateDialog::VersionUpdateDialog(QWidget *parent)
 		: QDialog(parent) {

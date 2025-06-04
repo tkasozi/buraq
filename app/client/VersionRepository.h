@@ -13,11 +13,12 @@
 #include "../include/version.h"
 #include "../include/network.h"
 #include "client/VersionRepository.h"
+#include "IToolsAPI.h"
 
 class VersionRepository {
 
 public:
-	VersionRepository();
+	explicit VersionRepository(IToolsApi *api_context);
 
 	~VersionRepository() = default;
 
@@ -26,8 +27,11 @@ public:
 	 * @return Returns the new version object or an empty version object otherwise.
 	 */
 	[[nodiscard]] UpdateInfo main_version_logic();
+	void downloadNewVersion();
+
 
 private:
+	IToolsApi *api_context;
 	std::string endpoint;
 	UpdateInfo versionInfo;
 	Network &network;

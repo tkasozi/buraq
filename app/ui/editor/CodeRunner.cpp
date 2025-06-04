@@ -8,7 +8,7 @@
 #include <QThread>
 #include "CustomLabel.h"
 #include "IconButton.h"
-#include "AppUi.h"
+#include "app_ui/AppUi.h"
 
 CodeRunner::CodeRunner(QWidget *appUi) :
 		IconButton(nullptr),

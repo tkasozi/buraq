@@ -24,7 +24,7 @@ set(ITOOLS_MAIN_SOURCES
 )
 
 set(ITOOLS_UI_SOURCES
-		ui/AppUi.cpp
+		ui/app_ui/AppUi.cpp
 		ui/ToolBarEventFilter.cpp
 		ui/ToolBar.cpp
 		ui/editor/Editor.cpp
@@ -51,7 +51,7 @@ set(ITOOLS_ALL_SOURCES
 set(ITOOLS_HEADERS
 		PluginManager.h
 		FileObject.h
-		ui/AppUi.h
+		ui/app_ui/AppUi.h
 		ui/ToolBarEventFilter.h
 		ui/ToolButton.h
 		ui/ToolBar.h

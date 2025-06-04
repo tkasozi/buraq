@@ -27,7 +27,7 @@
 #include <QDateTime>
 #include "OutputDisplay.h"
 #include "Utils.h"
-#include "AppUi.h"
+#include "app_ui/AppUi.h"
 
 
 #define OUTPUT_DISPLAY_STYLES R"(

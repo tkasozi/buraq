@@ -163,6 +163,7 @@ void CustomDrawer::onFileLabelClick() {
 	// Update the editor
 	if (!editor) {
 		return;
+		return;
 	}
 	editor->openAndParseFile(label->getFilePath(), QFile::OpenModeFlag::ReadWrite);
 }
@@ -176,10 +177,14 @@ void CustomDrawer::showPreviouslyOpenedFiles() {
 
 	bool isFirstTime = true;
 	for (auto file: previousOpenedFiles) {
-		createFileLabel(file->getFilePath(), file->getFileName(), isFirstTime);
+		try {
+			createFileLabel(file->getFilePath(), file->getFileName(), isFirstTime);
 
-		if (isFirstTime) {
-			isFirstTime = false;
+			if (isFirstTime) {
+				isFirstTime = false;
+			}
+		} catch (...) {
+			deleteRow(file->getFilePath());
 		}
 	}
 }

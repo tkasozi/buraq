@@ -4,7 +4,7 @@
 #include <QApplication>
 #include <QStyleFactory>
 
-#include "ui/AppUi.h"
+#include "app_ui/AppUi.h"
 #include "network.h"
 #include "db_connection.h"
 
@@ -15,9 +15,17 @@ int main(int argc, char *argv[]) {
 
 	QApplication app(argc, argv);
 
-	if (!db_conn()) {
+	if(!db_conn()) {
 		db_log("db_conn() EXIT_FAILURE..");
 		// failed to connect to the database
+		return EXIT_FAILURE;
+	}
+
+	// Initialize the database:
+	QSqlError err = init_db();
+	if (err.type() != QSqlError::NoError) {
+		db_log("Error executing initializing db:" + err.text().toStdString());
+		return EXIT_FAILURE;
 	}
 
 	// configure default css

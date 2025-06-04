@@ -36,6 +36,9 @@
 #include <map>
 #include <QtSql>
 
+#include <windows.h>
+#include <string>
+
 #include "client/VersionRepository.h"
 #include "dialog/VersionUpdateDialog.h"
 
@@ -168,19 +171,22 @@ void AppUi::onWindowFullyLoaded() {
 	// - Load data from a database/network without blocking the UI initially
 
 	// MyCustomDialog customDlg(this); // 'this' would be the parent widget
-	VersionUpdateDialog versionUpdateDialog(this);
-	VersionRepository repo;
+	VersionUpdateDialog versionUpdater(this);
+	VersionRepository repo(api_context.get());
 
 	UpdateInfo info = repo.main_version_logic();
 
 	if (!info.latestVersion.empty()) {
-		versionUpdateDialog.setWindowTitle("New Version " + QString::fromStdString(info.latestVersion) + " Available!");
-		versionUpdateDialog.setContent(QString::fromStdString(info.releaseNotes));
+		versionUpdater.setWindowTitle("A new version " + QString::fromStdString(info.latestVersion) + " is available!");
+		versionUpdater.setContent(QString::fromStdString(info.releaseNotes));
 
-		if (versionUpdateDialog.exec() == QDialog::Accepted) {
-			qDebug("exec.");
+		if (versionUpdater.exec() == QDialog::Accepted) {
+			repo.downloadNewVersion();
+
+			launchUpdaterAndExit(api_context->searchPath, api_context->userPath, api_context->searchPath.parent_path());
 		} else {
-			qDebug("Custom dialog was rejected or closed.");
+			// New version was rejected or modal was closed.
+			// do nothing
 		}
 	}
 }
@@ -231,7 +237,7 @@ void AppUi::processResultSlot(int exitCode, const QString &output, const QString
 }
 
 void AppUi::configureAppContext() {
-	std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "ITools" / ".data";
+	std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "ITools";
 
 	// app search_path for plugins
 	std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
@@ -240,12 +246,13 @@ void AppUi::configureAppContext() {
 			{"power_shell", searchPath.string() + "/plugins/ext/libPowershellExt.dll"}
 	};
 
-	auto api_context = new IToolsApi;
+	api_context = std::make_unique<IToolsApi>();
 	api_context->searchPath = searchPath;
 	api_context->plugins = plugins_;
+	api_context->userDataPath = userDataPath / ".data";
 	api_context->userPath = userDataPath;
 
-	pluginManager = std::make_unique<PluginManager>(api_context);
+	pluginManager = std::make_unique<PluginManager>(api_context.get());
 
 	// Load plugins from the specified directory
 	pluginManager->loadPlugin("power_shell");
@@ -253,4 +260,38 @@ void AppUi::configureAppContext() {
 
 EditorMargin *AppUi::getEditorMargin() {
 	return editorMargin.get();
+}
+
+void AppUi::launchUpdaterAndExit(const std::filesystem::path &updaterPath, const std::filesystem::path &packagePath,
+								 const std::filesystem::path &installPath) {
+	std::string commandLine = "\"" + updaterPath.string() + "\"";
+	commandLine += " \"" + packagePath.string() + "\"";
+	commandLine += " \"" + installPath.string() + "\"";
+	commandLine += " " + std::to_string(GetCurrentProcessId()); // Pass current process ID
+
+	STARTUPINFOA si;
+	PROCESS_INFORMATION pi;
+
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	if (CreateProcessA(NULL,   // No module name (use command line)
+					   (LPSTR) commandLine.c_str(), // Command line
+					   NULL,           // Process handle not inheritable
+					   NULL,           // Thread handle not inheritable
+					   FALSE,          // Set handle inheritance to FALSE
+					   0,              // No creation flags
+					   NULL,           // Use parent's environment block
+					   NULL,           // Use parent's starting directory
+					   &si,            // Pointer to STARTUPINFO structure
+					   &pi)            // Pointer to PROCESS_INFORMATION structure
+			) {
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+		std::cout << "Updater launched. Exiting main application." << std::endl;
+		exit(0); // Exit the main application
+	} else {
+		std::cerr << "Failed to launch updater. Error: " << GetLastError() << std::endl;
+	}
 }

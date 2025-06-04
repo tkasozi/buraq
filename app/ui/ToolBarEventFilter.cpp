@@ -6,7 +6,7 @@
 #include <QMouseEvent>
 
 #include "ToolBarEventFilter.h"
-#include "AppUi.h"
+#include "app_ui/AppUi.h"
 #include "ToolBar.h"
 
 bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e) {

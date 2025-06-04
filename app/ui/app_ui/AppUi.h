@@ -21,7 +21,7 @@
 #include "IconButton.h"
 #include "output_display/OutputDisplay.h"
 #include "ToolBar.h"
-#include "../PluginManager.h"
+#include "PluginManager.h"
 #include "EditorMargin.h"
 
 
@@ -64,8 +64,11 @@ private:
 	std::unique_ptr<EditorMargin> editorMargin;
 	std::unique_ptr<ToolBar> toolBar;
 	std::unique_ptr<QStatusBar> statusBar;
+	std::unique_ptr<IToolsApi> api_context;
 
 	void configureAppContext();
+	static void launchUpdaterAndExit(const  std::filesystem::path &updaterPath, const  std::filesystem::path &packagePath,
+			const  std::filesystem::path &installPath);
 };
 
 

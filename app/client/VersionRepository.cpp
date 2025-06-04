@@ -11,8 +11,10 @@
 // Global mutex to protect access to the Network singleton's methods
 std::mutex network_mutex;
 
-VersionRepository::VersionRepository() : endpoint("file:///C:/Users/talik/workspace/ITools/app/version.json"),
-										 network(Network::singleton()) {}
+VersionRepository::VersionRepository(IToolsApi *api_context) :
+		endpoint("file:///E:/it-tools-editor/app/version.json"),
+		network(Network::singleton()),
+		api_context(api_context) {}
 
 void VersionRepository::get_manifest_json(const std::string &endpoint, UpdateInfo &info) {
 	std::string response;
@@ -120,4 +122,22 @@ std::vector<std::string> VersionRepository::split_version(const std::string &str
 	}
 	tokens.push_back(str.substr(start));
 	return tokens;
+}
+
+void VersionRepository::downloadNewVersion() {
+	if (versionInfo.latestVersion.empty()) return;
+
+	std::filesystem::path latestRelease = std::filesystem::temp_directory_path()
+										  / "ITools" / ("it-tools-" + versionInfo.latestVersion + ".zip");
+
+	{ // Create a scope for the lock_guard
+		std::lock_guard<std::mutex> lock(network_mutex); // Lock before accessing network methods
+
+		Network &net = Network::singleton(); // Get the singleton instance
+		auto response = net.downloadFile(versionInfo.downloadUrl, latestRelease.string().c_str());    // Call the method
+		if (response != 0) {
+			std::cout << "Failed to download" << std::endl;
+		}
+		// Mutex is released when 'lock' goes out of scope
+	} // network_mutex is unlocked here
 }

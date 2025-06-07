@@ -53,6 +53,7 @@ public:
 
 	PluginManager *getLangPluginManager();
 
+	IToolsApi *get_api_context() { return api_context.get(); };
 private:
 	std::unique_ptr<PluginManager> pluginManager;
 	std::unique_ptr<CustomDrawer> drawer;
@@ -68,7 +69,7 @@ private:
 
 	void configureAppContext();
 	static void launchUpdaterAndExit(const  std::filesystem::path &updaterPath, const  std::filesystem::path &packagePath,
-			const  std::filesystem::path &installPath);
+								 const  std::filesystem::path &installPath);
 };
 
 

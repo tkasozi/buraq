@@ -36,11 +36,24 @@ Network::~Network() {
 // Callback for std::ofstream
 size_t write_data_to_ofstream(void *ptr, size_t size, size_t nmemb, void *userdata) {
 	std::ofstream *out_stream = static_cast<std::ofstream *>(userdata);
-	out_stream->write(static_cast<const char *>(ptr), size * nmemb);
-	if (out_stream->fail()) { // Check for write errors
+	std::ios_base::iostate original_exceptions = out_stream->exceptions();
+	out_stream->exceptions(std::ios::failbit | std::ios::badbit); // Enable for this scope
+
+	try {
+		out_stream->write(static_cast<const char*>(ptr), size * nmemb);
+		out_stream->exceptions(original_exceptions); // Restore original exception mask
+		return size * nmemb; // Success
+	} catch (const std::ios_base::failure& e) {
+		std::cerr << "Write Callback Exception: " << e.what() << std::endl;
+		// Some implementations might provide an error code
+		if (e.code()) { // C++11
+			std::cerr << "  Error Code: " << e.code().value() << " (" << e.code().message() << ")" << std::endl;
+		}
+		// e.what() *might* contain text from strerror(errno) depending on the STL implementation.
+		out_stream->clear(); // Clear error flags on the stream
+		out_stream->exceptions(original_exceptions); // Restore original exception mask
 		return 0; // Signal error to libcurl
 	}
-	return size * nmemb; // Return number of bytes "written" (passed to stream)
 }
 
 // libcurl write callback function
@@ -101,7 +114,6 @@ int Network::downloadFile(const std::string &url, const char *output_filename) {
 		return 1;
 	}
 
-	std::cout << "output_filename: " << output_filename << std::endl;
 	std::ofstream output_file_stream(output_filename, std::ios::binary);
 	if (!output_file_stream.is_open()) {
 		std::cerr << "Error: Cannot open file for writing: " << output_filename << std::endl;
@@ -129,9 +141,6 @@ int Network::downloadFile(const std::string &url, const char *output_filename) {
 	// Set a user agent (good practice)
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-c++-it-tools-editor/1.0");
 
-	output_file_stream.close(); // Close after download or on error
-
-
 	// --- 5. Perform the file transfer ---
 	CURLcode res = curl_easy_perform(curl);
 
@@ -153,7 +162,7 @@ int Network::downloadFile(const std::string &url, const char *output_filename) {
 
 	// --- 7. Cleanup ---
 	// Close the output file
-	output_file_stream.close();
+	 output_file_stream.close(); // Close after download or on error
 
 	// Clean up the curl easy handle
 	curl_easy_cleanup(curl);

@@ -7,6 +7,9 @@
 #include "app_ui/AppUi.h"
 #include "network.h"
 #include "db_connection.h"
+#include "client/VersionRepository.h"
+#include "dialog/VersionUpdateDialog.h"
+#include "app_version.h"
 
 int main(int argc, char *argv[]) {
 	// Ensure the singleton (and curl_global_init) is created before threads,

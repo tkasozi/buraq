@@ -124,20 +124,28 @@ std::vector<std::string> VersionRepository::split_version(const std::string &str
 	return tokens;
 }
 
-void VersionRepository::downloadNewVersion() {
+std::filesystem::path VersionRepository::downloadNewVersion() const {
 	if (versionInfo.latestVersion.empty()) return;
 
 	std::filesystem::path latestRelease = std::filesystem::temp_directory_path()
 										  / "ITools" / ("it-tools-" + versionInfo.latestVersion + ".zip");
 
+	bool has_errors = false;
 	{ // Create a scope for the lock_guard
 		std::lock_guard<std::mutex> lock(network_mutex); // Lock before accessing network methods
 
 		Network &net = Network::singleton(); // Get the singleton instance
 		auto response = net.downloadFile(versionInfo.downloadUrl, latestRelease.string().c_str());    // Call the method
 		if (response != 0) {
+			has_errors = true;
 			std::cout << "Failed to download" << std::endl;
 		}
 		// Mutex is released when 'lock' goes out of scope
 	} // network_mutex is unlocked here
+
+	if (has_errors) {
+		return std::filesystem::temp_directory_path() / "ITools";
+	}
+
+	return latestRelease;
 }

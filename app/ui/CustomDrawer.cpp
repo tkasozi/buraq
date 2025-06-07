@@ -165,7 +165,8 @@ void CustomDrawer::onFileLabelClick() {
 		return;
 		return;
 	}
-	editor->openAndParseFile(label->getFilePath(), QFile::OpenModeFlag::ReadWrite);
+	// TODO emit active file path
+//	editor->openAndParseFile(label->getFilePath(), QFile::OpenModeFlag::ReadWrite);
 }
 
 void CustomDrawer::setActive(QWidget *pLabel) {

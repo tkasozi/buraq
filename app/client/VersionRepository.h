@@ -8,6 +8,7 @@
 #include <string>
 #include "network.h"
 #include "app_version.h"
+#include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include <boost/property_tree/json_parser.hpp>
 
 #include "../include/version.h"
@@ -27,7 +28,7 @@ public:
 	 * @return Returns the new version object or an empty version object otherwise.
 	 */
 	[[nodiscard]] UpdateInfo main_version_logic();
-	void downloadNewVersion();
+	std::filesystem::path downloadNewVersion() const;
 
 
 private:

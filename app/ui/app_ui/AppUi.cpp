@@ -181,9 +181,12 @@ void AppUi::onWindowFullyLoaded() {
 		versionUpdater.setContent(QString::fromStdString(info.releaseNotes));
 
 		if (versionUpdater.exec() == QDialog::Accepted) {
-			repo.downloadNewVersion();
+			std::filesystem::path zipFile = repo.downloadNewVersion();
 
-			launchUpdaterAndExit(api_context->searchPath, api_context->userPath, api_context->searchPath.parent_path());
+			launchUpdaterAndExit(
+					api_context->searchPath / "updater.exe",
+					zipFile,
+					api_context->searchPath.parent_path());
 		} else {
 			// New version was rejected or modal was closed.
 			// do nothing
@@ -262,8 +265,9 @@ EditorMargin *AppUi::getEditorMargin() {
 	return editorMargin.get();
 }
 
-void AppUi::launchUpdaterAndExit(const std::filesystem::path &updaterPath, const std::filesystem::path &packagePath,
+void AppUi::launchUpdaterAndExit(const std::filesystem::path &updaterPath, const std::filesystem::path &userPath,
 								 const std::filesystem::path &installPath) {
+	const std::filesystem::path packagePath = userPath / ""
 	std::string commandLine = "\"" + updaterPath.string() + "\"";
 	commandLine += " \"" + packagePath.string() + "\"";
 	commandLine += " \"" + installPath.string() + "\"";
@@ -281,7 +285,7 @@ void AppUi::launchUpdaterAndExit(const std::filesystem::path &updaterPath, const
 					   NULL,           // Process handle not inheritable
 					   NULL,           // Thread handle not inheritable
 					   FALSE,          // Set handle inheritance to FALSE
-					   0,              // No creation flags
+					   CREATE_NEW_CONSOLE,  // Give the updater its own console. Prevents from closing after the main app is closed.
 					   NULL,           // Use parent's environment block
 					   NULL,           // Use parent's starting directory
 					   &si,            // Pointer to STARTUPINFO structure
@@ -290,7 +294,7 @@ void AppUi::launchUpdaterAndExit(const std::filesystem::path &updaterPath, const
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 		std::cout << "Updater launched. Exiting main application." << std::endl;
-		exit(0); // Exit the main application
+		exit(0);
 	} else {
 		std::cerr << "Failed to launch updater. Error: " << GetLastError() << std::endl;
 	}

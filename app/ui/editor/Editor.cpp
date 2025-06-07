@@ -186,17 +186,22 @@ void Editor::openAndParseFile(const QString &filePath, QFile::OpenModeFlag modeF
 		this->currentFile = filePath;
 	}
 
-	QFile file(filePath);
-	file.open(modeFlag);
+	try {
+		QFile file(filePath);
+		file.open(modeFlag);
 
-	QString fileContent = QString::fromLatin1(file.readAll());
-	file.close(); // close file
+		QString fileContent = QString::fromLatin1(file.readAll());
+		file.close(); // close file
 
-	// clear editor before using the function to avoid adding to the previous opened file
-	setPlainText(fileContent);
+		// clear editor before using the function to avoid adding to the previous opened file
+		setPlainText(fileContent);
 
-	// highlight syntax
-	emit syntaxtHighlightingEvent();
+		// highlight syntax
+		emit syntaxtHighlightingEvent();
+	} catch (...) {
+		qDebug() << "emit exception";
+		statusUpdate("File to open file " + filePath);
+	}
 }
 
 void Editor::setupSignals() {

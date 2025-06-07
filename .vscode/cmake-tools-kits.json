@@ -1,0 +1,19 @@
+[
+  {
+    "name": "GCC 9.2.0",
+    "compilers": {
+      "C": "C:/MinGW/bin/gcc.exe",
+      "CXX": "C:/MinGW/bin/g++.exe"
+    },
+    "preferredGenerator": {
+      "name": "Ninja"
+    }
+  },
+  {
+    "name": "VCPKG",
+    "toolchainFile": "E:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+    "preferredGenerator": {
+      "name": "VCPKG Makefiles"
+    }
+  }
+]

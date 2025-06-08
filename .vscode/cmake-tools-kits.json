@@ -1,16 +1,1 @@
-[
-     {
-      "name": "MinGW GCC (via Vcpkg)",
-      "compilers": {
-        "C": "C:/MinGW/bin/gcc.exe",
-        "CXX": "C:/MinGW/bin/g++.exe"
-      },
-      "toolchainFile": "E:/vcpkg/scripts/buildsystems/vcpkg.cmake",
-      "cmakeSettings": {
-        "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic"
-      },
-      "preferredGenerator": {
-        "name": "Ninja"
-      }
-    }
-]
+[]

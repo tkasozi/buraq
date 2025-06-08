@@ -26,6 +26,11 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
     add_executable(updater ${UPDATER_SOURCES} ../../app/res/ITools.rc)
 endif()
 
+# Add this for MSVC builds to use the faster lld linker
+if(MSVC)
+    target_link_options(ITools PRIVATE "/fuse-ld=lld")
+endif()
+
 target_link_libraries(updater PRIVATE
     unofficial::minizip::minizip
     Qt::Core

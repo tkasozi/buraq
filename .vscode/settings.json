@@ -1,12 +1,47 @@
 {
-    "files.associations": {
-        "*.dbclient-js": "javascript",
-        ".fantomasignore": "ignore",
-        "memory": "cpp",
-        "charconv": "cpp",
-        "xmemory": "cpp"
-    },
+    "cmake.toolchainFile": "E:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+    "cmake.enableAutomaticKitScan": false,
+    "cmake.cmakePath": "C:/Program Files/CMake/bin/cmake.exe",
     "cmake.additionalKits": [
-        "[   {     \"name\": \"GCC 9.2.0\",     \"compilers\": {       \"C\": \"C:/MinGW/bin/gcc.exe\",       \"CXX\": \"C:/MinGW/bin/g++.exe\"     },     \"preferredGenerator\": {       \"name\": \"Ninja\"     }   },   {     \"name\": \"VCPKG\",     \"compilers\": {       \"C\": \"C:/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/gcc.exe\",       \"CXX\": \"C:/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/g++.exe\"     },     \"toolchainFile\": \"E:/vcpkg/scripts/buildsystems/vcpkg.cmake\",     \"preferredGenerator\": {       \"name\": \"VCPKG Makefiles\"     }   } ]"
+        "${workspaceFolder}/.vscode/cmake-tools-kits.json"
     ],
+    "cmake.configureArgs": [
+        "-DCMAKE_DOTNET_TARGET_FRAMEWORK=C:/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native",
+    ],
+    "cmake.defaultVariants": {
+        "buildType": {
+            "default": "debug",
+            "description": "The build type.",
+            "choices": {
+                "debug": {
+                    "short": "Debug",
+                    "long": "Disable optimizations - include debug information.",
+                    "buildType": "Debug",
+                },
+                "release": {
+                    "short": "Release",
+                    "long": "Optimize for speed - exclude debug information.",
+                    "buildType": "Release"
+                },
+                "minsize": {
+                    "short": "MinSizeRel",
+                    "long": "Optimize for smallest binary size - exclude debug information.",
+                    "buildType": "MinSizeRel"
+                },
+                "reldeb": {
+                    "short": "RelWithDebInfo",
+                    "long": "Optimize for speed - include debug information.",
+                    "buildType": "RelWithDebInfo"
+                },
+                "unspecified": {
+                    "short": "Unspecified",
+                    "long": "Let CMake pick the default build type.",
+                    "buildType": "Unspecified"
+                }
+            }
+        }
+    },
+    "cmake.clearOutputBeforeBuild": true,
+    "cmake.showSystemKits": true,
+    "cmake.buildDirectory": "${workspaceFolder}/cmake-build-${buildType}",
 }

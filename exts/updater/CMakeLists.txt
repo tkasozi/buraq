@@ -30,8 +30,15 @@ endif()
 target_precompile_headers(updater PRIVATE ${CMAKE_SOURCE_DIR}/include/pch.h)
 
 # Add this for MSVC builds to use the faster lld linker
+# In your CMakeLists.txt, after add_executable(updater ...)
+
+# Set linker options based on the compiler being used
 if(MSVC)
-    target_link_options(updater PRIVATE "/fuse-ld=lld")
+    # For the Microsoft toolchain (link.exe), the flag is /lld
+    target_link_options(updater PRIVATE "/lld")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # For Clang toolchains, the flag is -fuse-ld=lld
+    target_link_options(updater PRIVATE "-fuse-ld=lld")
 endif()
 
 target_link_libraries(updater PRIVATE

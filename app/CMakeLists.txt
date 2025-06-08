@@ -17,8 +17,6 @@ find_package(CURL REQUIRED)
 
 find_package(Boost REQUIRED COMPONENTS property_tree)
 
-target_precompile_headers(ITools PRIVATE ../include/pch.h)
-
 set(ITOOLS_MAIN_SOURCES
     main.cpp
     PluginManager.cpp
@@ -91,6 +89,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
     add_executable(ITools ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
 endif()
+
+# Adds Qt, Boost, and Standard Library headers that are used everywhere
+target_precompile_headers(ITools PRIVATE ../include/pch.h)
 
 # Add this for MSVC builds to use the faster lld linker
 if(MSVC)

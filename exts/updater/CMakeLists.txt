@@ -26,6 +26,9 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
     add_executable(updater ${UPDATER_SOURCES} ../../app/res/ITools.rc)
 endif()
 
+# Adds Qt, Boost, and Standard Library headers that are used everywhere
+target_precompile_headers(updater PRIVATE ../include/pch.h)
+
 # Add this for MSVC builds to use the faster lld linker
 if(MSVC)
     target_link_options(ITools PRIVATE "/fuse-ld=lld")

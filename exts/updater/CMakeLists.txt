@@ -27,7 +27,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
 endif()
 
 # Adds Qt, Boost, and Standard Library headers that are used everywhere
-target_precompile_headers(updater PRIVATE ../include/pch.h)
+target_precompile_headers(updater PRIVATE ../../include/pch.h)
 
 # Add this for MSVC builds to use the faster lld linker
 if(MSVC)

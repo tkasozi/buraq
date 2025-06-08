@@ -289,8 +289,8 @@ EditorMargin *AppUi::getEditorMargin()
 void AppUi::launchUpdaterAndExit(const std::filesystem::path &updaterPath, const std::filesystem::path &userPath,
 								 const std::filesystem::path &installPath)
 {
+	// TODO incomplete package path, should be set to the actual package path.
 	const std::filesystem::path packagePath = userPath / "";
-	; // TODO incomplete package path, should be set to the actual package path.
 	std::string commandLine = "\"" + updaterPath.string() + "\"";
 	commandLine += " \"" + packagePath.string() + "\"";
 	commandLine += " \"" + installPath.string() + "\"";

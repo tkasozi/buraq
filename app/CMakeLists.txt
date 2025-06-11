@@ -73,11 +73,11 @@ set(ITOOLS_HEADERS
     ui/editor/LineNumberAreaWidget.h
     ui/frameless_window/FramelessWindow.cpp
     ui/frameless_window/FramelessWindow.h
-    ../include/version.h
+    ${CMAKE_SOURCE_DIR}/include/version.h
     app_version.cpp
     app_version.h
-    ../include/network.cpp
-    ../include/network.h
+    ${CMAKE_SOURCE_DIR}/include/network.cpp
+    ${CMAKE_SOURCE_DIR}/include/network.h
     client/VersionRepository.cpp
     client/VersionRepository.h
     ui/dialog/VersionUpdateDialog.cpp
@@ -91,7 +91,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
 endif()
 
 # Adds Qt, Boost, and Standard Library headers that are used everywhere
-target_precompile_headers(ITools PRIVATE ../include/pch.h)
+target_precompile_headers(ITools PRIVATE ${CMAKE_SOURCE_DIR}/include/pch.h)
 
 # Add this for MSVC builds to use the faster lld linker
 # In your CMakeLists.txt, after add_executable(updater ...)
@@ -109,7 +109,7 @@ endif()
 target_include_directories(ITools PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/ui" # For ui headers
     "${CMAKE_CURRENT_SOURCE_DIR}/utils" # For utils headers
-    "${CMAKE_CURRENT_SOURCE_DIR}/../include" # For PluginInterface.h, IToolsAPI.h
+    "${CMAKE_SOURCE_DIR}/include" # For PluginInterface.h, IToolsAPI.h
     "${CMAKE_CURRENT_SOURCE_DIR}" # For headers in the current source dir
 )
 

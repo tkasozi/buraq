@@ -12,18 +12,18 @@ find_package(Qt6 REQUIRED COMPONENTS
 
 find_package(unofficial-minizip CONFIG REQUIRED)
 
-set(UPDATER_RESOURCES ../../app/resources.qrc)
+set(UPDATER_RESOURCES ${CMAKE_SOURCE_DIR}/app/resources.qrc)
 set(UPDATER_SOURCES Updater.cpp ${UPDATER_RESOURCES}
     UpdaterProgressDialog.cpp
     UpdaterProgressDialog.h
     UpdateWorker.cpp
     UpdateWorker.h)
-set(UPDATER_HEADERS ../../include/IToolsAPI.h)
+set(UPDATER_HEADERS ${CMAKE_SOURCE_DIR}/include/IToolsAPI.h)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
-    add_executable(updater WIN32 ${UPDATER_SOURCES} ../../app/res/ITools.rc)
+    add_executable(updater WIN32 ${UPDATER_SOURCES} ${CMAKE_SOURCE_DIR}/app/res/ITools.rc)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
-    add_executable(updater ${UPDATER_SOURCES} ../../app/res/ITools.rc)
+    add_executable(updater ${UPDATER_SOURCES} ${CMAKE_SOURCE_DIR}/app/res/ITools.rc)
 endif()
 
 # Adds Qt, Boost, and Standard Library headers that are used everywhere

@@ -29,18 +29,13 @@
 #include "Utils.h"
 #include "app_ui/AppUi.h"
 
-
-#define OUTPUT_DISPLAY_STYLES R"(
-	QWidget {
-		background-color: #252525;
-		border: 0px;
-	}
-)"
-
 void init_main_out_area(QPlainTextEdit *, QVBoxLayout *, int);
 
-OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
-	setStyleSheet(OUTPUT_DISPLAY_STYLES);
+OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi)
+{
+	setStyleSheet(
+		"background - color : #252525;"
+		"border:0px;");
 
 	auto layout = new QVBoxLayout(this);
 	layout->setSpacing(0);
@@ -51,9 +46,8 @@ OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
 	pMainLabel->setFixedHeight(25);
 	pMainLabel->setText("Output:");
 	pMainLabel->setStyleSheet(
-			"color: #fff;"
-			"border-bottom: 1px solid #000;"
-	);
+		"color: #fff;"
+		"border-bottom: 1px solid #000;");
 	layout->addWidget(pMainLabel);
 
 	main = std::make_unique<QPlainTextEdit>();
@@ -62,7 +56,8 @@ OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi) {
 	hide();
 }
 
-void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int editorWidth = 0) {
+void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int editorWidth = 0)
+{
 	// For displaying the output_display
 	layout->addWidget(main);
 
@@ -71,7 +66,7 @@ void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int editorWid
 
 	// Set the color for the background of the selection
 	palette.setColor(QPalette::Highlight, QColor(0, 120, 215)); // A common blue selection background
-	palette.setColor(QPalette::Text, QColor(Qt::white)); // A common blue selection background
+	palette.setColor(QPalette::Text, QColor(Qt::white));		// A common blue selection background
 	main->setPalette(palette);
 
 	main->setReadOnly(true);
@@ -80,7 +75,8 @@ void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int editorWid
 	main->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	qDebug() << "appWidth: " << editorWidth;
-	if (editorWidth > 0) {
+	if (editorWidth > 0)
+	{
 		main->setMinimumWidth(editorWidth);
 	}
 
@@ -91,15 +87,20 @@ void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int editorWid
 	main->setMinimumHeight(550);
 }
 
-void OutputDisplay::toggle() {
-	if (isVisible()) {
+void OutputDisplay::toggle()
+{
+	if (isVisible())
+	{
 		hide();
-	} else {
+	}
+	else
+	{
 		show();
 	}
 }
 
-void OutputDisplay::log(const QString &strOutput, const QString &errorOutput) {
+void OutputDisplay::log(const QString &strOutput, const QString &errorOutput)
+{
 	QStringList list = strOutput.split("\\u2029");
 	QStringList errorsList = errorOutput.split("\\u2029");
 
@@ -108,26 +109,31 @@ void OutputDisplay::log(const QString &strOutput, const QString &errorOutput) {
 
 	// Adds timestamp
 	QDateTime currentDateTime = QDateTime::currentDateTime();
-	QString formattedDateTime = currentDateTime.toString("yyyy-MM-dd hh:mm:ss");  // Custom format
+	QString formattedDateTime = currentDateTime.toString("yyyy-MM-dd hh:mm:ss"); // Custom format
 	main->appendHtml("<h4 style=\"color: #FFFDD0;\">Executed: " +
 					 formattedDateTime + "</h4>");
 	// End Adds timestamp
 
 	main->appendHtml("<div>");
-	for (const QString &qString: list) {
+	for (const QString &qString : list)
+	{
 		main->appendHtml("<p  style=\"color: #FFFFFF;\">" + qString + "</p>");
 	}
-	for (const QString &qString: errorsList) {
+	for (const QString &qString : errorsList)
+	{
 		// error logs
 		main->appendHtml("<p style=\"color: #FF6347;\">" + qString + "</p>");
 	}
 	main->appendHtml("</div>");
 
-	if (error != nullptr) layout->addWidget(error);
+	if (error != nullptr)
+		layout->addWidget(error);
 }
 
-QLabel *OutputDisplay::createLabel(const QString &text, QString state) {
-	if (text.isEmpty()) return nullptr;
+QLabel *OutputDisplay::createLabel(const QString &text, QString state)
+{
+	if (text.isEmpty())
+		return nullptr;
 
 	auto label = new QLabel;
 	label->setText(text);
@@ -135,9 +141,7 @@ QLabel *OutputDisplay::createLabel(const QString &text, QString state) {
 
 	//@formatter:off
 	label->setStyleSheet(
-			std::equal(state.begin(), state.end(), "error") ?
-			"color: #FF6347;":
-			"color: #F9F6EE;");
+		std::equal(state.begin(), state.end(), "error") ? "color: #FF6347;" : "color: #F9F6EE;");
 	//@formatter:on
 
 	label->setAlignment(Qt::AlignLeft);
@@ -148,8 +152,8 @@ QLabel *OutputDisplay::createLabel(const QString &text, QString state) {
 	// Get the recommended size from sizeHint()
 	QSize recommendedSize = label->sizeHint();
 	recommendedSize.setWidth(recommendedSize.width() * 2); // Add some extra width
-	recommendedSize.setHeight(
-			recommendedSize.height() + std::max(100, recommendedSize.height())); // Add some extra width
+	// auto n = std::max(100, recommendedSize.height());
+	recommendedSize.setHeight(recommendedSize.height() + 100); // Add some extra width
 
 	// Set the label's size manually
 	label->setFixedSize(recommendedSize);

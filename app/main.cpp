@@ -11,14 +11,16 @@
 #include "dialog/VersionUpdateDialog.h"
 #include "app_version.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 	// Ensure the singleton (and curl_global_init) is created before threads,
 	// though Meyers singleton handles this.
 	Network::singleton(); // Initialize network singleton if not already.
 
 	QApplication app(argc, argv);
 
-	if(!db_conn()) {
+	if (!db_conn())
+	{
 		db_log("db_conn() EXIT_FAILURE..");
 		// failed to connect to the database
 		return EXIT_FAILURE;
@@ -26,7 +28,8 @@ int main(int argc, char *argv[]) {
 
 	// Initialize the database:
 	QSqlError err = init_db();
-	if (err.type() != QSqlError::NoError) {
+	if (err.type() != QSqlError::NoError)
+	{
 		db_log("Error executing initializing db:" + err.text().toStdString());
 		return EXIT_FAILURE;
 	}

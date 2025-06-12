@@ -41,15 +41,22 @@
     "cmake.showSystemKits": true,
     "cmake.buildDirectory": "${workspaceFolder}/cmake-build-${buildType}",
     // "cmake.configureArgs": [
-    //     "-DCMAKE_DOTNET_TARGET_FRAMEWORK=C:/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native",
+    //     "-DCMAKE_DOTNET_TARGET_FRAMEWORK=C:/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.6/runtimes/win-x64/native",
     //     "-DCMAKE_TOOLCHAIN_FILE=E:/vcpkg/scripts/buildsystems/vcpkg.cmake",
     //     "-DCMAKE_BUILD_TYPE=${buildType}",
     // ],
     "cmake.configureSettings": {
-        "CMAKE_DOTNET_TARGET_FRAMEWORK": "C:/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native",
+        "CMAKE_DOTNET_TARGET_FRAMEWORK": "C:/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.6/runtimes/win-x64/native",
         "CMAKE_TOOLCHAIN_FILE": "E:/vcpkg/scripts/buildsystems/vcpkg.cmake",
         "CMAKE_BUILD_TYPE": "${buildType}",
         "CMAKE_C_COMPILER_LAUNCHER": "sccache",
-        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache"
-    }
+        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache",
+        "QT_DEBUG_PLUGINS": "1"
+    },
+    "files.associations": {
+        "*.dbclient-js": "javascript",
+        ".fantomasignore": "ignore",
+        "chrono": "cpp"
+    },
+    "csharp.debug.logging.exceptions": true
 }

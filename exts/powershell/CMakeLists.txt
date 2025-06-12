@@ -1,6 +1,6 @@
 project(PowershellExt LANGUAGES CXX)
 
-set(MANAGED_LIBRARY_PUBLISH_DIR "${CMAKE_HOME_DIRECTORY}/ManagedLibrary/publish") # Path from dotnet publish -o
+set(MANAGED_LIBRARY_PUBLISH_DIR "${CMAKE_SOURCE_DIR}/ManagedLibrary/publish") # Path from dotnet publish -o
 
 # --- Define the shared library target ---
 # The first argument is the target name. CMake will automatically name the file
@@ -10,7 +10,7 @@ add_library(PowershellExt SHARED
 )
 
 # Assuming MainApp.exe is in CMAKE_BINARY_DIR for single-config MinGW:
-set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
+set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 set(PLUGIN_SUBDIR "ext")
 set(PLUGIN_FULL_OUTPUT_DIR "${PLUGIN_BASE_OUTPUT_DIR}/${PLUGIN_SUBDIR}")
 
@@ -40,13 +40,33 @@ foreach(NET_LIB nethost.lib nethost.dll)
     if(EXISTS "${FRAMEWORK_LINK_DIR}/${NET_LIB}")
         # Link the nethost library to your PowershellExt target
         message("${FRAMEWORK_LINK_DIR}/${NET_LIB}")
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${PLUGIN_FULL_OUTPUT_DIR}" # Ensure directory exists
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${FRAMEWORK_LINK_DIR}/${NET_LIB}"
-            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-            COMMENT "Copying ${NET_HOST_DLL} to ${PLUGIN_SUBDIR}"
-            VERBATIM)
+
+        # --- DEPLOY MANAGED DEPENDENCIES ---
+
+        # 1. Define a variable holding the path to the source DLL you want to copy.
+        #    Using CMAKE_CURRENT_SOURCE_DIR makes the path relative to the current CMakeLists.txt
+        set(MANAGED_DLL_SOURCE "${FRAMEWORK_LINK_DIR}/${NET_LIB}")
+
+        # 2. Define the destination directory.
+        #    Here, we DO use a generator expression correctly to get the output directory
+        #    of your main target, and then we append the subdirectories.
+        set(MANAGED_DLL_DESTINATION "$<TARGET_FILE_DIR:PowershellExt>/ext")
+
+
+        # 3. Create the custom command to perform the copy after the build.
+        add_custom_command(
+            TARGET PowershellExt POST_BUILD
+
+            # First, create the destination directory to make sure it exists
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${MANAGED_DLL_DESTINATION}"
+
+            # Next, copy the DLL using the variables we defined
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${MANAGED_DLL_SOURCE}"
+            "${MANAGED_DLL_DESTINATION}"
+
+            COMMENT "Copying managed dependency ${MANAGED_DLL_SOURCE}"
+        )
     else()
         message(FATAL_ERROR "nethost.dll not found at ${NET_HOST_DLL}. Please check CMAKE_DOTNET_TARGET_FRAMEWORK and your .NET SDK installation.")
     endif()
@@ -62,13 +82,31 @@ endif()
 # Glob all files in the source assets directory
 file(GLOB ASSET_FILES "${MANAGED_LIBRARY_PUBLISH_DIR}/*") # Gets files directly in the folder
 
-# Ensure destination directory exists
-file(MAKE_DIRECTORY "${PLUGIN_BASE_OUTPUT_DIR}/managed")
-
-# Loop through the globbed files and copy them
 foreach(ASSET_FILE ${ASSET_FILES})
-    file(COPY "${ASSET_FILE}" DESTINATION "${PLUGIN_BASE_OUTPUT_DIR}/managed")
+    if(EXISTS "${FRAMEWORK_LINK_DIR}/${NET_LIB}")
+
+        set(MANAGED_DLL_DESTINATION "$<TARGET_FILE_DIR:PowershellExt>/ext/managed")
+
+
+        # 3. Create the custom command to perform the copy after the build.
+        add_custom_command(
+            TARGET PowershellExt POST_BUILD
+
+            # First, create the destination directory to make sure it exists
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${MANAGED_DLL_DESTINATION}"
+
+            # Next, copy the DLL using the variables we defined
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${ASSET_FILE}"
+            "${MANAGED_DLL_DESTINATION}"
+
+            # COMMENT "Copying managed dependency ${ASSET_FILE}"
+        )
+    else()
+        message(FATAL_ERROR "Failed to copy a .NET managed file: ${ASSET_FILE}.")
+    endif()
 endforeach()
+
 
 # On Windows, also place the PDB (Program Database for debugging) file alongside the DLL.
 set_target_properties(PowershellExt PROPERTIES

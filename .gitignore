@@ -64,3 +64,5 @@ TestManagedApp/obj/
 .idea/
 
 *.bat
+
+vcpkg_installed/

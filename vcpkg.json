@@ -1,0 +1,25 @@
+{
+  "name": "it-tools-editor",
+  "version-string": "1.0.1",
+  "dependencies": [
+    {
+      "name": "qtbase",
+      "default-features": false,
+      "features": [
+        "gui",
+        "widgets",
+        "sql",
+        "sql-sqlite"
+      ]
+    },
+    {
+      "name": "curl"
+    },
+    {
+      "name": "boost-property-tree"
+    },
+    {
+      "name": "minizip"
+    }
+  ]
+}

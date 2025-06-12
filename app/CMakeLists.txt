@@ -85,13 +85,13 @@ set(ITOOLS_HEADERS
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
-    add_executable(ITools WIN32 ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
+    add_executable(${PROJECT_NAME} WIN32 ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
-    add_executable(ITools ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
+    add_executable(${PROJECT_NAME} ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
 endif()
 
 # Adds Qt, Boost, and Standard Library headers that are used everywhere
-target_precompile_headers(ITools PRIVATE ${CMAKE_SOURCE_DIR}/include/pch.h)
+target_precompile_headers(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/pch.h)
 
 # Add this for MSVC builds to use the faster lld linker
 # In your CMakeLists.txt, after add_executable(updater ...)
@@ -99,21 +99,21 @@ target_precompile_headers(ITools PRIVATE ${CMAKE_SOURCE_DIR}/include/pch.h)
 # Set linker options based on the compiler being used
 if(MSVC)
     # For the Microsoft toolchain (link.exe), the flag is /lld
-    target_link_options(ITools PRIVATE "/lld")
+    target_link_options(${PROJECT_NAME} PRIVATE "/lld")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # For Clang toolchains, the flag is -fuse-ld=lld
-    target_link_options(ITools PRIVATE "-fuse-ld=lld")
+    target_link_options(${PROJECT_NAME} PRIVATE "-fuse-ld=lld")
 endif()
 
 
-target_include_directories(ITools PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/ui" # For ui headers
     "${CMAKE_CURRENT_SOURCE_DIR}/utils" # For utils headers
     "${CMAKE_SOURCE_DIR}/include" # For PluginInterface.h, IToolsAPI.h
     "${CMAKE_CURRENT_SOURCE_DIR}" # For headers in the current source dir
 )
 
-target_link_libraries(ITools PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt::Core
     Qt::Gui
     Qt::Widgets
@@ -123,22 +123,15 @@ target_link_libraries(ITools PRIVATE
     Boost::property_tree
 )
 
-add_dependencies(ITools app_icon)
+add_dependencies(${PROJECT_NAME} app_icon)
 add_custom_target(app_icon ALL COMMAND
     ${CMAKE_COMMAND} -E copy
     ${PROJECT_SOURCE_DIR}/icons/workflow.ico
     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 )
 
-add_dependencies(ITools conf_file)
-add_custom_target(conf_file ALL COMMAND
-    ${CMAKE_COMMAND} -E copy
-    ${PROJECT_SOURCE_DIR}/qt.conf
-    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-)
-
 # Embed resources into the executable
-qt6_add_resources(ITools RESOURCES resources.qrc)
+qt6_add_resources(${PROJECT_NAME} RESOURCES resources.qrc)
 
 set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
 
@@ -149,7 +142,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
     get_filename_component(MINGW_RUNTIME_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
 
     message(STATUS "GCC detected, adding static linking flags for libgcc and libstdc++")
-    target_link_options(ITools PRIVATE -static-libgcc -static-libstdc++ -lpthread)
+    target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++ -lpthread)
 
     set(QT_THIRD_PARTY_DEPENDENCY_DLLS
         "libb2-1.dll"
@@ -185,8 +178,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
         if(EXISTS "${PTHREAD_DLL_SOURCE_PATH}")
             message(STATUS "Found ${DLL_FILENAME} at ${PTHREAD_DLL_SOURCE_PATH}")
 
-            # Add a custom command to copy the DLL after 'iTools' is built
-            add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
+            # Add a custom command to copy the DLL after '${PROJECT_NAME}' is built
+            add_custom_command(TARGET ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "${PTHREAD_DLL_SOURCE_PATH}"
                 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
@@ -202,46 +195,28 @@ else()
 endif()
 
 if(WIN32)
-    foreach(QT_LIB Core Gui Widgets Sql Xml)
-        get_target_property(QT_BINARY_DIR Qt6::${QT_LIB} IMPORTED_LOCATION_RELEASE)
-        get_filename_component(QT_BIN_DIR ${QT_BINARY_DIR} DIRECTORY)
-
-        message(STATUS, " ${QT_BINARY_DIR}")
-
-        if(EXISTS "${QT_BINARY_DIR}")
-            add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy
-                "${QT_BINARY_DIR}"
-                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-        endif()
-    endforeach(QT_LIB)
-
-    if(EXISTS "${QT_BIN_DIR}/../plugins/platforms/qwindows${DEBUG_SUFFIX}.dll")
-        add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${CMAKE_ROOT_PROJECT_POSTFIX}>/plugins/platforms/")
-        add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${QT_BIN_DIR}/../plugins/platforms/qwindows${DEBUG_SUFFIX}.dll"
-            "$<TARGET_FILE_DIR:${CMAKE_ROOT_PROJECT_POSTFIX}>/plugins/platforms/")
-    endif()
-    if(EXISTS "${QT_BIN_DIR}/../plugins/sqldrivers/qsqlite${DEBUG_SUFFIX}.dll")
-        add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${CMAKE_ROOT_PROJECT_POSTFIX}>/plugins/sqldrivers/")
-        add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${QT_BIN_DIR}/../plugins/sqldrivers/qsqlite${DEBUG_SUFFIX}.dll"
-            "$<TARGET_FILE_DIR:${CMAKE_ROOT_PROJECT_POSTFIX}>/plugins/sqldrivers/")
-    endif()
-    if(EXISTS "${QT_BIN_DIR}/../plugins/sqldrivers/qsqlpsql${DEBUG_SUFFIX}.dll")
-        add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${CMAKE_ROOT_PROJECT_POSTFIX}>/plugins/sqldrivers/")
-        add_custom_command(TARGET ${CMAKE_ROOT_PROJECT_POSTFIX} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${QT_BIN_DIR}/../plugins/sqldrivers/qsqlpsql${DEBUG_SUFFIX}.dll"
-            "$<TARGET_FILE_DIR:${CMAKE_ROOT_PROJECT_POSTFIX}>/plugins/sqldrivers/")
-    endif()
-    # Add similar logic for other necessary plugin types (e.g., sqldrivers)
+    # --- DEPLOYMENT LOGIC ---
+    # This command adds a new target to your project named "deploy"
+    string(TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
+    add_custom_target(deploy_main #ALL
+        COMMAND ${CMAKE_COMMAND} -E echo "Deploying for ${PROJECT_NAME} $<CONFIG>..."
+        # The COMMAND runs windeployqt using the Qt6::windeployqt target we found earlier
+        COMMAND Qt6::windeployqt
+        "--dir=plugins"
+        # Use a generator expression to add the --release or --debug flag automatically
+        "--${BUILD_TYPE}"
+        # Add other useful flags as needed (e.g., --qmldir)
+        # "--sqldrivers"
+        "--no-translations"
+        "--no-opengl-sw"
+        # "--no-svg"
+        # Use a generator expression to get the path to your .exe file at build time
+        "$<TARGET_FILE:${PROJECT_NAME}>"
+        # This ensures the deployment command runs from the directory where the .exe is located
+        WORKING_DIRECTORY "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+        # This makes sure ${PROJECT_NAME}.exe is built BEFORE this command tries to run
+        DEPENDS ${PROJECT_NAME}
+        # This makes the output appear nicely in the terminal
+        USES_TERMINAL
+    )
 endif()

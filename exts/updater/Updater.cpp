@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <string>
 #include <iostream>
-//#include <tlhelp32.h> // For process checking (optional, better to use Handle)
+// #include <tlhelp32.h> // For process checking (optional, better to use Handle)
 #include <filesystem> // C++17
 #include <QApplication>
 #include "../../include/IToolsAPI.h"
@@ -12,7 +12,8 @@
 
 #include <QThread>
 
-void log(const std::string &_log) {
+void log(const std::string &_log)
+{
 	db_log("[Updater.exe] " + _log);
 }
 
@@ -21,14 +22,15 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 
 	// --- Get arguments from command line ---
-	if (QApplication::arguments().size() < 4) {
+	if (QApplication::arguments().size() < 4)
+	{
 		qCritical() << "Usage: Updater.exe <packagePath> <installPath> <parentPID>";
 		return 1;
 	}
 	QString installer = QApplication::arguments().at(0);
-	QString packagePath =  QApplication::arguments().at(1);
-	QString installPath =  QApplication::arguments().at(2);
-	unsigned long parentPID =  QApplication::arguments().at(3).toULong();
+	QString packagePath = QApplication::arguments().at(1);
+	QString installPath = QApplication::arguments().at(2);
+	unsigned long parentPID = QApplication::arguments().at(3).toULong();
 
 	log("Updater started.");
 	log("Installer: " + installer.toStdString());
@@ -39,8 +41,8 @@ int main(int argc, char *argv[])
 	// --- Setup Dialog and Worker Thread ---
 	UpdateProgressDialog dialog;
 
-	auto* workerThread = new QThread();
-	auto* worker = new UpdateWorker();
+	auto *workerThread = new QThread();
+	auto *worker = new UpdateWorker();
 
 	worker->moveToThread(workerThread);
 
@@ -59,9 +61,8 @@ int main(int argc, char *argv[])
 	QObject::connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
 
 	// When the thread starts, call the worker's doUpdate function
-	QObject::connect(workerThread, &QThread::started, worker, [=]() {
-		worker->doUpdate(packagePath, installPath, parentPID);
-	});
+	QObject::connect(workerThread, &QThread::started, worker, [=]()
+					 { worker->doUpdate(packagePath, installPath, parentPID); });
 
 	// --- Start the Process ---
 	workerThread->start(); // Start the background thread

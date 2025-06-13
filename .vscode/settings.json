@@ -54,11 +54,7 @@
         "CMAKE_CXX_COMPILER_LAUNCHER": "sccache",
         "QT_DEBUG_PLUGINS": "1"
     },
-    "files.associations": {
-        "*.dbclient-js": "javascript",
-        ".fantomasignore": "ignore",
-        "chrono": "cpp",
-        "filesystem": "cpp"
-    },
-    "csharp.debug.logging.exceptions": true
+    "csharp.debug.logging.exceptions": true,
+    "clang-format.language.c.enable": true,
+    "C_Cpp.codeAnalysis.clangTidy.codeAction.formatFixes": true
 }

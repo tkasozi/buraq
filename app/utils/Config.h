@@ -31,7 +31,8 @@
 #include <QIcon>
 #include <QDomElement>
 
-struct WindowConfig {
+struct WindowConfig
+{
 	int minWidth;
 	int minHeight;
 	int normalSize;
@@ -40,7 +41,8 @@ struct WindowConfig {
 	QIcon restoreIcon;
 	QIcon closeIcon;
 };
-struct AppIcons {
+struct AppIcons
+{
 	QIcon settingsIcon;
 	QIcon folderIcon;
 	QIcon terminalIcon;
@@ -50,7 +52,8 @@ struct AppIcons {
 	QIcon addFileIcon;
 };
 
-struct StyleSheetStruct {
+struct StyleSheetStruct
+{
 	QString color = QString("");
 	QString backgroundColor = QString("");
 	QString padding = QString("");
@@ -65,7 +68,8 @@ struct StyleSheetStruct {
 	QString styleSheet;
 };
 
-struct MainStyles {
+struct MainStyles
+{
 	StyleSheetStruct commonStyle;
 	StyleSheetStruct controlToolBar;
 	StyleSheetStruct toolBar;
@@ -73,66 +77,62 @@ struct MainStyles {
 	StyleSheetStruct toolBarHover;
 };
 
-class Config { // TODO: make this a singleton
-	// This class is used to load the configuration from the XML file.
-	// It is not meant to be instantiated directly, but rather through the static method loadConfig().
-	// The configuration is loaded from the XML file and stored in the class members.
-	// The class members can be accessed through the getter methods.
-	// The class is not meant to be inherited from.
+class Config
+{
 
 public:
-	explicit Config();
+	/**
+	 * @brief Returns the singleton instance of the Config class.
+	 *
+	 * This static method provides access to the single, shared instance of the Config class,
+	 * ensuring that only one instance exists throughout the application's lifetime.
+	 *
+	 * @return Config The singleton instance of the Config class.
+	 */
+	static Config singleton();
 
-	void init(Config *_thi);
-
-	// smart pointer tobe cleaned up
-	virtual ~Config() = default;
-
-	[[nodiscard]] const QString &getTitle() const {
+	[[nodiscard]] const QString &getTitle() const
+	{
 		return title;
 	}
 
-	[[nodiscard]] QString getVersion() const {
+	[[nodiscard]] QString getVersion() const
+	{
 		return version;
 	}
 
-	[[nodiscard]] const QString &getPowershellPath() const {
+	[[nodiscard]] const QString &getPowershellPath() const
+	{
 		return powershellPath;
 	}
 
-	[[nodiscard]] const QIcon &getAppLogo() const {
+	[[nodiscard]] const QIcon &getAppLogo() const
+	{
 		return appLogo;
 	}
 
-	[[nodiscard]] const WindowConfig *getWindow() const {
+	[[nodiscard]] const WindowConfig *getWindow() const
+	{
 		return windowConfig.get();
 	}
 
-	[[nodiscard]] const AppIcons *getAppIcons() const {
+	[[nodiscard]] const AppIcons *getAppIcons() const
+	{
 		return appIcons.get();
 	}
 
-	[[nodiscard]] const MainStyles *getMainStyles() const {
+	[[nodiscard]] const MainStyles *getMainStyles() const
+	{
 		return mainStyles.get();
-	}
-	static void loadConfig(Config *_thi);
-
-	/**
-	 * Returns true if the configuration is set up.
-	 * @return true if the configuration is set up.
-	 */
-	[[nodiscard]] bool isSetupDone() const {
-		return isSetup;
-	}
-
-	/**
-	 * Sets the configuration as set up.
-	 */
-	void setSetupDone() {
-		isSetup = true;
 	}
 
 private:
+	Config();
+	// smart pointer tobe cleaned up
+	~Config();
+	Config(const Config &) = delete;			// No copy constructor
+	Config &operator=(const Config &) = delete; // No copy assignment
+
 	bool isSetup = false;
 	QString title;
 	QString version;
@@ -149,7 +149,8 @@ private:
 	void processStyles(const QDomElement &element);
 
 	void processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct);
-	 
+
+	static void loadConfig(Config *_thi);
 };
 
-#endif //ITOOLS_CONFIG_H
+#endif // ITOOLS_CONFIG_H

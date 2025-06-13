@@ -10,6 +10,7 @@
 #include "dialog/VersionUpdateDialog.h"
 #include "app_version.h"
 #include "app_ui/AppUi.h"
+#include "utils/Config.h"
 
 int main(int argc, char *argv[])
 {
@@ -33,6 +34,8 @@ int main(int argc, char *argv[])
 		db_log("Error executing initializing db:" + err.text().toStdString());
 		return EXIT_FAILURE;
 	}
+
+	Config::singleton(); // Load configuration settings
 
 	// configure default css
 	QFile styleFile(":/styles.qss"); // Assuming the file is a resource

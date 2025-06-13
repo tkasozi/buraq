@@ -34,48 +34,48 @@
 
 class IconButton : public ToolButton {
 
-public:
-	explicit IconButton(QWidget *ptr = nullptr) : ToolButton(ptr) {};
-	explicit IconButton(const QString &fileName) : ToolButton(fileName) {};
-	explicit IconButton(const QString &fileName, const int w = 32, int h = 32, const QString &customStyles = "")
-			: ToolButton(fileName) {
-		setFixedSize(w, h);
-		setStyleSheet(customStyles + "border: 0px;");
-		this->customStyles = customStyles;
-	}
+  public:
+    explicit IconButton(QWidget *ptr = nullptr) : ToolButton(ptr) {};
+    explicit IconButton(const QString &fileName) : ToolButton(fileName) {};
+    explicit IconButton(const QString &fileName, const int w = 32, int h = 32, const QString &customStyles = "")
+        : ToolButton(fileName) {
+        setFixedSize(w, h);
+        setStyleSheet(customStyles + "border: 0px;");
+        this->customStyles = customStyles;
+    }
 
-	explicit IconButton(const QIcon &icon, const int w = 32, int h = 32, const QString &customStyles = "")
-			: ToolButton(icon) {
-		setFixedSize(w, h);
-		setStyleSheet(customStyles + "border: 0px;");
-		this->customStyles = customStyles;
-	}
+    explicit IconButton(const QIcon &icon, const int w = 32, int h = 32, const QString &customStyles = "")
+        : ToolButton(icon) {
+        setFixedSize(w, h);
+        setStyleSheet(customStyles + "border: 0px;");
+        this->customStyles = customStyles;
+    }
 
-	void leaveEvent(QEvent *p) override {
-		setStyleSheet(
-				"border: 0px;" +
-				ItoolsNS::main_config.getMainStyles()->commonStyle.styleSheet
-		);
-	}
+    void leaveEvent(QEvent *p) override {
+        setStyleSheet(
+            "border: 0px;" +
+            ItoolsNS::getConfig().getMainStyles()->commonStyle.styleSheet
+        );
+    }
 
-	void enterEvent(QEnterEvent *event) override {
-		if (customStyles != "") {
-			setStyleSheet(
-					"border-radius: 10px;" +
-					customStyles
-			);
-		} else {
-			setStyleSheet(
-					"border-radius: 10px;" +
-					ItoolsNS::main_config.getMainStyles()->toolBarHover.styleSheet
-			);
-		}
-	}
+    void enterEvent(QEnterEvent *event) override {
+        if(customStyles != "") {
+            setStyleSheet(
+                "border-radius: 10px;" +
+                customStyles
+            );
+        } else {
+            setStyleSheet(
+                "border-radius: 10px;" +
+                ItoolsNS::getConfig().getMainStyles()->toolBarHover.styleSheet
+            );
+        }
+    }
 
-	~IconButton() override = default;
+    ~IconButton() override = default;
 
-private:
-	QString customStyles;
+  private:
+    QString customStyles;
 };
 
 #endif //IT_TOOLS_ICON_BUTTON_H

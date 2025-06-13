@@ -78,6 +78,8 @@ class Config {
 public:
 	explicit Config();
 
+	void init(Config *_thi);
+
 	// smart pointer tobe cleaned up
 	virtual ~Config() = default;
 
@@ -108,6 +110,7 @@ public:
 	[[nodiscard]] const MainStyles *getMainStyles() const {
 		return mainStyles.get();
 	}
+	static void loadConfig(Config *_thi);
 
 private:
 	QString title;
@@ -125,6 +128,7 @@ private:
 	void processStyles(const QDomElement &element);
 
 	void processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct);
+	 
 };
 
 #endif //ITOOLS_CONFIG_H

@@ -4,12 +4,12 @@
     <Version>ITools v0.0.15</Version>
     <AppLogo>workflow</AppLogo>
     <window minWidth="800"
-            minHeight="720"
-            normalSize="1200"
-            minimizeIcon="minimize_icon"
-            maximizeIcon="maximize_icon"
-            restoreIcon="restore_icon"
-            closeIcon="close_icon"/>
+        minHeight="720"
+        normalSize="1200"
+        minimizeIcon="minimize_icon"
+        maximizeIcon="maximize_icon"
+        restoreIcon="restore_icon"
+        closeIcon="close_icon" />
     <AppIcons>
         <settings>settings_icon</settings>
         <folder>script_icon</folder>

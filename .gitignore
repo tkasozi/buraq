@@ -66,3 +66,4 @@ TestManagedApp/obj/
 *.bat
 
 vcpkg_installed/
+.fake

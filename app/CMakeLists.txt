@@ -41,7 +41,7 @@ set(ITOOLS_UTILS_SOURCES
     utils/Utils.cpp
 )
 
-set(ITOOLS_RESOURCES resources.qrc)
+set(ITOOLS_RESOURCES resources.qrc res/ITools.rc)
 
 set(ITOOLS_ALL_SOURCES
     ${ITOOLS_MAIN_SOURCES}
@@ -85,9 +85,9 @@ set(ITOOLS_HEADERS
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
-    add_executable(${PROJECT_NAME} WIN32 ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
+    add_executable(${PROJECT_NAME} WIN32 ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS})
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
-    add_executable(${PROJECT_NAME} ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS} res/ITools.rc)
+    add_executable(${PROJECT_NAME} ${ITOOLS_ALL_SOURCES} ${ITOOLS_HEADERS})
 endif()
 
 # Adds Qt, Boost, and Standard Library headers that are used everywhere

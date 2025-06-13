@@ -11,7 +11,8 @@
 // Global mutex to protect access to the Network singleton's methods
 std::mutex network_mutex;
 
-VersionRepository::VersionRepository(IToolsApi *api_context) : endpoint("file:///E:/it-tools-editor/app/version.json"),
+
+VersionRepository::VersionRepository(IToolsApi *api_context) : endpoint("file:///C:/Users/talik/projects/it-tools-editor/app/version.json"),
 															   network(Network::singleton()),
 															   api_context(api_context) {}
 

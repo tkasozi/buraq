@@ -11,61 +11,61 @@
 
 bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e) {
 
-	auto *toolBar = dynamic_cast<ToolBar *>(obj);
-	auto *event = dynamic_cast<QMouseEvent *>(e);
+    auto *toolBar = dynamic_cast<ToolBar *>(obj);
+    auto *event = dynamic_cast<QMouseEvent *>(e);
 
-	if (toolBar == nullptr || event == nullptr) {
-		return false; // Pass event to the object's normal handlers
-	}
+    if(toolBar == nullptr || event == nullptr) {
+        return false; // Pass event to the object's normal handlers
+    }
 
-	auto *ui = dynamic_cast<AppUi *>(obj->parent());
-	auto geo = toolBar->geometry();
+    auto *ui = dynamic_cast<AppUi *>(obj->parent());
+    auto geo = toolBar->geometry();
 
-	switch (event->type()) {
-		case QEvent::MouseButtonDblClick:
-			toolBar->updateMaxAndRestoreIconButton();
+    switch(event->type()) {
+    case QEvent::MouseButtonDblClick:
+        toolBar->updateMaxAndRestoreIconButton();
 
-			return true;
-		case QEvent::MouseButtonPress:
+        return true;
+    case QEvent::MouseButtonPress:
 
-			if (event->button() == Qt::LeftButton) {
+        if(event->button() == Qt::LeftButton) {
 
-				isMouseBtnPressed = true;
-				this->dragStartPos = event->pos();
+            isMouseBtnPressed = true;
+            this->dragStartPos = event->pos();
 
-				return true;
-			}
+            return true;
+        }
 
-			return false;
-		case QEvent::MouseMove:
-			if (isMouseBtnPressed) {
-				if (ui->width() != ItoolsNS::main_config.getWindow()->normalSize) {
-					toolBar->updateMaxAndRestoreIconButton();
-				}
+        return false;
+    case QEvent::MouseMove:
+        if(isMouseBtnPressed) {
+            if(ui->width() != ItoolsNS::getConfig().getWindow()->normalSize) {
+                toolBar->updateMaxAndRestoreIconButton();
+            }
 
-				auto pos = event->globalPosition().toPoint();
+            auto pos = event->globalPosition().toPoint();
 
-				QPoint newPos = toolBar->pos() + pos - dragStartPos;
+            QPoint newPos = toolBar->pos() + pos - dragStartPos;
 
-				ui->setGeometry(newPos.x(), newPos.y(), ItoolsNS::main_config.getWindow()->normalSize, geo.height());
+            ui->setGeometry(newPos.x(), newPos.y(), ItoolsNS::getConfig().getWindow()->normalSize, geo.height());
 
-				return true;
-			}
+            return true;
+        }
 
-			return false; // Stop event propagation (optional)
-		case QEvent::MouseButtonRelease:
+        return false; // Stop event propagation (optional)
+    case QEvent::MouseButtonRelease:
 
-			isMouseBtnPressed = false;
+        isMouseBtnPressed = false;
 
-			return true;
-		default:
-			return QObject::eventFilter(obj, e);
-	}
+        return true;
+    default:
+        return QObject::eventFilter(obj, e);
+    }
 }
 
 ToolBarEventFilter::ToolBarEventFilter()
-		: dragStartPos(0, 0),
-		  isMouseBtnPressed(false) {
+    : dragStartPos(0, 0),
+      isMouseBtnPressed(false) {
 }
 
 ToolBarEventFilter::~ToolBarEventFilter() = default;

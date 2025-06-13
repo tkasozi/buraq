@@ -24,221 +24,223 @@
 // Created by talik on 5/12/2025.
 //
 
-#include "Config.h"
 #include <QFile>
 #include <QDomDocument>
 #include <QDebug>
+#include <QDir>
 
-Config::Config() :
-		mainStyles(new MainStyles),
-		windowConfig(new WindowConfig),
-		appIcons(new AppIcons) {
+#include <Config.h>
+#include <error_codes.h>
 
-	QFile file(":/config/main_config.xml");
-	if (!file.open(QIODevice::ReadOnly)) {
-		exit(-1);
-	}
+Config::Config() : mainStyles(new MainStyles),
+    windowConfig(new WindowConfig),
+    appIcons(new AppIcons) {}
 
-	QDomDocument configDoc;
-	if (!configDoc.setContent(&file)) {
-		file.close();
-		qDebug() << "Error parsing XML file.";
-		exit(-1);
-	}
+void Config::loadConfig(Config *_this) {
+     QFile file(":/config/main_config.xml");
+    if(!file.open(QIODevice::ReadOnly)) {
+        // Add this line to see all available resources at the root.
+        qDebug() << "Available resources:" << QDir(":/config").entryList();
+        exit(ErrorCode::ERROR_FILE_NOT_FOUND);
+    }
 
-	// Get the root element (configuration)
-	QDomElement root = configDoc.documentElement();
-	if (root.tagName() != "configuration") {
-		exit(-1);
-	}
+    QDomDocument configDoc;
+    if(!configDoc.setContent(&file)) {
+        file.close();
+        qDebug() << "Error parsing XML file.";
+        exit(ErrorCode::ERROR_INVALID_FORMAT);
+    }
 
-	QDomNodeList appTitleList = root.elementsByTagName("Title");
-	if (appTitleList.count() > 0) {
-		QDomElement appTitleElement = appTitleList.at(0).toElement();
-		this->title = QString(appTitleElement.text());
-	} else {
-		qDebug() << "Error: Configuration is missing a 'Title'.";
-		exit(-1);
-	}
+    // Get the root element (configuration)
+    QDomElement root = configDoc.documentElement();
+    if(root.tagName() != "configuration") {
+        exit(ErrorCode::ERROR_INVALID_FORMAT);
+    }
 
-	QDomNodeList appVersionList = root.elementsByTagName("Version");
-	if (appVersionList.count() > 0) {
-		QDomElement appVersionElement = appVersionList.at(0).toElement();
-		this->version = QString(appVersionElement.text());
-	} else {
-		// Error: Configuration is missing a 'Version'.;
-		exit(-1);
-	}
+    QDomNodeList appTitleList = root.elementsByTagName("Title");
+    if(appTitleList.count() > 0) {
+        // Extracts the first element from the appTitleList QDomNodeList and converts it to a QDomElement.
+        // This element typically represents the application's title node in the XML configuration.
+        QDomElement appTitleElement = appTitleList.at(0).toElement();
+        _this->title = QString(appTitleElement.text());
+    } else {
+        qDebug() << "Error: Configuration is missing a 'Title'.";
+        exit(ErrorCode::ERROR_INVALID_FORMAT);
+    }
 
-	QDomNodeList appLogoList = root.elementsByTagName("AppLogo");
-	if (appLogoList.count() > 0) {
-		QDomElement appLogoElement = appLogoList.at(0).toElement();
-		this->appLogo = QIcon::fromTheme(appLogoElement.text());
-	} else {
-		qDebug() << "Error: Configuration is missing a 'AppLogo'.";
-		exit(-1);
-	}
+    QDomNodeList appVersionList = root.elementsByTagName("Version");
+    if(appVersionList.count() > 0) {
+        QDomElement appVersionElement = appVersionList.at(0).toElement();
+        _this->version = QString(appVersionElement.text());
+    } else {
+        // Error: Configuration is missing a 'Version'.;
+        exit(ErrorCode::ERROR_INVALID_FORMAT);
+    }
 
-	QDomNodeList windowList = root.elementsByTagName("window");
-	if (windowList.count() > 0) {
-		QDomElement windowElement = windowList.at(0).toElement();
-		this->processWindowAttr(windowElement);
-	} else {
-		// "Error: Configuration is missing a 'window'.";
-		exit(-1);
-	}
+    QDomNodeList appLogoList = root.elementsByTagName("AppLogo");
+    if(appLogoList.count() > 0) {
+        QDomElement appLogoElement = appLogoList.at(0).toElement();
+        _this->appLogo = QIcon::fromTheme(appLogoElement.text());
+    } else {
+        qDebug() << "Error: Configuration is missing a 'AppLogo'.";
+        exit(ErrorCode::ERROR_INVALID_FORMAT);
+    }
 
-	QDomNodeList appIconsList = root.elementsByTagName("AppIcons");
-	if (appIconsList.count() > 0) {
-		QDomElement appIconsElement = appIconsList.at(0).toElement();
-		this->processAppIconsAttr(appIconsElement);
-	} else {
-		qDebug() << "Error: Configuration is missing a 'AppIcons'.";
-		exit(-1);
-	}
+    QDomNodeList windowList = root.elementsByTagName("window");
+    if(windowList.count() > 0) {
+        QDomElement windowElement = windowList.at(0).toElement();
+        _this->processWindowAttr(windowElement);
+    } else {
+        // "Error: Configuration is missing a 'window'.";
+        exit(ErrorCode::ERROR_INVALID_FORMAT);
+    }
 
-	QDomNodeList mainStylesList = root.elementsByTagName("Styles");
-	if (mainStylesList.count() > 0) {
-		QDomElement mainStylesElement = mainStylesList.at(0).toElement();
-		this->processStyles(mainStylesElement);
-	} else {
-		// "Error: Configuration is missing a 'Styles'.";
-		exit(-1);
-	}
+    QDomNodeList appIconsList = root.elementsByTagName("AppIcons");
+    if(appIconsList.count() > 0) {
+        QDomElement appIconsElement = appIconsList.at(0).toElement();
+        _this->processAppIconsAttr(appIconsElement);
+    } else {
+        qDebug() << "Error: Configuration is missing a 'AppIcons'.";
+        exit(ErrorCode::ERROR_INVALID_FORMAT);
+    }
 
-	file.close();
+    QDomNodeList mainStylesList = root.elementsByTagName("Styles");
+    if(mainStylesList.count() > 0) {
+        QDomElement mainStylesElement = mainStylesList.at(0).toElement();
+        _this->processStyles(mainStylesElement);
+    } else {
+        // "Error: Configuration is missing a 'Styles'.";
+        exit(ErrorCode::ERROR_INVALID_FORMAT);
+    }
+
+    file.close();
 }
 
 void Config::processWindowAttr(const QDomElement &element) {
-	//element.attributes().item(1).nodeValue()
-	for (int i = 0; i < element.attributes().size(); ++i) {
-		QString attrName = element.attributes().item(i).nodeName();
-		QString attrValue = element.attributes().item(i).nodeValue();
+    // element.attributes().item(1).nodeValue()
+    for(int i = 0; i < element.attributes().size(); ++i) {
+        QString attrName = element.attributes().item(i).nodeName();
+        QString attrValue = element.attributes().item(i).nodeValue();
 
-		if (attrName == "minWidth") {
-			windowConfig->minWidth = attrValue.toInt();
-		}
-		if (attrName == "minHeight") {
-			windowConfig->minHeight = attrValue.toInt();
-		}
-		if (attrName == "normalSize") {
-			windowConfig->normalSize = attrValue.toInt();
-		}
-		if (attrName == "minimizeIcon") {
-			windowConfig->minimizeIcon = QIcon::fromTheme(attrValue);
-		}
-		if (attrName == "maximizeIcon") {
-			windowConfig->maximizeIcon = QIcon::fromTheme(attrValue);
-		}
-		if (attrName == "restoreIcon") {
-			windowConfig->restoreIcon = QIcon::fromTheme(attrValue);
-		}
-		if (attrName == "closeIcon") {
-			windowConfig->closeIcon = QIcon::fromTheme(attrValue);
-		}
-	}
+        if(attrName == "minWidth") {
+            windowConfig->minWidth = attrValue.toInt();
+        }
+        if(attrName == "minHeight") {
+            windowConfig->minHeight = attrValue.toInt();
+        }
+        if(attrName == "normalSize") {
+            windowConfig->normalSize = attrValue.toInt();
+        }
+        if(attrName == "minimizeIcon") {
+            windowConfig->minimizeIcon = QIcon::fromTheme(attrValue);
+        }
+        if(attrName == "maximizeIcon") {
+            windowConfig->maximizeIcon = QIcon::fromTheme(attrValue);
+        }
+        if(attrName == "restoreIcon") {
+            windowConfig->restoreIcon = QIcon::fromTheme(attrValue);
+        }
+        if(attrName == "closeIcon") {
+            windowConfig->closeIcon = QIcon::fromTheme(attrValue);
+        }
+    }
 }
 
 void Config::processAppIconsAttr(const QDomElement &element) {
-	auto appIconsNodes = element.childNodes();
-	for (int i = 0; i < appIconsNodes.size(); ++i) {
-		QDomElement qDomElement = appIconsNodes.item(i).toElement();
-		QString tagName = qDomElement.tagName();
+    auto appIconsNodes = element.childNodes();
+    for(int i = 0; i < appIconsNodes.size(); ++i) {
+        QDomElement qDomElement = appIconsNodes.item(i).toElement();
+        QString tagName = qDomElement.tagName();
 
-		if (tagName == "settings") {
-			appIcons->settingsIcon = QIcon::fromTheme(qDomElement.text());
-		}
-		if (tagName == "folder") {
-			appIcons->folderIcon = QIcon::fromTheme(qDomElement.text());
-		}
-		if (tagName == "terminal") {
-			appIcons->terminalIcon = QIcon::fromTheme(qDomElement.text());
-		}
-		if (tagName == "playCode") {
-			appIcons->playCode = QIcon::fromTheme(qDomElement.text());
-		}
-		if (tagName == "execute") {
-			appIcons->executeIcon = QIcon::fromTheme(qDomElement.text());
-		}
-		if (tagName == "executeSelected") {
-			appIcons->executeSelectedIcon = QIcon::fromTheme(qDomElement.text());
-		}
-		if (tagName == "addFile") {
-			appIcons->addFileIcon = QIcon::fromTheme(qDomElement.text());
-		}
-	}
+        if(tagName == "settings") {
+            appIcons->settingsIcon = QIcon::fromTheme(qDomElement.text());
+        }
+        if(tagName == "folder") {
+            appIcons->folderIcon = QIcon::fromTheme(qDomElement.text());
+        }
+        if(tagName == "terminal") {
+            appIcons->terminalIcon = QIcon::fromTheme(qDomElement.text());
+        }
+        if(tagName == "playCode") {
+            appIcons->playCode = QIcon::fromTheme(qDomElement.text());
+        }
+        if(tagName == "execute") {
+            appIcons->executeIcon = QIcon::fromTheme(qDomElement.text());
+        }
+        if(tagName == "executeSelected") {
+            appIcons->executeSelectedIcon = QIcon::fromTheme(qDomElement.text());
+        }
+        if(tagName == "addFile") {
+            appIcons->addFileIcon = QIcon::fromTheme(qDomElement.text());
+        }
+    }
 }
 
 void Config::processStyles(const QDomElement &element) {
-	auto styleNodes = element.childNodes();
-	QDomElement qDomCommonNode;
-	for (int i = 0; i < styleNodes.size(); ++i) {
-		auto temp = styleNodes.item(i).toElement();
-		if (temp.tagName() == "commonStyle") {
-			processStyleBlock(temp, mainStyles->commonStyle);
-			break;
-		}
-	}
+    auto styleNodes = element.childNodes();
+    QDomElement qDomCommonNode;
+    for(int i = 0; i < styleNodes.size(); ++i) {
+        auto temp = styleNodes.item(i).toElement();
+        if(temp.tagName() == "commonStyle") {
+            processStyleBlock(temp, mainStyles->commonStyle);
+            break;
+        }
+    }
 
-	for (int i = 0; i < styleNodes.size(); ++i) {
-		auto temp = styleNodes.item(i).toElement();
-		if (temp.tagName() != "commonStyle") {
-			if (temp.tagName() == "controlToolBar") {
-				processStyleBlock(temp, mainStyles->controlToolBar);
-			}
-			if (temp.tagName() == "toolBar") {
-				processStyleBlock(temp, mainStyles->toolBar);
-			}
-			if (temp.tagName() == "statusToolBar") {
-				processStyleBlock(temp, mainStyles->statusToolBar);
-			}
-			if (temp.tagName() == "toolBarHover") {
-				processStyleBlock(temp, mainStyles->toolBarHover);
-			}
-		}
-	}
+    for(int i = 0; i < styleNodes.size(); ++i) {
+        auto temp = styleNodes.item(i).toElement();
+        if(temp.tagName() != "commonStyle") {
+            if(temp.tagName() == "controlToolBar") {
+                processStyleBlock(temp, mainStyles->controlToolBar);
+            }
+            if(temp.tagName() == "toolBar") {
+                processStyleBlock(temp, mainStyles->toolBar);
+            }
+            if(temp.tagName() == "statusToolBar") {
+                processStyleBlock(temp, mainStyles->statusToolBar);
+            }
+            if(temp.tagName() == "toolBarHover") {
+                processStyleBlock(temp, mainStyles->toolBarHover);
+            }
+        }
+    }
 }
 
 void Config::processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct) {
-	// includes styles
-	if (element.hasAttribute("inherits") && element.attributes().item(0).nodeValue() == "commonStyle") {
-		aStruct.color = mainStyles->commonStyle.color;
-		aStruct.backgroundColor = mainStyles->commonStyle.backgroundColor;
-		aStruct.padding = mainStyles->commonStyle.padding;
-		aStruct.border = mainStyles->commonStyle.border;
-		aStruct.height = mainStyles->commonStyle.height;
-	}
+    // includes styles
+    if(element.hasAttribute("inherits") && element.attributes().item(0).nodeValue() == "commonStyle") {
+        aStruct.color = mainStyles->commonStyle.color;
+        aStruct.backgroundColor = mainStyles->commonStyle.backgroundColor;
+        aStruct.padding = mainStyles->commonStyle.padding;
+        aStruct.border = mainStyles->commonStyle.border;
+        aStruct.height = mainStyles->commonStyle.height;
+    }
 
-	auto styleNodes = element.childNodes();
-	for (int i = 0; i < styleNodes.size(); ++i) {
-		auto temp = styleNodes.item(i).toElement();
-		if (temp.tagName() == "backgroundColor") {
-			aStruct.backgroundColor = QString("background-color:" + temp.text() + ";");
-		}
-		if (temp.tagName() == "border") {
-			aStruct.border = QString("border: " + temp.text() + ";");
-		}
-		if (temp.tagName() == "borderBottom") {
-			aStruct.borderBottom = QString("border-bottom:" + temp.text() + ";");
-		}
-		if (temp.tagName() == "borderTop") {
-			aStruct.borderBottom = QString("border-top:" + temp.text() + ";");
-		}
-		if (temp.tagName() == "borderColor") {
-			aStruct.borderColor = QString("border-color:" + temp.text() + ";");
-		}
-		if (temp.tagName() == "padding") {
-			aStruct.padding = QString("padding:" + temp.text() + ";");
-		}
-		if (temp.tagName() == "height") {
-			aStruct.height = QString("height:" + temp.text() + ";");
-		}
+    auto styleNodes = element.childNodes();
+    for(int i = 0; i < styleNodes.size(); ++i) {
+        auto temp = styleNodes.item(i).toElement();
+        if(temp.tagName() == "backgroundColor") {
+            aStruct.backgroundColor = QString("background-color:" + temp.text() + ";");
+        }
+        if(temp.tagName() == "border") {
+            aStruct.border = QString("border: " + temp.text() + ";");
+        }
+        if(temp.tagName() == "borderBottom") {
+            aStruct.borderBottom = QString("border-bottom:" + temp.text() + ";");
+        }
+        if(temp.tagName() == "borderTop") {
+            aStruct.borderBottom = QString("border-top:" + temp.text() + ";");
+        }
+        if(temp.tagName() == "borderColor") {
+            aStruct.borderColor = QString("border-color:" + temp.text() + ";");
+        }
+        if(temp.tagName() == "padding") {
+            aStruct.padding = QString("padding:" + temp.text() + ";");
+        }
+        if(temp.tagName() == "height") {
+            aStruct.height = QString("height:" + temp.text() + ";");
+        }
 
-		aStruct.styleSheet = aStruct.backgroundColor + aStruct.padding
-							 + aStruct.color
-							 + aStruct.border
-							 + aStruct.height
-							 + aStruct.borderColor
-							 + aStruct.borderBottom;
-	}
+        aStruct.styleSheet = aStruct.backgroundColor + aStruct.padding + aStruct.color + aStruct.border + aStruct.height + aStruct.borderColor + aStruct.borderBottom;
+    }
 }

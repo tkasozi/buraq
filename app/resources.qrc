@@ -21,33 +21,35 @@
   - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   - SOFTWARE.
   -->
+<!DOCTYPE RCC>
+<RCC version="1.0">
+	<qresource prefix="/config">
+		<file alias="main_config.xml">main_config.xml</file>
+	</qresource>
+	<qresource prefix="/">
+		<file>version.json</file>
+		<file>styles.qss</file>
+		<file>test/temp.ps1</file>
+		<file>icons/dark/index.theme</file>
+		<file>icons/dark/png/close_icon.png</file>
+		<file>icons/dark/png/home.png</file>
+		<file>icons/dark/png/maximize_icon.png</file>
+		<file>icons/dark/png/minimize_icon.png</file>
+		<file>icons/dark/png/restore_icon.png</file>
+		<file>icons/dark/png/workflow.png</file>
+		<file>icons/workflow.ico</file>
+		<file>icons/dark/png/settings_icon.png</file>
+		<file>icons/dark/png/folder_icon.png</file>
+		<file>icons/dark/png/script_icon.png</file>
+		<file>icons/dark/png/terminal_icon.png</file>
+		<file>icons/dark/png/play_filled_icon.png</file>
+		<file>icons/dark/png/play_filled_icon2.png</file>
+		<file>icons/dark/png/play_filled_icon3.png</file>
+		<file>icons/dark/png/create_new_icon.png</file>
 
-<RCC>
-    <qresource prefix="/">
-        <file>../config/main_config.xml</file>
-        <file>version.json</file>
-        <file>styles.qss</file>
-        <file>test/temp.ps1</file>
-        <file>icons/dark/index.theme</file>
-        <file>icons/dark/png/close_icon.png</file>
-        <file>icons/dark/png/home.png</file>
-        <file>icons/dark/png/maximize_icon.png</file>
-        <file>icons/dark/png/minimize_icon.png</file>
-        <file>icons/dark/png/restore_icon.png</file>
-        <file>icons/dark/png/workflow.png</file>
-        <file>icons/workflow.ico</file>
-        <file>icons/dark/png/settings_icon.png</file>
-        <file>icons/dark/png/folder_icon.png</file>
-        <file>icons/dark/png/script_icon.png</file>
-        <file>icons/dark/png/terminal_icon.png</file>
-        <file>icons/dark/png/play_filled_icon.png</file>
-        <file>icons/dark/png/play_filled_icon2.png</file>
-        <file>icons/dark/png/play_filled_icon3.png</file>
-        <file>icons/dark/png/create_new_icon.png</file>
-
-        <file>icons/dark/svg/home.svg</file>
-        <file>icons/dark/svg/settings.svg</file>
-        <file>icons/dark/svg/workflow.svg</file>
-        <file>icons/dark/svg/folder_icon.svg</file>
-    </qresource>
+		<file>icons/dark/svg/home.svg</file>
+		<file>icons/dark/svg/settings.svg</file>
+		<file>icons/dark/svg/workflow.svg</file>
+		<file>icons/dark/svg/folder_icon.svg</file>
+	</qresource>
 </RCC>

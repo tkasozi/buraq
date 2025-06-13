@@ -4,20 +4,20 @@
 #include <QApplication>
 #include <QStyleFactory>
 
-#include "app_ui/AppUi.h"
 #include "network.h"
 #include "db_connection.h"
 #include "client/VersionRepository.h"
 #include "dialog/VersionUpdateDialog.h"
 #include "app_version.h"
+#include "app_ui/AppUi.h"
 
 int main(int argc, char *argv[])
 {
+	QApplication app(argc, argv);
+
 	// Ensure the singleton (and curl_global_init) is created before threads,
 	// though Meyers singleton handles this.
 	Network::singleton(); // Initialize network singleton if not already.
-
-	QApplication app(argc, argv);
 
 	if (!db_conn())
 	{

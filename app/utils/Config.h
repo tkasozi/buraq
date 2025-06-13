@@ -73,7 +73,12 @@ struct MainStyles {
 	StyleSheetStruct toolBarHover;
 };
 
-class Config {
+class Config { // TODO: make this a singleton
+	// This class is used to load the configuration from the XML file.
+	// It is not meant to be instantiated directly, but rather through the static method loadConfig().
+	// The configuration is loaded from the XML file and stored in the class members.
+	// The class members can be accessed through the getter methods.
+	// The class is not meant to be inherited from.
 
 public:
 	explicit Config();
@@ -112,7 +117,23 @@ public:
 	}
 	static void loadConfig(Config *_thi);
 
+	/**
+	 * Returns true if the configuration is set up.
+	 * @return true if the configuration is set up.
+	 */
+	[[nodiscard]] bool isSetupDone() const {
+		return isSetup;
+	}
+
+	/**
+	 * Sets the configuration as set up.
+	 */
+	void setSetupDone() {
+		isSetup = true;
+	}
+
 private:
+	bool isSetup = false;
 	QString title;
 	QString version;
 	QString powershellPath;

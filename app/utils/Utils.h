@@ -36,7 +36,11 @@ static Config& getConfig() {
     // 'static' here means 'instance' is created only ONCE,
     // the very first time this function is called.
     static Config instance;
-    Config::loadConfig(&instance);
+    if(!instance.isSetupDone()) {
+        // Load the configuration only once.
+        Config::loadConfig(&instance);
+        instance.setSetupDone();
+    }
     return instance;
 }
 

@@ -32,50 +32,55 @@
 
 #include "ToolButton.h"
 
-class IconButton : public ToolButton {
+class IconButton : public ToolButton
+{
 
-  public:
+public:
     explicit IconButton(QWidget *ptr = nullptr) : ToolButton(ptr) {};
     explicit IconButton(const QString &fileName) : ToolButton(fileName) {};
     explicit IconButton(const QString &fileName, const int w = 32, int h = 32, const QString &customStyles = "")
-        : ToolButton(fileName) {
+        : ToolButton(fileName)
+    {
         setFixedSize(w, h);
         setStyleSheet(customStyles + "border: 0px;");
         this->customStyles = customStyles;
     }
 
     explicit IconButton(const QIcon &icon, const int w = 32, int h = 32, const QString &customStyles = "")
-        : ToolButton(icon) {
+        : ToolButton(icon)
+    {
         setFixedSize(w, h);
         setStyleSheet(customStyles + "border: 0px;");
         this->customStyles = customStyles;
     }
 
-    void leaveEvent(QEvent *p) override {
+    void leaveEvent(QEvent *p) override
+    {
         setStyleSheet(
             "border: 0px;" +
-            ItoolsNS::getConfig().getMainStyles()->commonStyle.styleSheet
-        );
+            Config::singleton().getMainStyles()->commonStyle.styleSheet);
     }
 
-    void enterEvent(QEnterEvent *event) override {
-        if(customStyles != "") {
+    void enterEvent(QEnterEvent *event) override
+    {
+        if (customStyles != "")
+        {
             setStyleSheet(
                 "border-radius: 10px;" +
-                customStyles
-            );
-        } else {
+                customStyles);
+        }
+        else
+        {
             setStyleSheet(
                 "border-radius: 10px;" +
-                ItoolsNS::getConfig().getMainStyles()->toolBarHover.styleSheet
-            );
+                Config::singleton().getMainStyles()->toolBarHover.styleSheet);
         }
     }
 
     ~IconButton() override = default;
 
-  private:
+private:
     QString customStyles;
 };
 
-#endif //IT_TOOLS_ICON_BUTTON_H
+#endif // IT_TOOLS_ICON_BUTTON_H

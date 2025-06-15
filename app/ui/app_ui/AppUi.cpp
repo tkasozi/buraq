@@ -42,7 +42,8 @@
 #include "client/VersionRepository.h"
 #include "dialog/VersionUpdateDialog.h"
 
-AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
+AppUi::AppUi(QWidget *parent) : QMainWindow(parent)
+{
 
     // Other UI
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
@@ -54,7 +55,7 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
     setStyleSheet("background-color: #232323;");
 
     // setting up default window size
-    const auto windowConfig = ItoolsNS::getConfig().getWindow();
+    const auto windowConfig = Config::singleton().getWindow();
     resize(windowConfig->normalSize, windowConfig->minHeight);
     setMinimumSize(windowConfig->minWidth, windowConfig->minHeight);
 
@@ -64,12 +65,12 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
     // Add Status bar
     statusBar = std::make_unique<QStatusBar>();
-    statusBar->setStyleSheet(ItoolsNS::getConfig().getMainStyles()->statusToolBar.styleSheet);
+    statusBar->setStyleSheet(Config::singleton().getMainStyles()->statusToolBar.styleSheet);
     setStatusBar(statusBar.get());
 
     // Setting window title and docking icon
-    setWindowTitle(ItoolsNS::getConfig().getTitle());
-    setWindowIcon(ItoolsNS::getConfig().getAppLogo());
+    setWindowTitle(Config::singleton().getTitle());
+    setWindowIcon(Config::singleton().getAppLogo());
 
     // Add CentralWidget
     auto *centralWidget = new QWidget;
@@ -87,7 +88,7 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
     centralWidgetLayout2->setContentsMargins(0, 0, 0, 0);
 
     auto *centralWidgetControlPanel = new QWidget;
-    centralWidgetControlPanel->setStyleSheet(ItoolsNS::getConfig().getMainStyles()->controlToolBar.styleSheet);
+    centralWidgetControlPanel->setStyleSheet(Config::singleton().getMainStyles()->controlToolBar.styleSheet);
     centralWidgetControlPanel->setFixedWidth(64);
     centralWidgetControlPanel->setLayout(centralWidgetLayout2);
 
@@ -102,7 +103,7 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
     centralWidgetLayout2->addWidget(centralWidgetControlPanelA, 0, 0, 1, 12, Qt::AlignJustify);
 
-    folderButton = std::make_unique<IconButton>(QIcon(ItoolsNS::getConfig().getAppIcons()->folderIcon));
+    folderButton = std::make_unique<IconButton>(QIcon(Config::singleton().getAppIcons()->folderIcon));
 
     layoutA->addWidget(folderButton.get());
 
@@ -116,11 +117,11 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
 
     centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
 
-    auto outputButton = new IconButton(QIcon(ItoolsNS::getConfig().getAppIcons()->terminalIcon));
+    auto outputButton = new IconButton(QIcon(Config::singleton().getAppIcons()->terminalIcon));
     connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
     layoutB->addWidget(outputButton);
 
-    auto *settingButton = new IconButton(QIcon(ItoolsNS::getConfig().getAppIcons()->settingsIcon));
+    auto *settingButton = new IconButton(QIcon(Config::singleton().getAppIcons()->settingsIcon));
     layoutB->addWidget(settingButton);
 
     // add to central widget
@@ -165,7 +166,8 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent) {
     processStatusSlot("Ready.", 2000);
 }
 
-void AppUi::onWindowFullyLoaded() {
+void AppUi::onWindowFullyLoaded()
+{
     // Perform your actions here
     // For example:
     // - Load data from a database/network without blocking the UI initially
@@ -176,69 +178,89 @@ void AppUi::onWindowFullyLoaded() {
 
     UpdateInfo info = repo.main_version_logic();
 
-    if(!info.latestVersion.empty()) {
+    if (!info.latestVersion.empty())
+    {
         versionUpdater.setWindowTitle("A new version " + QString::fromStdString(info.latestVersion) + " is available!");
         versionUpdater.setContent(QString::fromStdString(info.releaseNotes));
 
-        if(versionUpdater.exec() == QDialog::Accepted) {
+        if (versionUpdater.exec() == QDialog::Accepted)
+        {
             std::filesystem::path zipFile = repo.downloadNewVersion();
 
             launchUpdaterAndExit(
                 api_context->searchPath / "updater.exe",
                 zipFile,
                 api_context->searchPath.parent_path());
-        } else {
+        }
+        else
+        {
             // New version was rejected or modal was closed.
             // do nothing
         }
     }
 }
 
-void AppUi::onClicked() {
+void AppUi::onClicked()
+{
     drawer->toggle();
-    if(drawer->isVisible()) {
+    if (drawer->isVisible())
+    {
         placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
-    } else {
+    }
+    else
+    {
         placeHolderLayout->removeWidget(drawer.get());
     }
 }
 
-void AppUi::onShowOutputButtonClicked() {
+void AppUi::onShowOutputButtonClicked()
+{
     outPutArea->toggle();
-    if(outPutArea->isVisible()) {
+    if (outPutArea->isVisible())
+    {
         centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
-    } else {
+    }
+    else
+    {
         centralWidgetLayout->removeWidget(outPutArea.get());
     }
 }
 
-Editor *AppUi::getEditor() {
+Editor *AppUi::getEditor()
+{
     return itoolsEditor.get();
 }
 
-PluginManager *AppUi::getLangPluginManager() {
+PluginManager *AppUi::getLangPluginManager()
+{
     return pluginManager.get();
 }
 
-void AppUi::processStatusSlot(const QString &message, const int timeout) {
+void AppUi::processStatusSlot(const QString &message, const int timeout)
+{
     statusBar->showMessage(message, timeout);
 }
 
-void AppUi::processResultSlot(int exitCode, const QString &output, const QString &error) {
+void AppUi::processResultSlot(int exitCode, const QString &output, const QString &error)
+{
     outPutArea->show();
 
-    if(exitCode == 0) {
+    if (exitCode == 0)
+    {
 
         outPutArea->log(output, error);
 
         processStatusSlot(error.isEmpty() ? "Completed!" : "Completed with errors.");
-    } else {
+    }
+    else
+    {
         processStatusSlot("Process failed!");
         outPutArea->log("", error);
     }
 }
 
-void AppUi::configureAppContext() {
+void AppUi::configureAppContext()
+{
     std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "ITools";
 
     // app search_path for plugins
@@ -259,12 +281,14 @@ void AppUi::configureAppContext() {
     pluginManager->loadPlugin("power_shell");
 }
 
-EditorMargin *AppUi::getEditorMargin() {
+EditorMargin *AppUi::getEditorMargin()
+{
     return editorMargin.get();
 }
 
 void AppUi::launchUpdaterAndExit(const std::filesystem::path &updaterPath, const std::filesystem::path &userPath,
-                                 const std::filesystem::path &installPath) {
+                                 const std::filesystem::path &installPath)
+{
     // TODO incomplete package path, should be set to the actual package path.
     const std::filesystem::path packagePath = userPath / "";
     std::string commandLine = "\"" + updaterPath.string() + "\"";
@@ -279,22 +303,25 @@ void AppUi::launchUpdaterAndExit(const std::filesystem::path &updaterPath, const
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    if(CreateProcessA(NULL,					    // No module name (use command line)
-                      (LPSTR)commandLine.c_str(), // Command line
-                      NULL,					   // Process handle not inheritable
-                      NULL,					   // Thread handle not inheritable
-                      FALSE,					   // Set handle inheritance to FALSE
-                      CREATE_NEW_CONSOLE,		   // Give the updater its own console. Prevents from closing after the main app is closed.
-                      NULL,					   // Use parent's environment block
-                      NULL,					   // Use parent's starting directory
-                      &si,						   // Pointer to STARTUPINFO structure
-                      &pi)						   // Pointer to PROCESS_INFORMATION structure
-      ) {
+    if (CreateProcessA(NULL,                       // No module name (use command line)
+                       (LPSTR)commandLine.c_str(), // Command line
+                       NULL,                       // Process handle not inheritable
+                       NULL,                       // Thread handle not inheritable
+                       FALSE,                      // Set handle inheritance to FALSE
+                       CREATE_NEW_CONSOLE,         // Give the updater its own console. Prevents from closing after the main app is closed.
+                       NULL,                       // Use parent's environment block
+                       NULL,                       // Use parent's starting directory
+                       &si,                        // Pointer to STARTUPINFO structure
+                       &pi)                        // Pointer to PROCESS_INFORMATION structure
+    )
+    {
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
         std::cout << "Updater launched. Exiting main application." << std::endl;
         exit(0);
-    } else {
+    }
+    else
+    {
         std::cerr << "Failed to launch updater. Error: " << GetLastError() << std::endl;
     }
 }

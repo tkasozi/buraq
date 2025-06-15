@@ -35,15 +35,17 @@
 
 #include "../utils/Utils.h"
 
-
-class ToolButton : public QToolButton {
+class ToolButton : public QToolButton
+{
     Q_OBJECT
 
-  private:
+private:
     QString customHoverColor;
 
-    void applyIconStyles(const QIcon &icon) {
-        if(!icon.isNull()) {
+    void applyIconStyles(const QIcon &icon)
+    {
+        if (!icon.isNull())
+        {
             ToolButton::setIcon(icon);
         }
         setFixedWidth(48);
@@ -51,36 +53,42 @@ class ToolButton : public QToolButton {
         setMouseTracking(true);
     }
 
-  private slots:
+private slots:
 
-  public:
-    explicit ToolButton(QWidget *ptr = nullptr) :  QToolButton(ptr) {};
+public:
+    explicit ToolButton(QWidget *ptr = nullptr) : QToolButton(ptr) {};
     explicit ToolButton(const QString &fileName, QString customHoverColor = nullptr)
-        : customHoverColor(std::move(customHoverColor)) {
+        : customHoverColor(std::move(customHoverColor))
+    {
         applyIconStyles(QIcon::fromTheme(fileName));
     };
 
     explicit ToolButton(const QIcon &icon, QString customHoverColor = nullptr)
-        : customHoverColor(std::move(customHoverColor)) {
+        : customHoverColor(std::move(customHoverColor))
+    {
         applyIconStyles(icon);
     };
 
-    void leaveEvent(QEvent *p) override {
-        setStyleSheet(ItoolsNS::getConfig().getMainStyles()->toolBar.styleSheet);
+    void leaveEvent(QEvent *p) override
+    {
+        setStyleSheet(Config::singleton().getMainStyles()->toolBar.styleSheet);
     }
 
-    void enterEvent(QEnterEvent *event) override {
-        if(customHoverColor != nullptr) {
+    void enterEvent(QEnterEvent *event) override
+    {
+        if (customHoverColor != nullptr)
+        {
             setStyleSheet(
-                ItoolsNS::getConfig().getMainStyles()->toolBar.styleSheet +
-                "background-color: " + customHoverColor
-            );
-        } else {
-            setStyleSheet(ItoolsNS::getConfig().getMainStyles()->toolBarHover.styleSheet);
+                Config::singleton().getMainStyles()->toolBar.styleSheet +
+                "background-color: " + customHoverColor);
+        }
+        else
+        {
+            setStyleSheet(Config::singleton().getMainStyles()->toolBarHover.styleSheet);
         }
     }
 
     ~ToolButton() override = default;
 };
 
-#endif //IT_TOOLS_TOOL_BUTTON_H
+#endif // IT_TOOLS_TOOL_BUTTON_H

@@ -25,7 +25,8 @@
 
 #include "ToolBar.h"
 
-ToolBar::ToolBar(QWidget *parent) {
+ToolBar::ToolBar(QWidget *parent)
+{
     // This is the component on which the toolbar is installed.
     ToolBar::setParent(parent);
 
@@ -34,14 +35,14 @@ ToolBar::ToolBar(QWidget *parent) {
     installEventFilter(filter);
 
     // Toolbar css
-    setStyleSheet(ItoolsNS::getConfig().getMainStyles()->toolBar.styleSheet);
+    setStyleSheet(Config::singleton().getMainStyles()->toolBar.styleSheet);
 
     // initializing control buttons.
-    this->versionLabel = new QLabel(ItoolsNS::getConfig().getVersion());
-    this->minimizeBtn = new ToolButton(QIcon(ItoolsNS::getConfig().getWindow()->minimizeIcon));
-    this->closeBtn = new ToolButton(QIcon(ItoolsNS::getConfig().getWindow()->closeIcon), "red");
+    this->versionLabel = new QLabel(Config::singleton().getVersion());
+    this->minimizeBtn = new ToolButton(QIcon(Config::singleton().getWindow()->minimizeIcon));
+    this->closeBtn = new ToolButton(QIcon(Config::singleton().getWindow()->closeIcon), "red");
     // by default, window is minimized.
-    this->maxRestoreBtn = new ToolButton(QIcon(ItoolsNS::getConfig().getWindow()->maximizeIcon));
+    this->maxRestoreBtn = new ToolButton(QIcon(Config::singleton().getWindow()->maximizeIcon));
 
     // sets up the grid layout on this component
     configureLayout();
@@ -52,41 +53,50 @@ ToolBar::ToolBar(QWidget *parent) {
     connect(closeBtn, &ToolButton::clicked, this, &ToolBar::onCloseWindowButtonClicked);
 }
 
-void ToolBar::onCloseWindowButtonClicked() {
+void ToolBar::onCloseWindowButtonClicked()
+{
     // closing the window.
     auto *parent = dynamic_cast<QMainWindow *>(this->parent());
     parent->close();
 }
 
-void ToolBar::onMinimizeWindowButtonClicked() {
+void ToolBar::onMinimizeWindowButtonClicked()
+{
     auto *parent = dynamic_cast<QMainWindow *>(this->parent());
     parent->showMinimized();
 }
 
-void ToolBar::onMaximizeRestoreWindowButtonClicked() {
+void ToolBar::onMaximizeRestoreWindowButtonClicked()
+{
     updateMaxAndRestoreIconButton();
 }
 
-void ToolBar::updateMaxAndRestoreIconButton() {
-    QIcon maximizeIcon(ItoolsNS::getConfig().getWindow()->maximizeIcon);
-    QIcon restoreIcon(ItoolsNS::getConfig().getWindow()->restoreIcon);
+void ToolBar::updateMaxAndRestoreIconButton()
+{
+    QIcon maximizeIcon(Config::singleton().getWindow()->maximizeIcon);
+    QIcon restoreIcon(Config::singleton().getWindow()->restoreIcon);
 
     auto *parent = dynamic_cast<QMainWindow *>(this->parent());
-    if(parent != nullptr) {
+    if (parent != nullptr)
+    {
 
         const bool isMax = parent->isMaximized();
         // restore, maximize
-        if(!isMax) {
+        if (!isMax)
+        {
             maxRestoreBtn->setIcon(restoreIcon);
             parent->showMaximized();
-        } else {
+        }
+        else
+        {
             maxRestoreBtn->setIcon(maximizeIcon);
             parent->showNormal();
         }
     }
 }
 
-void ToolBar::configureLayout() {
+void ToolBar::configureLayout()
+{
     auto *toolBarGrid = new QGridLayout();
     this->setLayout(toolBarGrid);
 
@@ -104,7 +114,7 @@ void ToolBar::configureLayout() {
 
     auto *emptySpace2 = new QWidget();
     toolBarGrid->addWidget(emptySpace2, 0, 6, 1, 3);
-    toolBarGrid->addWidget(minimizeBtn, 0, 9, 1, 1);  // Span three columns
-    toolBarGrid->addWidget(maxRestoreBtn, 0, 10, 1, 1);  // Span three columns
-    toolBarGrid->addWidget(closeBtn, 0, 11, 1, 1);  // Span three columns
+    toolBarGrid->addWidget(minimizeBtn, 0, 9, 1, 1);    // Span three columns
+    toolBarGrid->addWidget(maxRestoreBtn, 0, 10, 1, 1); // Span three columns
+    toolBarGrid->addWidget(closeBtn, 0, 11, 1, 1);      // Span three columns
 }

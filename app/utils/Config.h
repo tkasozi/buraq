@@ -126,10 +126,11 @@ public:
 		return mainStyles.get();
 	}
 
-private:
-	Config();
 	// smart pointer tobe cleaned up
 	~Config();
+
+private:
+	Config();
 	Config(const Config &) = delete;			// No copy constructor
 	Config &operator=(const Config &) = delete; // No copy assignment
 

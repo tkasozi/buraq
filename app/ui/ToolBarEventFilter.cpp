@@ -9,26 +9,30 @@
 #include "app_ui/AppUi.h"
 #include "ToolBar.h"
 
-bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e) {
+bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e)
+{
 
     auto *toolBar = dynamic_cast<ToolBar *>(obj);
     auto *event = dynamic_cast<QMouseEvent *>(e);
 
-    if(toolBar == nullptr || event == nullptr) {
+    if (toolBar == nullptr || event == nullptr)
+    {
         return false; // Pass event to the object's normal handlers
     }
 
     auto *ui = dynamic_cast<AppUi *>(obj->parent());
     auto geo = toolBar->geometry();
 
-    switch(event->type()) {
+    switch (event->type())
+    {
     case QEvent::MouseButtonDblClick:
         toolBar->updateMaxAndRestoreIconButton();
 
         return true;
     case QEvent::MouseButtonPress:
 
-        if(event->button() == Qt::LeftButton) {
+        if (event->button() == Qt::LeftButton)
+        {
 
             isMouseBtnPressed = true;
             this->dragStartPos = event->pos();
@@ -38,8 +42,10 @@ bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e) {
 
         return false;
     case QEvent::MouseMove:
-        if(isMouseBtnPressed) {
-            if(ui->width() != ItoolsNS::getConfig().getWindow()->normalSize) {
+        if (isMouseBtnPressed)
+        {
+            if (ui->width() != Config::singleton().getWindow()->normalSize)
+            {
                 toolBar->updateMaxAndRestoreIconButton();
             }
 
@@ -47,7 +53,7 @@ bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e) {
 
             QPoint newPos = toolBar->pos() + pos - dragStartPos;
 
-            ui->setGeometry(newPos.x(), newPos.y(), ItoolsNS::getConfig().getWindow()->normalSize, geo.height());
+            ui->setGeometry(newPos.x(), newPos.y(), Config::singleton().getWindow()->normalSize, geo.height());
 
             return true;
         }
@@ -65,7 +71,8 @@ bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e) {
 
 ToolBarEventFilter::ToolBarEventFilter()
     : dragStartPos(0, 0),
-      isMouseBtnPressed(false) {
+      isMouseBtnPressed(false)
+{
 }
 
 ToolBarEventFilter::~ToolBarEventFilter() = default;

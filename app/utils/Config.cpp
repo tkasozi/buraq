@@ -42,23 +42,20 @@ Config &Config::singleton()
     static Config instance; // Created once, thread-safe since C++11
     if (!instance.isSetup)
     {
-        instance.loadConfig(&instance);
+        Config::loadConfig(&instance);
         instance.isSetup = true;
     }
     return instance;
 }
 
-Config::~Config()
-{
-    // No need to delete smart pointers, they will be automatically cleaned up.
-}
-
 void Config::loadConfig(Config *_this)
 {
     QFile file(":/config/main_config.xml");
-    if (!file.open(QIODevice::ReadOnly))
+	qDebug() << "Available resources /config:" << QDir(":/config").entryList();
+	qDebug() << "Available resources / :" << QDir(":/").entryList();
+	if (!file.open(QIODevice::ReadOnly))
     {
-        // Add this line to see all available resources at the root.
+		// Add this line to see all available resources at the root.
         qDebug() << "Available resources:" << QDir(":/config").entryList();
         exit(ErrorCode::ERROR_FILE_NOT_FOUND);
     }
@@ -201,34 +198,35 @@ void Config::processAppIconsAttr(const QDomElement &element)
     {
         QDomElement qDomElement = appIconsNodes.item(i).toElement();
         QString tagName = qDomElement.tagName();
+		const QString val = qDomElement.text();
 
         if (tagName == "settings")
         {
-            appIcons->settingsIcon = QIcon::fromTheme(qDomElement.text());
+            appIcons->settingsIcon = QIcon::fromTheme(val);
         }
         if (tagName == "folder")
         {
-            appIcons->folderIcon = QIcon::fromTheme(qDomElement.text());
+            appIcons->folderIcon = QIcon::fromTheme(val);
         }
         if (tagName == "terminal")
         {
-            appIcons->terminalIcon = QIcon::fromTheme(qDomElement.text());
+            appIcons->terminalIcon = QIcon::fromTheme(val);
         }
         if (tagName == "playCode")
         {
-            appIcons->playCode = QIcon::fromTheme(qDomElement.text());
+            appIcons->playCode = QIcon::fromTheme(val);
         }
         if (tagName == "execute")
         {
-            appIcons->executeIcon = QIcon::fromTheme(qDomElement.text());
+            appIcons->executeIcon = QIcon::fromTheme(val);
         }
         if (tagName == "executeSelected")
         {
-            appIcons->executeSelectedIcon = QIcon::fromTheme(qDomElement.text());
+            appIcons->executeSelectedIcon = QIcon::fromTheme(val);
         }
         if (tagName == "addFile")
         {
-            appIcons->addFileIcon = QIcon::fromTheme(qDomElement.text());
+            appIcons->addFileIcon = QIcon::fromTheme(val);
         }
     }
 }

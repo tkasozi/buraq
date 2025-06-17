@@ -28,7 +28,7 @@ message("***** NET_HOST_DLL: ${NET_HOST_DLL} *****")
 
 string(REPLACE "\\" "/" FRAMEWORK_LINK_DIR "${CMAKE_DOTNET_TARGET_FRAMEWORK}")
 
-if(EXISTS "${CMAKE_DOTNET_TARGET_FRAMEWORK}\\nethost.lib")
+if(EXISTS "${NET_HOST_DLL}")
     target_link_directories(PowershellExt PRIVATE "${FRAMEWORK_LINK_DIR}")
     target_link_libraries(PowershellExt PRIVATE nethost)
 else()

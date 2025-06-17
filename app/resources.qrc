@@ -38,7 +38,7 @@
 		<file>icons/dark/png/restore_icon.png</file>
 		<file>icons/dark/png/workflow.png</file>
 		<file>icons/workflow.ico</file>
-		<file>icons/dark/png/settings_icon.png</file>
+		<file alias="settings_icon">icons/dark/png/settings_icon.png</file>
 		<file>icons/dark/png/folder_icon.png</file>
 		<file>icons/dark/png/script_icon.png</file>
 		<file>icons/dark/png/terminal_icon.png</file>

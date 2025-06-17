@@ -103,7 +103,7 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent)
 
     centralWidgetLayout2->addWidget(centralWidgetControlPanelA, 0, 0, 1, 12, Qt::AlignJustify);
 
-    folderButton = std::make_unique<IconButton>(QIcon(Config::singleton().getAppIcons()->folderIcon));
+    folderButton = std::make_unique<IconButton>(Config::singleton().getAppIcons()->folderIcon);
 
     layoutA->addWidget(folderButton.get());
 
@@ -117,11 +117,15 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent)
 
     centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
 
-    auto outputButton = new IconButton(QIcon(Config::singleton().getAppIcons()->terminalIcon));
+    auto outputButton = new IconButton(Config::singleton().getAppIcons()->terminalIcon);
     connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
     layoutB->addWidget(outputButton);
 
-    auto *settingButton = new IconButton(QIcon(Config::singleton().getAppIcons()->settingsIcon));
+	auto gear_icon = QIcon(":/settings_icon");
+	if (gear_icon.isNull()) {
+		qDebug() << "Warning: 'settings' icon not found in theme or theme not configured.";
+	}
+		auto *settingButton = new IconButton(gear_icon);
     layoutB->addWidget(settingButton);
 
     // add to central widget
@@ -267,7 +271,7 @@ void AppUi::configureAppContext()
     std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
     // Add required plugins
     std::map<std::string, std::string> plugins_{
-        {"power_shell", searchPath.string() + "/plugins/ext/libPowershellExt.dll"}};
+        {"power_shell", searchPath.string() + "ext/libPowershellExt.dll"}};
 
     api_context = std::make_unique<IToolsApi>();
     api_context->searchPath = searchPath;

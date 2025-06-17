@@ -3,7 +3,6 @@
 #include <string>
 #include <iostream>
 // #include <tlhelp32.h> // For process checking (optional, better to use Handle)
-#include <filesystem> // C++17
 #include <QApplication>
 #include "../../include/IToolsAPI.h"
 

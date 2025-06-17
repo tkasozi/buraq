@@ -89,7 +89,7 @@ public:
 	 *
 	 * @return Config The singleton instance of the Config class.
 	 */
-	static Config singleton();
+	static Config &singleton();
 
 	[[nodiscard]] const QString &getTitle() const
 	{
@@ -125,12 +125,10 @@ public:
 	{
 		return mainStyles.get();
 	}
-
-	// smart pointer tobe cleaned up
-	~Config();
-
 private:
 	Config();
+	// smart pointer tobe cleaned up
+	~Config() = default;
 	Config(const Config &) = delete;			// No copy constructor
 	Config &operator=(const Config &) = delete; // No copy assignment
 

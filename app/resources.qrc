@@ -24,32 +24,37 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
 	<qresource prefix="/config">
-		<file alias="main_config.xml">main_config.xml</file>
+		<file alias="main_config">main_config.xml</file>
 	</qresource>
+    <qresource prefix="/icons">
+        <file alias="main_config">main_config.xml</file>
+        <file alias="index.theme">icons/dark/index.theme</file>
+        <file alias="close_icon">icons/dark/png/close_icon.png</file>
+        <file alias="home">icons/dark/png/home.png</file>
+        <file alias="maximize_icon">icons/dark/png/maximize_icon.png</file>
+        <file alias="maximize_icon">icons/dark/png/minimize_icon.png</file>
+        <file alias="restore_icon">icons/dark/png/restore_icon.png</file>
+        <file alias="workflow_png">icons/dark/png/workflow.png</file>
+        <file alias="workflow">icons/workflow.ico</file>
+        <file alias="settings_icon_png">icons/dark/png/settings_icon.png</file>
+        <file alias="settings_icon_bmp">icons/dark/png/settings_icon.bmp</file>
+        <file alias="folder_icon">icons/dark/png/folder_icon.png</file>
+        <file alias="script_icon">icons/dark/png/script_icon.png</file>
+        <file alias="terminal_icon">icons/dark/png/terminal_icon.png</file>
+        <file alias="play_filled_icon">icons/dark/png/play_filled_icon.png</file>
+        <file alias="play_filled_icon2">icons/dark/png/play_filled_icon2.png</file>
+        <file alias="play_filled_icon3">icons/dark/png/play_filled_icon3.png</file>
+        <file alias="create_new_icon">icons/dark/png/create_new_icon.png</file>
+
+        <file alias="home_svg">icons/dark/svg/home.svg</file>
+        <file alias="settings_svg">icons/dark/svg/settings.svg</file>
+        <file alias="workflow_svg">icons/dark/svg/workflow.svg</file>
+        <file alias="folder_icon_svg">icons/dark/svg/folder_icon.svg</file>
+    </qresource>
+
 	<qresource prefix="/">
 		<file>version.json</file>
 		<file>styles.qss</file>
 		<file>test/temp.ps1</file>
-		<file>icons/dark/index.theme</file>
-		<file>icons/dark/png/close_icon.png</file>
-		<file>icons/dark/png/home.png</file>
-		<file>icons/dark/png/maximize_icon.png</file>
-		<file>icons/dark/png/minimize_icon.png</file>
-		<file>icons/dark/png/restore_icon.png</file>
-		<file>icons/dark/png/workflow.png</file>
-		<file>icons/workflow.ico</file>
-		<file alias="settings_icon">icons/dark/png/settings_icon.png</file>
-		<file>icons/dark/png/folder_icon.png</file>
-		<file>icons/dark/png/script_icon.png</file>
-		<file>icons/dark/png/terminal_icon.png</file>
-		<file>icons/dark/png/play_filled_icon.png</file>
-		<file>icons/dark/png/play_filled_icon2.png</file>
-		<file>icons/dark/png/play_filled_icon3.png</file>
-		<file>icons/dark/png/create_new_icon.png</file>
-
-		<file>icons/dark/svg/home.svg</file>
-		<file>icons/dark/svg/settings.svg</file>
-		<file>icons/dark/svg/workflow.svg</file>
-		<file>icons/dark/svg/folder_icon.svg</file>
 	</qresource>
 </RCC>

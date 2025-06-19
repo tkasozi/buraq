@@ -11,9 +11,9 @@
         restoreIcon="restore_icon"
         closeIcon="close_icon" />
     <AppIcons>
-        <settings>settings_icon</settings>
-        <folder>script_icon</folder>
         <terminal>terminal_icon</terminal>
+        <settings>settings_icon</settings>
+        <folder>:/icons/script_icon</folder>
         <playCode>play_filled_icon</playCode>
         <execute>play_filled_icon2</execute>
         <executeSelected>play_filled_icon2</executeSelected>

@@ -34,7 +34,7 @@ void init_main_out_area(QPlainTextEdit *, QVBoxLayout *, int);
 OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi)
 {
 	setStyleSheet(
-		"background - color : #252525;"
+//		"background-color : #252525;"
 		"border:0px;");
 
 	auto layout = new QVBoxLayout(this);

@@ -1,11 +1,11 @@
-project(PowershellExt LANGUAGES CXX)
+project(powershell_plugin LANGUAGES CXX)
 
 set(MANAGED_LIBRARY_PUBLISH_DIR "${CMAKE_SOURCE_DIR}/ManagedLibrary/publish") # Path from dotnet publish -o
 
 # --- Define the shared library target ---
 # The first argument is the target name. CMake will automatically name the file
 # appropriately for the platform (e.g., my_cool_plugin.dll, libmy_cool_plugin.so, libmy_cool_plugin.dylib).
-add_library(PowershellExt SHARED
+add_library(${PROJECT_NAME} SHARED
     PowershellExt.cpp PowershellExt.h
 )
 
@@ -15,7 +15,7 @@ set(PLUGIN_SUBDIR "ext")
 set(PLUGIN_FULL_OUTPUT_DIR "${PLUGIN_BASE_OUTPUT_DIR}/${PLUGIN_SUBDIR}")
 
 # --- Include Directories ---
-target_include_directories(PowershellExt PUBLIC
+target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
     "${CMAKE_SOURCE_DIR}/include"
 )
@@ -29,8 +29,8 @@ message("***** NET_HOST_DLL: ${NET_HOST_DLL} *****")
 string(REPLACE "\\" "/" FRAMEWORK_LINK_DIR "${CMAKE_DOTNET_TARGET_FRAMEWORK}")
 
 if(EXISTS "${NET_HOST_DLL}")
-    target_link_directories(PowershellExt PRIVATE "${FRAMEWORK_LINK_DIR}")
-    target_link_libraries(PowershellExt PRIVATE nethost)
+    target_link_directories(${PROJECT_NAME} PRIVATE "${FRAMEWORK_LINK_DIR}")
+    target_link_libraries(${PROJECT_NAME} PRIVATE nethost)
 else()
     message(FATAL_ERROR "nethost.lib not found. Please check your .NET SDK installation.")
 endif()
@@ -38,7 +38,7 @@ endif()
 # Check if the library file exists
 foreach(NET_LIB nethost.lib nethost.dll)
     if(EXISTS "${FRAMEWORK_LINK_DIR}/${NET_LIB}")
-        # Link the nethost library to your PowershellExt target
+        # Link the nethost library to your ${PROJECT_NAME} target
         message("${FRAMEWORK_LINK_DIR}/${NET_LIB}")
 
         # --- DEPLOY MANAGED DEPENDENCIES ---
@@ -50,12 +50,11 @@ foreach(NET_LIB nethost.lib nethost.dll)
         # 2. Define the destination directory.
         #    Here, we DO use a generator expression correctly to get the output directory
         #    of your main target, and then we append the subdirectories.
-        set(MANAGED_DLL_DESTINATION "$<TARGET_FILE_DIR:PowershellExt>/ext")
-
+        set(MANAGED_DLL_DESTINATION "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
 
         # 3. Create the custom command to perform the copy after the build.
         add_custom_command(
-            TARGET PowershellExt POST_BUILD
+            TARGET ${PROJECT_NAME} POST_BUILD
 
             # First, create the destination directory to make sure it exists
             COMMAND ${CMAKE_COMMAND} -E make_directory "${MANAGED_DLL_DESTINATION}"
@@ -76,7 +75,7 @@ endforeach(NET_LIB)
 # On Windows, this ensures that the functions are exported from the DLL.
 # On other platforms (Linux, macOS), __attribute__((visibility("default"))) is typically used.
 if(WIN32)
-    target_compile_definitions(PowershellExt PRIVATE POWERSHELL_PLUGIN_EXPORTS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE POWERSHELL_PLUGIN_EXPORTS)
 endif()
 
 # Glob all files in the source assets directory
@@ -85,12 +84,12 @@ file(GLOB ASSET_FILES "${MANAGED_LIBRARY_PUBLISH_DIR}/*") # Gets files directly 
 foreach(ASSET_FILE ${ASSET_FILES})
     if(EXISTS "${FRAMEWORK_LINK_DIR}/${NET_LIB}")
 
-        set(MANAGED_DLL_DESTINATION "$<TARGET_FILE_DIR:PowershellExt>/ext/managed")
+        set(MANAGED_DLL_DESTINATION "$<TARGET_FILE_DIR:${PROJECT_NAME}>/managed")
 
 
         # 3. Create the custom command to perform the copy after the build.
         add_custom_command(
-            TARGET PowershellExt POST_BUILD
+            TARGET ${PROJECT_NAME} POST_BUILD
 
             # First, create the destination directory to make sure it exists
             COMMAND ${CMAKE_COMMAND} -E make_directory "${MANAGED_DLL_DESTINATION}"
@@ -109,7 +108,7 @@ endforeach()
 
 
 # On Windows, also place the PDB (Program Database for debugging) file alongside the DLL.
-set_target_properties(PowershellExt PROPERTIES
+set_target_properties(${PROJECT_NAME} PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${PLUGIN_FULL_OUTPUT_DIR}"
     LIBRARY_OUTPUT_DIRECTORY_RELEAS "${PLUGIN_FULL_OUTPUT_DIR}"
     LIBRARY_OUTPUT_DIRECTORY_DEBUG "${PLUGIN_FULL_OUTPUT_DIR}"

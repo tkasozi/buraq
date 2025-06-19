@@ -1,4 +1,5 @@
 {
+  "builtin-baseline": "4fc5d0252289d5dc22a422beff86344a6cb52414",
   "name": "it-tools-editor",
   "version-string": "1.0.1",
   "dependencies": [
@@ -20,6 +21,10 @@
     },
     {
       "name": "minizip"
+    },
+    {
+      "name": "qtsvg",
+      "version>=": "6.5.0"
     }
   ]
 }

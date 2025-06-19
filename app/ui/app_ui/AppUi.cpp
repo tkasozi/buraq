@@ -38,6 +38,10 @@
 
 #include <windows.h>
 #include <string>
+#include <QPushButton>
+#include <QSize>
+#include <QIcon>
+#include <QImageReader>
 
 #include "client/VersionRepository.h"
 #include "dialog/VersionUpdateDialog.h"
@@ -46,13 +50,13 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent)
 {
 
     // Other UI
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+//    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
     // This can be updated dynamically.
-    QIcon::setThemeName("dark");
+//    QIcon::setThemeName("dark");
 
     // overall bgColor
-    setStyleSheet("background-color: #232323;");
+//    setStyleSheet("background-color: #232323;");
 
     // setting up default window size
     const auto windowConfig = Config::singleton().getWindow();
@@ -121,12 +125,13 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent)
     connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
     layoutB->addWidget(outputButton);
 
-	auto gear_icon = QIcon(":/settings_icon");
+	qDebug() << "Supported image formats:" << QImageReader::supportedImageFormats();
+	QIcon gear_icon(":/icons/settings_svg");
 	if (gear_icon.isNull()) {
 		qDebug() << "Warning: 'settings' icon not found in theme or theme not configured.";
 	}
-		auto *settingButton = new IconButton(gear_icon);
-    layoutB->addWidget(settingButton);
+	auto settingsButton = new IconButton(gear_icon);
+	layoutB->addWidget(settingsButton);
 
     // add to central widget
     centralWidgetLayout->addWidget(centralWidgetControlPanel, 0, 0, 12, 1);
@@ -271,7 +276,7 @@ void AppUi::configureAppContext()
     std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
     // Add required plugins
     std::map<std::string, std::string> plugins_{
-        {"power_shell", searchPath.string() + "ext/libPowershellExt.dll"}};
+        {"power_shell", searchPath.string() + "/ext/powershell_plugin.dll"}};
 
     api_context = std::make_unique<IToolsApi>();
     api_context->searchPath = searchPath;

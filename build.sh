@@ -39,8 +39,6 @@ if [[ ! -n "${CI}" ]]; then
   popd
 fi
 
-CMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"
-
 # --- Configuration ---
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -78,10 +76,12 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
     --debug)
         BUILD_TYPE="Debug"
+        BUILD_DIR="${BUILD_DIR}-debug"
         shift
         ;;
     --release)
         BUILD_TYPE="Release"
+        BUILD_DIR="${BUILD_DIR}-release"
         shift
         ;; # Default, but explicit option
     --clean)
@@ -152,10 +152,13 @@ echo ""
 echo "--- Configuring CMake project (Build Type: ${BUILD_TYPE}) ---"
 # The -S option specifies the source directory.
 # The -B option specifies the build directory (created if it doesn't exist).
-#-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake
-"$CMAKE_EXE" -S "${SOURCE_DIR}" -B "${BUILD_DIR}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
- -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" -DMINGW_COMPILER_BIN_DIR="${MINGW_COMPILER_BIN_DIR}" \
- -G "MinGW Makefiles"
+"C:\Users\talik\AppData\Local\JetBrains\CLion 2023.3.2\bin\cmake\win\x64\bin\cmake.exe" -S "${SOURCE_DIR}"  -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
+ -DCMAKE_MAKE_PROGRAM="${CMAKE_MAKE_PROGRAM}" \
+ -G "MinGW Makefiles" -B "${BUILD_DIR}" \
+ -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}" \
+ -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
+ -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe \
+ -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe
 
 echo "CMake configuration complete."
 

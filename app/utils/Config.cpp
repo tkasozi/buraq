@@ -50,21 +50,18 @@ Config &Config::singleton()
 
 void Config::loadConfig(Config *_this)
 {
-    QFile file(":/config/main_config.xml");
-	qDebug() << "Available resources /config:" << QDir(":/config").entryList();
-	qDebug() << "Available resources / :" << QDir(":/").entryList();
-	if (!file.open(QIODevice::ReadOnly))
+    QFile config(":/icons/main_config");
+	if (!config.open(QIODevice::ReadOnly))
     {
 		// Add this line to see all available resources at the root.
-        qDebug() << "Available resources:" << QDir(":/config").entryList();
         exit(ErrorCode::ERROR_FILE_NOT_FOUND);
     }
 
     QDomDocument configDoc;
-    if (!configDoc.setContent(&file))
+    if (!configDoc.setContent(&config))
     {
-        file.close();
-        qDebug() << "Error parsing XML file.";
+        config.close();
+        qDebug() << "Error parsing XML config.";
         exit(ErrorCode::ERROR_INVALID_FORMAT);
     }
 
@@ -149,7 +146,7 @@ void Config::loadConfig(Config *_this)
         exit(ErrorCode::ERROR_INVALID_FORMAT);
     }
 
-    file.close();
+    config.close();
 }
 
 void Config::processWindowAttr(const QDomElement &element)

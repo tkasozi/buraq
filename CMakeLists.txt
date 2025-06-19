@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.27)
 
 project(MainProject)
 
+set(CMAKE_ROOT_PROJECT_POSTFIX it-tools-editor)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

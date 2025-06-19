@@ -49,7 +49,7 @@ namespace
 
 CustomDrawer::CustomDrawer(Editor *ptr) : editor(ptr), QWidget(ptr)
 {
-    setStyleSheet("background-color: #252525;");
+//    setStyleSheet("background-color: #252525;");
 
     setFixedWidth(DrawerMeasurements::width);
     setMaximumHeight(500);
@@ -62,7 +62,8 @@ CustomDrawer::CustomDrawer(Editor *ptr) : editor(ptr), QWidget(ptr)
     auto *panel = new QWidget;
     panel->setStyleSheet(
         "color: #C2C2C2;"
-        "background-color: #252525;");
+//        "background-color: #252525;"
+	);
 
     auto *layout = new QGridLayout;
     panel->setLayout(layout);

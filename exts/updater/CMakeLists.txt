@@ -11,8 +11,11 @@ find_package(Qt6 REQUIRED COMPONENTS
 
 find_package(unofficial-minizip CONFIG REQUIRED)
 
-set(UPDATER_RESOURCES ${CMAKE_SOURCE_DIR}/app/resources.qrc)
-set(UPDATER_SOURCES Updater.cpp ${UPDATER_RESOURCES}
+qt_standard_project_setup()
+# Add your .qrc file as a resource
+qt_add_resources(${PROJECT_NAME} RESOURCES ${CMAKE_SOURCE_DIR}/app/resources.qrc)
+
+set(UPDATER_SOURCES Updater.cpp # ${UPDATER_RESOURCES}
 		UpdaterProgressDialog.cpp
 		UpdaterProgressDialog.h
 		UpdateWorker.cpp
@@ -32,13 +35,13 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/pc
 # In your CMakeLists.txt, after add_executable(${PROJECT_NAME} ...)
 
 # Set linker options based on the compiler being used
-if (MSVC)
-	# For the Microsoft toolchain (link.exe), the flag is /lld
-	target_link_options(${PROJECT_NAME} PRIVATE "/lld")
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-	# For Clang toolchains, the flag is -fuse-ld=lld
-	target_link_options(${PROJECT_NAME} PRIVATE "-fuse-ld=lld")
-endif ()
+#if (MSVC)
+#	# For the Microsoft toolchain (link.exe), the flag is /lld
+#	target_link_options(${PROJECT_NAME} PRIVATE "/lld")
+#elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+#	# For Clang toolchains, the flag is -fuse-ld=lld
+#	target_link_options(${PROJECT_NAME} PRIVATE "-fuse-ld=lld")
+#endif ()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 		Qt6::Core

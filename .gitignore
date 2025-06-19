@@ -67,5 +67,6 @@ TestManagedApp/obj/
 
 vcpkg_installed/
 .fake
- cmake-build-debug-event-trace/
- cmake-build-debug-visual-studio/
+cmake-build-debug-event-trace/
+cmake-build-debug-visual-studio/
+cmake-build-release-visual-studio/

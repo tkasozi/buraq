@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 	// In the later release, save user's last dir/path
 	std::filesystem::current_path(ItoolsNS::get_user_home_directory());
 
-	const std::unique_ptr<AppUi> ui = std::make_unique<AppUi>(nullptr);
+	const auto ui = std::make_unique<AppUi>(nullptr);
 	ui->show();
 
 	return QApplication::exec();

@@ -2,7 +2,7 @@
 <configuration>
     <Title>ITools</Title>
     <Version>ITools v0.0.15</Version>
-    <AppLogo>workflow</AppLogo>
+    <AppLogo>:/icons/workflow</AppLogo>
     <window minWidth="800"
         minHeight="720"
         normalSize="1200"

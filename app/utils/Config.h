@@ -143,7 +143,7 @@ private:
 
 	void processAppIconsAttr(const QDomElement &element) const;
 
-	void processStyles(const QDomElement &element);
+	void processStyles(const QDomElement &element) const;
 
 	void processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct) const;
 

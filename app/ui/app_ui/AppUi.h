@@ -4,19 +4,9 @@
 #ifndef APP_UI_H
 #define APP_UI_H
 
-#include <QMainWindow>
-#include <QPushButton>
-#include <QLabel>
-#include <QObject>
-#include <QGridLayout>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QStatusBar>
-#include <QTextEdit>
-#include <QFile>
 
 #include "ToolBarEventFilter.h"
-#include "ToolButton.h"
 #include "CustomDrawer.h"
 #include "IconButton.h"
 #include "output_display/OutputDisplay.h"
@@ -29,14 +19,14 @@ class AppUi : public QMainWindow {
 Q_OBJECT
 
 public slots:
-	void processStatusSlot(const QString &, int timeout = 5000);
-	void processResultSlot(int exitCode, const QString &output, const QString &error);
+	void processStatusSlot(const QString &, int timeout = 5000) const;
+	void processResultSlot(int exitCode, const QString &output, const QString &error) const;
 
 private slots:
 
-	void onClicked();
+	void onClicked() const;
 
-	void onShowOutputButtonClicked();
+	void onShowOutputButtonClicked() const;
 
 	void onWindowFullyLoaded();
 
@@ -48,10 +38,10 @@ public:
 	// No manual delete, no manual nullptr.
 	~AppUi() override = default;
 
-	Editor *getEditor();
-	EditorMargin *getEditorMargin();
+	Editor *getEditor() const;
+	EditorMargin *getEditorMargin() const;
 
-	PluginManager *getLangPluginManager();
+	PluginManager *getLangPluginManager() const;
 
 	IToolsApi *get_api_context() { return api_context.get(); };
 private:

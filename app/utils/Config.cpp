@@ -25,8 +25,6 @@
 //
 
 #include <QFile>
-#include <QDomDocument>
-#include <QDebug>
 #include <QDir>
 
 #include <Config.h>
@@ -123,10 +121,9 @@ void Config::loadConfig(Config* _this)
         exit(ErrorCode::ERROR_INVALID_FORMAT);
     }
 
-    QDomNodeList appIconsList = root.elementsByTagName("AppIcons");
-    if (appIconsList.count() > 0)
+    if (const QDomNodeList appIconsList = root.elementsByTagName("AppIcons"); appIconsList.count() > 0)
     {
-        QDomElement appIconsElement = appIconsList.at(0).toElement();
+        const QDomElement appIconsElement = appIconsList.at(0).toElement();
         _this->processAppIconsAttr(appIconsElement);
     }
     else
@@ -135,10 +132,9 @@ void Config::loadConfig(Config* _this)
         exit(ErrorCode::ERROR_INVALID_FORMAT);
     }
 
-    QDomNodeList mainStylesList = root.elementsByTagName("Styles");
-    if (mainStylesList.count() > 0)
+    if (const QDomNodeList mainStylesList = root.elementsByTagName("Styles"); mainStylesList.count() > 0)
     {
-        QDomElement mainStylesElement = mainStylesList.at(0).toElement();
+        const QDomElement mainStylesElement = mainStylesList.at(0).toElement();
         _this->processStyles(mainStylesElement);
     }
     else
@@ -229,7 +225,7 @@ void Config::processAppIconsAttr(const QDomElement& element) const
     }
 }
 
-void Config::processStyles(const QDomElement& element)
+void Config::processStyles(const QDomElement& element) const
 {
     auto styleNodes = element.childNodes();
     QDomElement qDomCommonNode;

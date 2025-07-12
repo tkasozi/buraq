@@ -36,23 +36,12 @@
 
 #include <windows.h>
 #include <string>
-#include <QIcon>
 
 #include "client/VersionRepository.h"
 #include "dialog/VersionUpdateDialog.h"
 
-AppUi::AppUi(QWidget *parent) : QMainWindow(parent)
+AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 {
-
-    // Other UI
-//    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-
-    // This can be updated dynamically.
-//    QIcon::setThemeName("dark");
-
-    // overall bgColor
-//    setStyleSheet("background-color: #232323;");
-
     // setting up default window size
     const auto windowConfig = Config::singleton().getWindow();
     resize(windowConfig->normalSize, windowConfig->minHeight);
@@ -72,7 +61,7 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent)
     setWindowIcon(Config::singleton().getAppLogo());
 
     // Add CentralWidget
-    auto *centralWidget = new QWidget;
+    auto* centralWidget = new QWidget;
     setCentralWidget(centralWidget);
 
     // Add layout to centralWidget
@@ -82,21 +71,21 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent)
     centralWidget->setLayout(centralWidgetLayout.get());
 
     // Add control panel to the central widget.
-    auto *centralWidgetLayout2 = new QGridLayout;
+    auto* centralWidgetLayout2 = new QGridLayout;
     centralWidgetLayout2->setSpacing(0);
     centralWidgetLayout2->setContentsMargins(0, 0, 0, 0);
 
-    auto *centralWidgetControlPanel = new QWidget;
+    auto* centralWidgetControlPanel = new QWidget;
     centralWidgetControlPanel->setStyleSheet(Config::singleton().getMainStyles()->controlToolBar.styleSheet);
     centralWidgetControlPanel->setFixedWidth(64);
     centralWidgetControlPanel->setLayout(centralWidgetLayout2);
 
     // panel A
-    auto *layoutA = new QVBoxLayout;
+    auto* layoutA = new QVBoxLayout;
     layoutA->setSpacing(1);
     layoutA->setContentsMargins(0, 0, 0, 0);
 
-    auto *centralWidgetControlPanelA = new QWidget;
+    auto* centralWidgetControlPanelA = new QWidget;
     centralWidgetControlPanelA->setStyleSheet("border: none;");
     centralWidgetControlPanelA->setLayout(layoutA);
 
@@ -107,22 +96,21 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent)
     layoutA->addWidget(folderButton.get());
 
     // Good, to be placed in panel B
-    auto *layoutB = new QVBoxLayout;
+    auto* layoutB = new QVBoxLayout;
     layoutB->setSpacing(8);
 
-    auto *centralWidgetControlPanelB = new QWidget;
+    auto* centralWidgetControlPanelB = new QWidget;
     centralWidgetControlPanelB->setLayout(layoutB);
     centralWidgetControlPanelB->setContentsMargins(16, 0, 0, 8);
 
     centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
 
-    auto outputButton = new IconButton(Config::singleton().getAppIcons()->terminalIcon);
+    const auto outputButton = new IconButton(Config::singleton().getAppIcons()->terminalIcon);
     connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
     layoutB->addWidget(outputButton);
 
-	const QIcon gear_icon(":/icons/settings_icon_png");
-	const auto settingsButton = new IconButton(gear_icon);
-	layoutB->addWidget(settingsButton);
+    const auto settingsButton = new IconButton(Config::singleton().getAppIcons()->settingsIcon);
+    layoutB->addWidget(settingsButton);
 
     // add to central widget
     centralWidgetLayout->addWidget(centralWidgetControlPanel, 0, 0, 12, 1);
@@ -185,7 +173,7 @@ void AppUi::onWindowFullyLoaded()
 
         if (versionUpdater.exec() == QDialog::Accepted)
         {
-            std::filesystem::path zipFile = repo.downloadNewVersion();
+            const std::filesystem::path zipFile = repo.downloadNewVersion();
 
             launchUpdaterAndExit(
                 api_context->searchPath / "updater.exe",
@@ -200,7 +188,7 @@ void AppUi::onWindowFullyLoaded()
     }
 }
 
-void AppUi::onClicked()
+void AppUi::onClicked() const
 {
     drawer->toggle();
     if (drawer->isVisible())
@@ -213,7 +201,7 @@ void AppUi::onClicked()
     }
 }
 
-void AppUi::onShowOutputButtonClicked()
+void AppUi::onShowOutputButtonClicked() const
 {
     outPutArea->toggle();
     if (outPutArea->isVisible())
@@ -226,28 +214,27 @@ void AppUi::onShowOutputButtonClicked()
     }
 }
 
-Editor *AppUi::getEditor()
+Editor* AppUi::getEditor() const
 {
     return itoolsEditor.get();
 }
 
-PluginManager *AppUi::getLangPluginManager()
+PluginManager* AppUi::getLangPluginManager() const
 {
     return pluginManager.get();
 }
 
-void AppUi::processStatusSlot(const QString &message, const int timeout)
+void AppUi::processStatusSlot(const QString& message, const int timeout) const
 {
     statusBar->showMessage(message, timeout);
 }
 
-void AppUi::processResultSlot(int exitCode, const QString &output, const QString &error)
+void AppUi::processResultSlot(int exitCode, const QString& output, const QString& error) const
 {
     outPutArea->show();
 
     if (exitCode == 0)
     {
-
         outPutArea->log(output, error);
 
         processStatusSlot(error.isEmpty() ? "Completed!" : "Completed with errors.");
@@ -261,13 +248,15 @@ void AppUi::processResultSlot(int exitCode, const QString &output, const QString
 
 void AppUi::configureAppContext()
 {
-    std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "ITools"; // FIXME change the dirname
+    const std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "ITools";
+    // FIXME change the dirname
 
     // app search_path for plugins
-    std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
+    const std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
     // Add required plugins
-    std::map<std::string, std::string> plugins_{
-        {"power_shell", searchPath.string() + "/ext/libpowershell_plugin.dll"}};
+    const std::map<std::string, std::string> plugins_{
+        {"power_shell", searchPath.string() + "/ext/libpowershell_plugin.dll"}
+    };
 
     api_context = std::make_unique<IToolsApi>();
     api_context->searchPath = searchPath;
@@ -281,13 +270,13 @@ void AppUi::configureAppContext()
     pluginManager->loadPlugin("power_shell");
 }
 
-EditorMargin *AppUi::getEditorMargin()
+EditorMargin* AppUi::getEditorMargin() const
 {
     return editorMargin.get();
 }
 
-void AppUi::launchUpdaterAndExit(const std::filesystem::path &updaterPath, const std::filesystem::path &userPath,
-                                 const std::filesystem::path &installPath)
+void AppUi::launchUpdaterAndExit(const std::filesystem::path& updaterPath, const std::filesystem::path& userPath,
+                                 const std::filesystem::path& installPath)
 {
     // TODO incomplete package path, should be set to the actual package path.
     const std::filesystem::path packagePath = userPath / "";
@@ -303,16 +292,17 @@ void AppUi::launchUpdaterAndExit(const std::filesystem::path &updaterPath, const
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    if (CreateProcessA(NULL,                       // No module name (use command line)
+    if (CreateProcessA(NULL, // No module name (use command line)
                        (LPSTR)commandLine.c_str(), // Command line
-                       NULL,                       // Process handle not inheritable
-                       NULL,                       // Thread handle not inheritable
-                       FALSE,                      // Set handle inheritance to FALSE
-                       CREATE_NEW_CONSOLE,         // Give the updater its own console. Prevents from closing after the main app is closed.
-                       NULL,                       // Use parent's environment block
-                       NULL,                       // Use parent's starting directory
-                       &si,                        // Pointer to STARTUPINFO structure
-                       &pi)                        // Pointer to PROCESS_INFORMATION structure
+                       NULL, // Process handle not inheritable
+                       NULL, // Thread handle not inheritable
+                       FALSE, // Set handle inheritance to FALSE
+                       CREATE_NEW_CONSOLE,
+                       // Give the updater its own console. Prevents from closing after the main app is closed.
+                       NULL, // Use parent's environment block
+                       NULL, // Use parent's starting directory
+                       &si, // Pointer to STARTUPINFO structure
+                       &pi) // Pointer to PROCESS_INFORMATION structure
     )
     {
         CloseHandle(pi.hProcess);

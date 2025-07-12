@@ -47,10 +47,8 @@ namespace
     }
 }
 
-CustomDrawer::CustomDrawer(Editor *ptr) : editor(ptr), QWidget(ptr)
+CustomDrawer::CustomDrawer(Editor *editor) : QWidget(editor), editor(editor)
 {
-//    setStyleSheet("background-color: #252525;");
-
     setFixedWidth(DrawerMeasurements::width);
     setMaximumHeight(500);
 
@@ -59,25 +57,20 @@ CustomDrawer::CustomDrawer(Editor *ptr) : editor(ptr), QWidget(ptr)
     pLayout->setSpacing(8);
     pLayout->setContentsMargins(2, 4, 2, 4);
 
-    auto *panel = new QWidget;
-    panel->setStyleSheet(
-        "color: #C2C2C2;"
-//        "background-color: #252525;"
-	);
-
-    auto *layout = new QGridLayout;
-    panel->setLayout(layout);
+    const auto panel = std::make_unique<QWidget>();
+    const auto layout = std::make_unique<QGridLayout>();;
+    panel->setLayout(layout.get());
 
     addFile = std::make_unique<IconButton>(QIcon(Config::singleton().getAppIcons()->addFileIcon));
     connect(addFile.get(), &IconButton::clicked, this, &CustomDrawer::onAddButtonClicked);
 
-    auto label = new QLabel();
+    const auto label = std::make_unique<QLabel>();;
     label->setText("Workspace");
 
     layout->addWidget(addFile.get(), 0, 1, 12, 12, Qt::AlignmentFlag::AlignRight);
-    layout->addWidget(label, 0, 0, 12, 1);
+    layout->addWidget(label.get(), 0, 0, 12, 1);
 
-    pLayout->addWidget(panel, Qt::AlignmentFlag::AlignRight);
+    pLayout->addWidget(panel.get(), Qt::AlignmentFlag::AlignRight);
 
     // Read from the database and load all the files that were
     // previously opened.

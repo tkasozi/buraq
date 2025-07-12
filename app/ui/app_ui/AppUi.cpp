@@ -164,9 +164,7 @@ void AppUi::onWindowFullyLoaded()
     VersionUpdateDialog versionUpdater(this);
     VersionRepository repo(api_context.get());
 
-    UpdateInfo info = repo.main_version_logic();
-
-    if (!info.latestVersion.empty())
+    if (const UpdateInfo info = repo.main_version_logic(); !info.latestVersion.empty())
     {
         versionUpdater.setWindowTitle("A new version " + QString::fromStdString(info.latestVersion) + " is available!");
         versionUpdater.setContent(QString::fromStdString(info.releaseNotes));

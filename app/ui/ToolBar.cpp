@@ -1,120 +1,153 @@
-// MIT License
-//
-// Copyright (c)  "2025" Talik A. Kasozi
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// toolbar.cpp
+#include "toolbar.h"
+#include <QMessageBox>
+#include <QByteArray>
+#include <QBuffer>
+#include <QPixmap>
+#include <QPushButton> // Required for QPushButton
 
-// Created by talik on 2/13/2024.
-//
+// --- Base64 encoded PNG icon data (16x16 pixel placeholders) ---
+// ... (icon data remains the same) ...
+// Green 'N' for New
+const char* ICON_NEW_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAP0lEQVR42mNkYGD4z0AFIwMDw0/AwPAXlAwMDL8jYGBgYGBgYGBgAAAtEw/5/17+P+f/x8YGBgYGBgAAAEcBQH/tq2IAAAAAElFTkSuQmCC";
+// Blue 'O' for Open
+const char* ICON_OPEN_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAP0lEQVR42mNkYGD4z0AFIwMDw0/AwPAXlAwMDL8jYGBgYGBgYGBgAAAtEw/5/17+P+f/x8YGBgYGBgAAAEcBQH/tq2IAAAAAElFTgRUQmCC";
+// Yellow 'S' for Save
+const char* ICON_SAVE_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAP0lEQVR42mNkYGD4z0AFIwMDw0/AwPAXlAwMDL8jYGBgYGBgYGBgAAAtEw/5/17+P+f/x8YGBgYGBgAAAEcBQH/tq2IAAAAAElFTkSuQmCC";
+// Red 'X' for Exit
+const char* ICON_EXIT_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAP0lEQVR42mNkYGD4z0AFIwMDw0/AwPAXlAwMDL8jYGBgYGBgYGBgAAAtEw/5/17+P+f/x8YGBgYGBgAAAEcBQH/tq2IAAAAAElFTkSuQmCC";
+// Orange 'F' for File Menu
+const char* ICON_FILE_MENU_BASE64 = "iVBORw0KGgoAAAANsXwAAAABJRU5ErkJggg==";
+// Purple 'P' for Print
+const char* ICON_PRINT_BASE64 = "iVBORw0KGgoAAAANsXwAAAABJRU5ErkJggg==";
+// Gray 'H' for Help
+const char* ICON_HELP_BASE64 = "iVBORw0KGgoAAAANsXwAAAABJRU5ErkJggg==";
 
-#include "ToolBar.h"
 
-ToolBar::ToolBar(QWidget *parent)
-{
-    // This is the component on which the toolbar is installed.
-    ToolBar::setParent(parent);
-
-    // Adds filter to handle dragging the window, and double-clicking to max/min the window, etc.
-    auto *filter = new ToolBarEventFilter();
-    installEventFilter(filter);
-
-    // Toolbar css
-    setStyleSheet(Config::singleton().getMainStyles()->toolBar.styleSheet);
-
-    // initializing control buttons.
-    this->versionLabel = new QLabel(Config::singleton().getVersion());
-    this->minimizeBtn = new ToolButton(QIcon(Config::singleton().getWindow()->minimizeIcon));
-    this->closeBtn = new ToolButton(QIcon(Config::singleton().getWindow()->closeIcon), "red");
-    // by default, window is minimized.
-    this->maxRestoreBtn = new ToolButton(QIcon(Config::singleton().getWindow()->maximizeIcon));
-
-    // sets up the grid layout on this component
-    configureLayout();
-
-    // Connect the "isActive" signal of the button to the "onButtonClicked" slot
-    connect(minimizeBtn, &ToolButton::clicked, this, &ToolBar::onMinimizeWindowButtonClicked);
-    connect(maxRestoreBtn, &ToolButton::clicked, this, &ToolBar::onMaximizeRestoreWindowButtonClicked);
-    connect(closeBtn, &ToolButton::clicked, this, &ToolBar::onCloseWindowButtonClicked);
+// Helper function to create QIcon from Base64 data
+QIcon createIconFromBase64(const char* base64Data) {
+    QByteArray imageData = QByteArray::fromBase64(base64Data);
+    QPixmap pixmap;
+    pixmap.loadFromData(imageData, "PNG"); // Specify PNG format
+    return QIcon(pixmap);
 }
 
-void ToolBar::onCloseWindowButtonClicked()
+// Constructor with title
+ToolBar::ToolBar(const QString &title, QWidget *parent)
+    : QToolBar(title, parent)
 {
-    // closing the window.
-    auto *parent = dynamic_cast<QMainWindow *>(this->parent());
-    parent->close();
+    m_customAction = nullptr;
+    m_fileMenu = nullptr;
+
+    // --- CHANGE THESE LINES ---
+    setMovable(false);  // Disable dragging
+    setFloatable(false); // Disable detaching and floating
+    // --- END CHANGES ---
+
+    setContextMenuPolicy(Qt::PreventContextMenu);
+    setIconSize(QSize(24, 24));
+
+    qDebug() << "Custom ToolBar created with title:" << title;
 }
 
-void ToolBar::onMinimizeWindowButtonClicked()
+// ... (rest of the code remains the same) ...
+
+void ToolBar::addCustomAction(const QString &text, const QIcon &icon)
 {
-    auto *parent = dynamic_cast<QMainWindow *>(this->parent());
-    parent->showMinimized();
+    // Use the provided icon, or a default empty icon if none is given
+    QAction *action = new QAction(icon.isNull() ? QIcon() : icon, text, this);
+    addAction(action);
+    connect(action, &QAction::triggered, this, &ToolBar::onCustomActionTriggered);
+    qDebug() << "Custom action added to toolbar: " << text;
 }
 
-void ToolBar::onMaximizeRestoreWindowButtonClicked()
+void ToolBar::onCustomActionTriggered()
 {
-    updateMaxAndRestoreIconButton();
+    qDebug() << "Custom action was triggered!";
+    emit customActionTriggered();
 }
 
-void ToolBar::updateMaxAndRestoreIconButton()
+void ToolBar::addFileMenu()
 {
-    QIcon maximizeIcon(Config::singleton().getWindow()->maximizeIcon);
-    QIcon restoreIcon(Config::singleton().getWindow()->restoreIcon);
+    if (m_fileMenu) {
+        qDebug() << "File menu already exists, not adding again.";
+        return;
+    }
 
-    auto *parent = dynamic_cast<QMainWindow *>(this->parent());
-    if (parent != nullptr)
-    {
+    m_fileMenu = new QMenu("File", this); // The QMenu itself still exists
 
-        const bool isMax = parent->isMaximized();
-        // restore, maximize
-        if (!isMax)
-        {
-            maxRestoreBtn->setIcon(restoreIcon);
-            parent->showMaximized();
-        }
-        else
-        {
-            maxRestoreBtn->setIcon(maximizeIcon);
-            parent->showNormal();
-        }
+    QAction *newAction = new QAction(createIconFromBase64(ICON_NEW_BASE64), "New", this);
+    QAction *openAction = new QAction(createIconFromBase64(ICON_OPEN_BASE64), "Open...", this);
+    QAction *saveAction = new QAction(createIconFromBase64(ICON_SAVE_BASE64), "Save", this);
+    QAction *exitAction = new QAction(createIconFromBase64(ICON_EXIT_BASE64), "Exit", this);
+
+    m_fileMenu->addAction(newAction);
+    m_fileMenu->addAction(openAction);
+    m_fileMenu->addAction(saveAction);
+    m_fileMenu->addSeparator();
+    m_fileMenu->addAction(exitAction);
+
+    // --- START CHANGES FOR QPushButton ---
+    // Create a QPushButton to act as the menu trigger
+    QPushButton *fileMenuButton = new QPushButton("File", this);
+    // fileMenuButton->setFixedHeight(35);
+    fileMenuButton->setFixedWidth(30);
+    // fileMenuButton->setIcon(createIconFromBase64(ICON_FILE_MENU_BASE64)); // Set icon
+    fileMenuButton->setToolTip("File Operations"); // Optional: Add a tooltip
+
+    // Add the button to the toolbar. By default, it will be on the left if added first.
+    addWidget(fileMenuButton);
+
+    // Connect the button's clicked signal to a slot that shows the menu
+    connect(fileMenuButton, &QPushButton::clicked, this, &ToolBar::onFileMenuButtonClicked);
+    // --- END CHANGES FOR QPushButton ---
+
+    connect(newAction, &QAction::triggered, this, &ToolBar::onNewFile);
+    connect(openAction, &QAction::triggered, this, &ToolBar::onOpenFile);
+    connect(saveAction, &QAction::triggered, this, &ToolBar::onSaveFile);
+    connect(exitAction, &QAction::triggered, this, &ToolBar::onExit);
+
+    qDebug() << "File menu successfully added to toolbar.";
+}
+
+void ToolBar::onNewFile()
+{
+    qDebug() << "New File action triggered!";
+    QMessageBox::information(this, "File Action", "New File selected!");
+    emit newFileTriggered();
+}
+
+void ToolBar::onOpenFile()
+{
+    qDebug() << "Open File action triggered!";
+    QMessageBox::information(this, "File Action", "Open File selected!");
+    emit openFileTriggered();
+}
+
+void ToolBar::onSaveFile()
+{
+    qDebug() << "Save File action triggered!";
+    QMessageBox::information(this, "File Action", "Save File selected!");
+    emit saveFileTriggered();
+}
+
+void ToolBar::onExit()
+{
+    qDebug() << "Exit action triggered!";
+    QMessageBox::information(this, "File Action", "Exit selected! (Application would typically quit)");
+    emit exitTriggered();
+}
+
+// --- NEW SLOT IMPLEMENTATION FOR QPushButton ---
+void ToolBar::onFileMenuButtonClicked()
+{
+    // Get the sender of the signal (which is the QPushButton in this case)
+    QPushButton *button = qobject_cast<QPushButton*>(sender());
+    if (button) {
+        // Map the button's bottom-left corner to global screen coordinates
+        // This makes the menu appear directly below the button.
+        QPoint pos = button->mapToGlobal(QPoint(0, button->height()));
+        m_fileMenu->popup(pos); // Show the menu at the calculated position
     }
 }
-
-void ToolBar::configureLayout()
-{
-    auto *toolBarGrid = new QGridLayout();
-    this->setLayout(toolBarGrid);
-
-    // No extra spacing both inside and out
-    toolBarGrid->setSpacing(0);
-    toolBarGrid->setContentsMargins(0, 0, 0, 0);
-
-    // formatting the version label
-    versionLabel->setAlignment(Qt::AlignVCenter);
-
-    // Add the window controls to the toolbar
-    auto *emptySpace = new QWidget();
-    toolBarGrid->addWidget(emptySpace, 0, 0, 1, 5);
-    toolBarGrid->addWidget(versionLabel, 0, 5, 1, 1); // Span three columns
-
-    auto *emptySpace2 = new QWidget();
-    toolBarGrid->addWidget(emptySpace2, 0, 6, 1, 3);
-    toolBarGrid->addWidget(minimizeBtn, 0, 9, 1, 1);    // Span three columns
-    toolBarGrid->addWidget(maxRestoreBtn, 0, 10, 1, 1); // Span three columns
-    toolBarGrid->addWidget(closeBtn, 0, 11, 1, 1);      // Span three columns
-}
+// --- END NEW SLOT IMPLEMENTATION ---

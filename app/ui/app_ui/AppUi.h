@@ -14,8 +14,7 @@
 #include "PluginManager.h"
 #include "EditorMargin.h"
 
-
-class AppUi : public QMainWindow {
+class AppUi final : public QMainWindow {
 Q_OBJECT
 
 public slots:
@@ -43,7 +42,7 @@ public:
 
 	PluginManager *getLangPluginManager() const;
 
-	IToolsApi *get_api_context() { return api_context.get(); };
+	IToolsApi *get_api_context() const { return api_context.get(); };
 private:
 	std::unique_ptr<PluginManager> pluginManager;
 	std::unique_ptr<CustomDrawer> drawer;

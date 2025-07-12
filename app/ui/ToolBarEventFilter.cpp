@@ -26,7 +26,7 @@ bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e)
     switch (event->type())
     {
     case QEvent::MouseButtonDblClick:
-        toolBar->updateMaxAndRestoreIconButton();
+        // toolBar->updateMaxAndRestoreIconButton();
 
         return true;
     case QEvent::MouseButtonPress:
@@ -46,7 +46,7 @@ bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e)
         {
             if (ui->width() != Config::singleton().getWindow()->normalSize)
             {
-                toolBar->updateMaxAndRestoreIconButton();
+                // toolBar->updateMaxAndRestoreIconButton();
             }
 
             auto pos = event->globalPosition().toPoint();

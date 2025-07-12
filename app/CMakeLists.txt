@@ -90,6 +90,8 @@ set(ITOOLS_HEADERS
         client/VersionRepository.h
         ui/dialog/VersionUpdateDialog.cpp
         ui/dialog/VersionUpdateDialog.h
+        ../include/theme_manager.h
+        ../include/theme_manager.cpp
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)

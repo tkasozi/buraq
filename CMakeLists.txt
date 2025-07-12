@@ -25,7 +25,7 @@ add_subdirectory(exts)
 
 # This command takes the template file and creates the final qt.conf
 # in the same directory as your ITools.exe
-#configure_file(
-#    "${CMAKE_SOURCE_DIR}/qt.conf.in"
-#    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qt.conf"
-#)
+configure_file(
+    "${CMAKE_SOURCE_DIR}/qt.conf.in"
+    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qt.conf"
+)

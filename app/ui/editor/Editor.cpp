@@ -54,7 +54,7 @@ Editor::Editor(QWidget *ptr) : QPlainTextEdit(nullptr), appUi(ptr) {
 		QFile file(":/test/temp.ps1");
 		file.open(QFile::OpenModeFlag::ReadOnly);
 
-		QString fileContent = QString::fromLatin1(file.readAll());
+		const QString fileContent = QString::fromLatin1(file.readAll());
 		setPlaceholderText(fileContent);
 
 		file.close();
@@ -63,16 +63,14 @@ Editor::Editor(QWidget *ptr) : QPlainTextEdit(nullptr), appUi(ptr) {
 	// Setup communication btn Widgets
 	setupSignals();
 
-	setStyleSheet(QString(EDITOR_STYLES));
-
 	// Get the current palette
-	QPalette palette = QPlainTextEdit::palette();
+	const QPalette palette = QPlainTextEdit::palette();
 
 	// Set the color for the background of the selection
-	palette.setColor(QPalette::Highlight, QColor(0, 120, 215)); // A common blue selection background
+	// palette.setColor(QPalette::Highlight, QColor(0, 120, 215)); // A common blue selection background
 
 	// Apply the modified palette back to the widget
-	setPalette(palette);
+	// setPalette(palette);
 }
 
 void Editor::highlightCurrentLine() {
@@ -81,7 +79,7 @@ void Editor::highlightCurrentLine() {
 	if (!isReadOnly()) {
 		QTextEdit::ExtraSelection selection;
 
-		QColor lineColor = QColor(Qt::lightGray).lighter(25);
+		const QColor lineColor = QColor(Qt::lightGray).lighter(25);
 
 		selection.format.setBackground(lineColor);
 		selection.format.setProperty(QTextFormat::FullWidthSelection, true);

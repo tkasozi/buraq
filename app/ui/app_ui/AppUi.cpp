@@ -49,6 +49,9 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 
     // Add Tool bar
     toolBar = std::make_unique<ToolBar>(this);
+    // Add the File menu first
+    toolBar->addFileMenu();
+
     setMenuWidget(toolBar.get());
 
     // Add Status bar
@@ -57,7 +60,7 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     setStatusBar(statusBar.get());
 
     // Setting window title and docking icon
-    setWindowTitle(Config::singleton().getTitle());
+    setWindowTitle(Config::singleton().getVersion());
     setWindowIcon(Config::singleton().getAppLogo());
 
     // Add CentralWidget

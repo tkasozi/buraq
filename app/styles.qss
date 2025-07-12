@@ -1,0 +1,164 @@
+
+/* General styles */
+QWidget {
+  font-family: "Open Sans", Arial, sans-serif, serif, monospace;
+  font-size: 14px;
+  line-height: 1.5; /* One and a half times the font size */
+}
+
+QPlainTextEdit {
+    font-size: 16px;
+    /* Add padding so text doesn't touch the scrollbar directly if scrollbar is inside */
+	font-family: Consolas, Courier New, monospace;
+	height: 100vh;
+	width: 100%;
+	padding: 0px;
+}
+
+
+QWidget br {
+    display: none;
+}
+
+ /* Style for vertical scrollbars */
+        QScrollBar:vertical {
+            width: 15px;         /* Width of the vertical scrollbar */
+            margin: 0px 0px 0px 0px; /* Top, Right, Bottom, Left margins */
+        }
+        QScrollBar::handle:vertical {
+            min-height: 20px;    /* Minimum height of the handle */
+            border-radius: 7px;  /* Rounded corners for the handle */
+        }
+        QScrollBar::handle:vertical:hover {
+        }
+        QScrollBar::add-line:vertical { /* Up arrow button */
+            height: 14px;
+            subcontrol-position: bottom;
+            subcontrol-origin: margin;
+        }
+        QScrollBar::sub-line:vertical { /* Down arrow button */
+            height: 14px;
+            subcontrol-position: top;
+            subcontrol-origin: margin;
+        }
+        /* You can use an image for the arrows: */
+        /*
+        QScrollBar::up-arrow:vertical {
+            image: url(:/icons/up_arrow.png);
+        }
+        QScrollBar::down-arrow:vertical {
+            image: url(:/icons/down_arrow.png);
+        }
+        */
+        QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+            background: none; /* Area between handle and arrows */
+        }
+
+/* Style for horizontal scrollbars */
+QScrollBar:horizontal {
+    height: 15px;            /* Thickness of the horizontal scrollbar */
+    margin: 0px 0px 0px 0px; /* No margins around the scrollbar itself */
+    border: none;            /* Optional: remove any default border on the scrollbar track */
+}
+
+QScrollBar::handle:horizontal {
+    min-width: 20px;         /* Minimum length of the handle */
+    border-radius: 5px;      /* Rounded corners (radius <= height/2) */
+}
+
+QScrollBar::handle:horizontal:hover {
+}
+
+/* Left arrow button */
+QScrollBar::sub-line:horizontal {
+    width: 15px;             /* Width of the button area */
+    height: 15px;            /* Height of the button area, matching scrollbar thickness */
+    subcontrol-position: left;
+    subcontrol-origin: margin; /* Or border/padding depending on desired spacing */
+    border: none;            /* Remove button border */
+}
+
+/* Right arrow button */
+QScrollBar::add-line:horizontal {
+    width: 15px;             /* Width of the button area */
+    height: 15px;            /* Height of the button area */
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+    border: none;            /* Remove button border */
+}
+
+
+/* Area on the track not covered by the handle or buttons */
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none; /* Makes these parts of the track transparent or use the QScrollBar:horizontal background */
+}
+
+/* General styling for both buttons - can be applied to the parent dialog or QApplication */
+/* Or, if you only want to style these specific buttons, incorporate into their specific rules */
+
+/* Primary Action Button: "Update" */
+QPushButton#updateButton {
+    border: 1px solid #4A90E2; /* Same as background or slightly darker for depth */
+    padding: 8px 16px; /* Adjust padding as needed for your text */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 14px; /* Adjust as needed */
+    font-weight: bold;
+}
+
+QPushButton#updateButton:hover {
+}
+
+QPushButton#updateButton:pressed {
+}
+
+QPushButton#updateButton:disabled {
+    background-color: #787878;
+    color: #A0A0A0;
+    border-color: #787878;
+}
+
+
+/* Secondary Action Button: "Later" */
+QPushButton#laterButton {
+    border: 1px solid #656565; /* Subtle border */
+    padding: 8px 16px; /* Consistent padding */
+    border-radius: 4px; /* Consistent rounded corners */
+    font-size: 14px; /* Consistent font size */
+    font-weight: normal; /* Normal weight to be less emphasized than Update */
+}
+
+QPushButton#laterButton:hover {
+}
+
+QPushButton#laterButton:pressed {
+}
+
+QPushButton#laterButton:disabled {
+    background-color: #404040;
+    color: #808080;
+    border-color: #404040;
+}
+
+/* General styling for both buttons - can be applied to the parent dialog or QApplication */
+/* Or, if you only want to style these specific buttons, incorporate into their specific rules */
+
+/* Primary Action Button: "Update" */
+QPushButton#updateButton {
+    border: 1px solid #4A90E2; /* Same as background or slightly darker for depth */
+    padding: 8px 16px; /* Adjust padding as needed for your text */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 14px; /* Adjust as needed */
+    font-weight: bold;
+}
+
+QPushButton#updateButton:hover {
+}
+
+QPushButton#updateButton:pressed {
+}
+
+QPushButton#updateButton:disabled {
+    background-color: #787878;
+    color: #A0A0A0;
+    border-color: #787878;
+}

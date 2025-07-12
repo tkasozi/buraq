@@ -36,6 +36,7 @@
         <file alias="restore_icon">icons/dark/png/restore_icon.png</file>
         <file alias="workflow_png">icons/dark/png/workflow.png</file>
         <file alias="workflow">icons/workflow.ico</file>
+        <file alias="settings_icon_ico">icons/settings_icon.ico</file>
         <file alias="settings_icon_png">icons/dark/png/settings_icon.png</file>
         <file alias="settings_icon_bmp">icons/dark/png/settings_icon.bmp</file>
         <file alias="folder_icon">icons/dark/png/folder_icon.png</file>
@@ -55,6 +56,8 @@
 	<qresource prefix="/">
 		<file>version.json</file>
 		<file>styles.qss</file>
+		<file>dark_theme.qss</file>
+		<file>light_theme.qss</file>
 		<file>test/temp.ps1</file>
 	</qresource>
 </RCC>

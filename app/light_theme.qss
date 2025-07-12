@@ -1,0 +1,17 @@
+/* light_theme.qss */
+QMainWindow, QWidget {
+    background-color: #F0F0F0; /* Light gray */
+    color: #333333;            /* Dark text */
+}
+QPushButton {
+    background-color: #E0E0E0;
+    color: #333333;
+    border: 1px solid #BBBBBB;
+}
+QPlainTextEdit {
+    background-color: #FFFFFF; /* White for editor */
+    color: #000000;            /* Black text */
+    selection-background-color: #ADD6FF; /* Light blue */
+    border: 1px solid #CCCCCC;
+}
+/* ... other light theme styles ... */

@@ -32,7 +32,7 @@
         <file alias="close_icon">icons/dark/png/close_icon.png</file>
         <file alias="home">icons/dark/png/home.png</file>
         <file alias="maximize_icon">icons/dark/png/maximize_icon.png</file>
-        <file alias="maximize_icon">icons/dark/png/minimize_icon.png</file>
+        <file alias="minimize_icon">icons/dark/png/minimize_icon.png</file>
         <file alias="restore_icon">icons/dark/png/restore_icon.png</file>
         <file alias="workflow_png">icons/dark/png/workflow.png</file>
         <file alias="workflow">icons/workflow.ico</file>

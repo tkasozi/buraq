@@ -9,4 +9,6 @@ See https://tkasozi.github.io/ITools/
 ./vcpkg install boost-property-tree:x64-windows
  ./vcpkg install qtbase:x64-windows
 
- windeployqt --basedir "C:\vcpkg\installed\x64-windows\tools\qt6" --debug --no-translations --no-opengl-sw ITools.exe
+### Navigate to your project's root directory (where vcpkg.json is) and run:
+
+vcpkg install --triplet=x64-mingw-dynamic --host-triplet=x64-mingw-dynamic

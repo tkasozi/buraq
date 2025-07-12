@@ -34,11 +34,12 @@
 
 Config::Config() : mainStyles(new MainStyles),
                    windowConfig(new WindowConfig),
-                   appIcons(new AppIcons) {}
-
-Config &Config::singleton()
+                   appIcons(new AppIcons)
 {
+}
 
+Config& Config::singleton()
+{
     static Config instance; // Created once, thread-safe since C++11
     if (!instance.isSetup)
     {
@@ -48,12 +49,12 @@ Config &Config::singleton()
     return instance;
 }
 
-void Config::loadConfig(Config *_this)
+void Config::loadConfig(Config* _this)
 {
     QFile config(":/icons/main_config");
-	if (!config.open(QIODevice::ReadOnly))
+    if (!config.open(QIODevice::ReadOnly))
     {
-		// Add this line to see all available resources at the root.
+        // Add this line to see all available resources at the root.
         exit(ErrorCode::ERROR_FILE_NOT_FOUND);
     }
 
@@ -149,7 +150,7 @@ void Config::loadConfig(Config *_this)
     config.close();
 }
 
-void Config::processWindowAttr(const QDomElement &element)
+void Config::processWindowAttr(const QDomElement& element) const
 {
     // element.attributes().item(1).nodeValue()
     for (int i = 0; i < element.attributes().size(); ++i)
@@ -161,41 +162,41 @@ void Config::processWindowAttr(const QDomElement &element)
         {
             windowConfig->minWidth = attrValue.toInt();
         }
-        if (attrName == "minHeight")
+        else if (attrName == "minHeight")
         {
             windowConfig->minHeight = attrValue.toInt();
         }
-        if (attrName == "normalSize")
+        else if (attrName == "normalSize")
         {
             windowConfig->normalSize = attrValue.toInt();
         }
-        if (attrName == "minimizeIcon")
+        else if (attrName == "minimizeIcon")
         {
             windowConfig->minimizeIcon = QIcon::fromTheme(attrValue);
         }
-        if (attrName == "maximizeIcon")
+        else if (attrName == "maximizeIcon")
         {
             windowConfig->maximizeIcon = QIcon::fromTheme(attrValue);
         }
-        if (attrName == "restoreIcon")
+        else if (attrName == "restoreIcon")
         {
             windowConfig->restoreIcon = QIcon::fromTheme(attrValue);
         }
-        if (attrName == "closeIcon")
+        else if (attrName == "closeIcon")
         {
             windowConfig->closeIcon = QIcon::fromTheme(attrValue);
         }
     }
 }
 
-void Config::processAppIconsAttr(const QDomElement &element)
+void Config::processAppIconsAttr(const QDomElement& element) const
 {
     auto appIconsNodes = element.childNodes();
     for (int i = 0; i < appIconsNodes.size(); ++i)
     {
         QDomElement qDomElement = appIconsNodes.item(i).toElement();
         QString tagName = qDomElement.tagName();
-		const QString val = qDomElement.text();
+        const QString val = qDomElement.text();
 
         if (tagName == "settings")
         {
@@ -228,7 +229,7 @@ void Config::processAppIconsAttr(const QDomElement &element)
     }
 }
 
-void Config::processStyles(const QDomElement &element)
+void Config::processStyles(const QDomElement& element)
 {
     auto styleNodes = element.childNodes();
     QDomElement qDomCommonNode;
@@ -267,7 +268,7 @@ void Config::processStyles(const QDomElement &element)
     }
 }
 
-void Config::processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct)
+void Config::processStyleBlock(QDomElement& element, StyleSheetStruct& aStruct) const
 {
     // includes styles
     if (element.hasAttribute("inherits") && element.attributes().item(0).nodeValue() == "commonStyle")
@@ -312,6 +313,7 @@ void Config::processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct)
             aStruct.height = QString("height:" + temp.text() + ";");
         }
 
-        aStruct.styleSheet = aStruct.backgroundColor + aStruct.padding + aStruct.color + aStruct.border + aStruct.height + aStruct.borderColor + aStruct.borderBottom;
+        aStruct.styleSheet = aStruct.backgroundColor + aStruct.padding + aStruct.color + aStruct.border + aStruct.height
+            + aStruct.borderColor + aStruct.borderBottom;
     }
 }

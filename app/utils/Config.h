@@ -51,7 +51,6 @@ struct AppIcons
 	QIcon executeSelectedIcon;
 	QIcon addFileIcon;
 };
-
 struct StyleSheetStruct
 {
 	QString color = QString("");
@@ -67,7 +66,6 @@ struct StyleSheetStruct
 	 */
 	QString styleSheet;
 };
-
 struct MainStyles
 {
 	StyleSheetStruct commonStyle;
@@ -141,13 +139,13 @@ private:
 	std::unique_ptr<AppIcons> appIcons;
 	std::unique_ptr<MainStyles> mainStyles;
 
-	void processWindowAttr(const QDomElement &);
+	void processWindowAttr(const QDomElement &) const;
 
-	void processAppIconsAttr(const QDomElement &element);
+	void processAppIconsAttr(const QDomElement &element) const;
 
 	void processStyles(const QDomElement &element);
 
-	void processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct);
+	void processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct) const;
 
 	static void loadConfig(Config *_thi);
 };

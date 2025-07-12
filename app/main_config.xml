@@ -6,18 +6,18 @@
     <window minWidth="800"
         minHeight="720"
         normalSize="1200"
-        minimizeIcon="minimize_icon"
-        maximizeIcon="maximize_icon"
-        restoreIcon="restore_icon"
-        closeIcon="close_icon" />
+        minimizeIcon=":/icons/minimize_icon"
+        maximizeIcon=":/icons/maximize_icon"
+        restoreIcon=":/icons/restore_icon"
+        closeIcon=":/icons/close_icon" />
     <AppIcons>
-        <terminal>terminal_icon</terminal>
-        <settings>settings_icon</settings>
+        <terminal>:/icons/terminal_icon</terminal>
+        <settings>:/icons/settings_icon</settings>
         <folder>:/icons/script_icon</folder>
-        <playCode>play_filled_icon</playCode>
-        <execute>play_filled_icon2</execute>
-        <executeSelected>play_filled_icon2</executeSelected>
-        <addFile>create_new_icon</addFile>
+        <playCode>:/icons/play_filled_icon</playCode>
+        <execute>:/icons/play_filled_icon2</execute>
+        <executeSelected>:/icons/play_filled_icon2</executeSelected>
+        <addFile>:/icons/create_new_icon</addFile>
     </AppIcons>
     <Styles>
         <commonStyle>

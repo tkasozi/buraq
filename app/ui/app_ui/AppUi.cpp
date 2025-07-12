@@ -30,18 +30,13 @@
 #include "editor/Editor.h"
 #include "CustomDrawer.h"
 #include "EditorMargin.h"
-#include <sstream>
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include <QCoreApplication>
 #include <map>
-#include <QtSql>
 
 #include <windows.h>
 #include <string>
-#include <QPushButton>
-#include <QSize>
 #include <QIcon>
-#include <QImageReader>
 
 #include "client/VersionRepository.h"
 #include "dialog/VersionUpdateDialog.h"
@@ -125,12 +120,8 @@ AppUi::AppUi(QWidget *parent) : QMainWindow(parent)
     connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
     layoutB->addWidget(outputButton);
 
-	qDebug() << "Supported image formats:" << QImageReader::supportedImageFormats();
-	QIcon gear_icon(":/icons/settings_svg");
-	if (gear_icon.isNull()) {
-		qDebug() << "Warning: 'settings' icon not found in theme or theme not configured.";
-	}
-	auto settingsButton = new IconButton(gear_icon);
+	const QIcon gear_icon(":/icons/settings_icon_png");
+	const auto settingsButton = new IconButton(gear_icon);
 	layoutB->addWidget(settingsButton);
 
     // add to central widget
@@ -270,13 +261,13 @@ void AppUi::processResultSlot(int exitCode, const QString &output, const QString
 
 void AppUi::configureAppContext()
 {
-    std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "ITools";
+    std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "ITools"; // FIXME change the dirname
 
     // app search_path for plugins
     std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
     // Add required plugins
     std::map<std::string, std::string> plugins_{
-        {"power_shell", searchPath.string() + "/ext/powershell_plugin.dll"}};
+        {"power_shell", searchPath.string() + "/ext/libpowershell_plugin.dll"}};
 
     api_context = std::make_unique<IToolsApi>();
     api_context->searchPath = searchPath;

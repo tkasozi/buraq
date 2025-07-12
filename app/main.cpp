@@ -17,23 +17,23 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 
 	// Create a custom palette
-	QPalette darkPalette;
-	darkPalette.setColor(QPalette::Window, QColor(53, 53, 53)); // Background of windows
-	darkPalette.setColor(QPalette::WindowText, Qt::white);     // Text color on window background
-	darkPalette.setColor(QPalette::Base, QColor(25, 25, 25));   // Background for input fields, text views etc.
-	darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53)); // Alternate background for items in lists/tables
-	darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
-	darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-	darkPalette.setColor(QPalette::Text, Qt::white);
-	darkPalette.setColor(QPalette::Button, QColor(53, 53, 53)); // Button background
-	darkPalette.setColor(QPalette::ButtonText, Qt::white);     // Button text
-	darkPalette.setColor(QPalette::BrightText, Qt::red);       // Bright text color
-
-	darkPalette.setColor(QPalette::Highlight, QColor(142, 45, 197)); // Selection highlight
-	darkPalette.setColor(QPalette::HighlightedText, Qt::black);   // Text on selection highlight
-
-	// Apply the custom palette to the application
-	QApplication::setPalette(darkPalette);
+	// QPalette darkPalette;
+	// darkPalette.setColor(QPalette::Window, QColor(53, 53, 53)); // Background of windows
+	// darkPalette.setColor(QPalette::WindowText, Qt::white);     // Text color on window background
+	// darkPalette.setColor(QPalette::Base, QColor(25, 25, 25));   // Background for input fields, text views etc.
+	// darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53)); // Alternate background for items in lists/tables
+	// darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
+	// darkPalette.setColor(QPalette::ToolTipText, Qt::white);
+	// darkPalette.setColor(QPalette::Text, Qt::white);
+	// darkPalette.setColor(QPalette::Button, QColor(53, 53, 53)); // Button background
+	// darkPalette.setColor(QPalette::ButtonText, Qt::white);     // Button text
+	// darkPalette.setColor(QPalette::BrightText, Qt::red);       // Bright text color
+	//
+	// darkPalette.setColor(QPalette::Highlight, QColor(142, 45, 197)); // Selection highlight
+	// darkPalette.setColor(QPalette::HighlightedText, Qt::black);   // Text on selection highlight
+	//
+	// // Apply the custom palette to the application
+	// QApplication::setPalette(darkPalette);
 
 	// It's generally cross-platform and modern-looking and better dark theme compatibility.
 	QApplication::setStyle("Fusion");

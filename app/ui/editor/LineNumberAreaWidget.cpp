@@ -14,7 +14,6 @@
 LineNumberAreaWidget::LineNumberAreaWidget(QWidget *parent) : QWidget(parent) {
 	// It's good to set an initial size policy or minimum width
 	setMinimumWidth(5);
-	setStyleSheet(LINE_NUMBER_STYLES);
 }
 
 void LineNumberAreaWidget::updateEditorState(const EditorState &state) {

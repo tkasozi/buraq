@@ -55,8 +55,10 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     setMenuWidget(toolBar.get());
 
     // Add Status bar
-    statusBar = std::make_unique<QStatusBar>();
-    statusBar->setStyleSheet(Config::singleton().getMainStyles()->statusToolBar.styleSheet);
+    statusBar = std::make_unique<QStatusBar>(this);
+    statusBar->setObjectName("appStatusBar");
+    statusBar->setSizeGripEnabled(false);
+
     setStatusBar(statusBar.get());
 
     // Setting window title and docking icon
@@ -78,8 +80,9 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     centralWidgetLayout2->setSpacing(0);
     centralWidgetLayout2->setContentsMargins(0, 0, 0, 0);
 
-    auto* centralWidgetControlPanel = new QWidget;
-    centralWidgetControlPanel->setStyleSheet(Config::singleton().getMainStyles()->controlToolBar.styleSheet);
+    const auto centralWidgetControlPanel = new QWidget;
+    centralWidgetControlPanel->setObjectName("ControlToolBar");
+
     centralWidgetControlPanel->setFixedWidth(64);
     centralWidgetControlPanel->setLayout(centralWidgetLayout2);
 
@@ -89,7 +92,6 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     layoutA->setContentsMargins(0, 0, 0, 0);
 
     auto* centralWidgetControlPanelA = new QWidget;
-    centralWidgetControlPanelA->setStyleSheet("border: none;");
     centralWidgetControlPanelA->setLayout(layoutA);
 
     centralWidgetLayout2->addWidget(centralWidgetControlPanelA, 0, 0, 1, 12, Qt::AlignJustify);

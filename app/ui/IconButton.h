@@ -38,43 +38,18 @@ class IconButton : public ToolButton
 public:
     explicit IconButton(QWidget *ptr = nullptr) : ToolButton(ptr) {};
     explicit IconButton(const QString &fileName) : ToolButton(fileName) {};
-    explicit IconButton(const QString &fileName, const int w = 32, int h = 32, const QString &customStyles = "")
+    explicit IconButton(const QString &fileName, const int w = 32, const int h = 32, const QString & = "")
         : ToolButton(fileName)
     {
         setFixedSize(w, h);
-        setStyleSheet(customStyles + "border: 0px;");
-        this->customStyles = customStyles;
+        setIconSize(QSize(24, 24));
     }
 
-    explicit IconButton(const QIcon &icon, const int w = 32, int h = 32, const QString &customStyles = "")
+    explicit IconButton(const QIcon &icon, const int w = 32, const int h = 32)
         : ToolButton(icon)
     {
         setFixedSize(w, h);
-        setStyleSheet(customStyles + "border: 0px;");
-        this->customStyles = customStyles;
-    }
-
-    void leaveEvent(QEvent *p) override
-    {
-        setStyleSheet(
-            "border: 0px;" +
-            Config::singleton().getMainStyles()->commonStyle.styleSheet);
-    }
-
-    void enterEvent(QEnterEvent *event) override
-    {
-        if (customStyles != "")
-        {
-            setStyleSheet(
-                "border-radius: 10px;" +
-                customStyles);
-        }
-        else
-        {
-            setStyleSheet(
-                "border-radius: 10px;" +
-                Config::singleton().getMainStyles()->toolBarHover.styleSheet);
-        }
+        setIconSize(QSize(24, 24));
     }
 
     ~IconButton() override = default;

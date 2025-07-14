@@ -7,7 +7,6 @@
 #include <QTextBlock>
 
 EditorMargin::EditorMargin(QWidget *appUi) : CommonWidget(nullptr), appUi(appUi) {
-	setStyleSheet("border-right: 1px solid #383838; padding: 0px; margin: 0px; color: #7E7E7E;");
 	setMinimumHeight(1000);
 	setFixedWidth(82); // The EditorMargin itself has a fixed width
 

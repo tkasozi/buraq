@@ -48,8 +48,9 @@ private:
         {
             ToolButton::setIcon(icon);
         }
-        setFixedWidth(48);
+        setFixedWidth(32);
         setFixedHeight(32);
+        setIconSize(QSize(24, 24));
         setMouseTracking(true);
     }
 
@@ -68,25 +69,6 @@ public:
     {
         applyIconStyles(icon);
     };
-
-    void leaveEvent(QEvent *p) override
-    {
-        setStyleSheet(Config::singleton().getMainStyles()->toolBar.styleSheet);
-    }
-
-    void enterEvent(QEnterEvent *event) override
-    {
-        if (customHoverColor != nullptr)
-        {
-            setStyleSheet(
-                Config::singleton().getMainStyles()->toolBar.styleSheet +
-                "background-color: " + customHoverColor);
-        }
-        else
-        {
-            setStyleSheet(Config::singleton().getMainStyles()->toolBarHover.styleSheet);
-        }
-    }
 
     ~ToolButton() override = default;
 };

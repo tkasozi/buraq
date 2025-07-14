@@ -26,6 +26,11 @@
 	<qresource prefix="/config">
 		<file alias="main_config">main_config.xml</file>
 	</qresource>
+    <qresource prefix="/styles">
+        <file>styles.qss</file>
+        <file>dark_theme.qss</file>
+        <file>light_theme.qss</file>
+    </qresource>
     <qresource prefix="/icons">
         <file alias="main_config">main_config.xml</file>
         <file alias="index.theme">icons/dark/index.theme</file>
@@ -55,9 +60,6 @@
 
 	<qresource prefix="/">
 		<file>version.json</file>
-		<file>styles.qss</file>
-		<file>dark_theme.qss</file>
-		<file>light_theme.qss</file>
 		<file>test/temp.ps1</file>
 	</qresource>
 </RCC>

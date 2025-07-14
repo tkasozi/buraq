@@ -13,7 +13,7 @@
     <AppIcons>
         <terminal>:/icons/terminal_icon</terminal>
         <settings>:/icons/settings_icon_png</settings>
-        <folder>:/icons/script_icon</folder>
+        <folder>:/icons/folder_icon</folder>
         <playCode>:/icons/play_filled_icon</playCode>
         <execute>:/icons/play_filled_icon2</execute>
         <executeSelected>:/icons/play_filled_icon2</executeSelected>

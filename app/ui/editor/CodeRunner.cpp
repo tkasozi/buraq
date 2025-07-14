@@ -18,8 +18,6 @@ CodeRunner::CodeRunner(QWidget *appUi) : IconButton(nullptr),
 
     setIcon(QIcon(Config::singleton().getAppIcons()->executeIcon));
     setFixedSize(32, 32);
-    setStyleSheet(
-        "border: 0px;");
 
     // set tooltip for the run buttons
     setToolTip(

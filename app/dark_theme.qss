@@ -1,17 +1,195 @@
-/* dark_theme.qss */
-QMainWindow, QWidget {
-    background-color: #2E2E2E; /* Dark gray */
-    color: #F0F0F0;            /* Light text */
+/*
+ * Material Design Dark Theme for Qt Widgets
+ * Primary: #2196F3 (Blue 500)
+ * Accent: #00BCD4 (Cyan 500)
+ * Background: #232323 (New Dark Gray)
+ * Surface: #333333 (Slightly lighter than background for elevation)
+ * Text: #E0E0E0 (Grey 200)
+ */
+
+/* General Application Colors & Typography */
+QMainWindow, QWidget, QDialog {
+    background-color: #232323; /* Dark background */
+    color: #E0E0E0;            /* Light text */
+    font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+    font-size: 10pt;
 }
-QPushButton {
-    background-color: #4A4A4A;
+
+/* Selection Colors (for text, list items, etc.) */
+QAbstractItemView {
+    selection-background-color: #00568B; /* Darker Blue for selection */
+    selection-color: #FFFFFF;
+}
+QAbstractItemView::item:selected {
+    background-color: #00568B; /* Darker Blue for selection */
     color: #FFFFFF;
-    border: 1px solid #666666;
 }
-QPlainTextEdit {
-    background-color: #1E1E1E; /* Very dark for editor */
-    color: #D4D4D4;            /* Light gray text */
-    selection-background-color: #007ACC; /* VS Code blue */
-    border: 1px solid #3A3A3A;
+
+/* Buttons (QPushButton, QToolButton) */
+QPushButton, QToolButton {
+    background-color: transparent; /* FIX: No default background */
+    color: #FFFFFF;            /* White text */
+    border: none;              /* Flat design */
+    border-radius: 4px;
 }
-/* ... other dark theme styles ... */
+QPushButton:hover, QToolButton:hover {
+    background-color: rgba(255, 255, 255, 0.08); /* FIX: Subtle background on hover */
+}
+QPushButton:pressed, QToolButton:pressed {
+    background-color: rgba(255, 255, 255, 0.15); /* FIX: More opaque background when pressed */
+}
+QPushButton:flat, QToolButton:flat {
+    background-color: transparent; /* FIX: No default background for flat buttons */
+    border: none;
+    color: #E0E0E0; /* Keep text color */
+    padding: 0px; /* FIX: Adjust padding for flat icon buttons to fill 35x35 */
+    border-radius: 4px; /* Keep rounded corners */
+}
+QPushButton:flat:hover, QToolButton:flat:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly more opaque on hover */
+    border-radius: 4px;
+}
+QPushButton:flat:pressed, QToolButton:flat:pressed {
+    background-color: rgba(255, 255, 255, 0.15); /* Even more opaque when pressed */
+}
+
+/* Primary Action Buttons */
+QPushButton#PrimaryButton, QToolButton#PrimaryButton { /* Use objectName("PrimaryButton") in C++ */
+    background-color: #2196F3; /* Primary Blue */
+    color: #FFFFFF;
+}
+QPushButton#PrimaryButton:hover, QToolButton#PrimaryButton:hover {
+    background-color: #1976D2; /* Darker blue on hover */
+}
+QPushButton#PrimaryButton:pressed, QToolButton#PrimaryButton:pressed {
+    background-color: #1565C0; /* Even darker blue when pressed */
+}
+
+QPushButton#TextButton, QToolButton#TextButton {
+ background-color: transparent; /* FIX: No default background for flat buttons */
+    border: none;
+    color: #E0E0E0; /* Keep text color */
+    padding: 0px; /* FIX: Adjust padding for flat icon buttons to fill 35x35 */
+    border-radius: 4px; /* Keep rounded corners */
+    min-width: 30px;           /* FIX: Reduced minimum width for text buttons */
+    min-height: 40px;          /* Ensure minimum height for all buttons */
+    font-weight: 500;
+}
+QPushButton#TextButton:hover, QToolButton#TextButton:hover {
+    background-color: rgba(255, 255, 255, 0.08); /* FIX: Subtle background on hover */
+}
+
+/* Labels */
+QLabel {
+    color: #E0E0E0; /* Default text color for labels */
+    /* font-weight: normal; */
+    /* font-size: 9pt; */
+    padding: 2px;
+}
+QLabel:hover { /* NEW: Hover effect for QLabel */
+    background-color: rgba(255, 255, 255, 0.05); /* Subtle background on hover */
+    border-radius: 2px; /* Slight rounding on hover */
+}
+QLabel#HeaderLabel { /* Example for a label used as a header */
+    color: #FFFFFF; /* Brighter white for headers */
+    font-size: 10pt;
+    font-weight: bold;
+    padding-bottom: 5px; /* Add some space below the header label */
+}
+QLabel#HeaderLabel:hover {
+    background-color: none;
+}
+
+/* Text Editors & Input Fields */
+QPlainTextEdit, QTextEdit, QLineEdit {
+    background-color: #333333; /* Darker surface */
+    color: #E0E0E0;
+    border: 1px solid #4A4A4A; /* Slightly lighter border */
+    border-radius: 4px;
+    padding: 0px;
+}
+QPlainTextEdit:focus, QTextEdit:focus, QLineEdit:focus {
+    border: 1px solid #2196F3; /* Primary blue border on focus */
+}
+QPlainTextEdit::placeholder, QLineEdit::placeholder {
+    color: #BBBBBB;
+}
+
+/* Toolbars */
+QToolBar {
+    background-color: #333333; /* Darker toolbar background */
+    border-bottom: 1px solid #4A4A4A;
+    padding: 2px;
+    spacing: 5px;
+}
+QToolBar::separator {
+    background-color: #555555;
+    width: 1px;
+    margin: 4px 5px;
+}
+
+/* Menus (QMenu, QMenuBar) */
+QMenuBar {
+    background-color: #333333;
+    color: #E0E0E0;
+    border-bottom: 1px solid #4A4A4A;
+}
+QMenuBar::item {
+    padding: 6px 10px;
+    background-color: transparent;
+}
+QMenuBar::item:selected {
+    background-color: #232323; /* Matches main background */
+}
+
+QMenu {
+    background-color: #333333; /* Dark menu background */
+    color: #E0E0E0;
+    border: 1px solid #4A4A4A;
+    min-width: 300px;
+}
+QMenu::item {
+    padding: 8px 20px 8px 10px;
+}
+QMenu::item:selected {
+    background-color: #2196F3; /* Primary Blue */
+    color: #FFFFFF;
+}
+QMenu::separator {
+    height: 1px;
+    background: #555555;
+    margin: 4px 0;
+}
+
+/* Status Bar */
+QStatusBar {
+    background-color: #333333;
+    color: #BBBBBB;
+    border-top: 1px solid #4A4A4A;
+}
+
+/* Scroll Bars */
+QScrollBar:vertical, QScrollBar:horizontal {
+    border: 1px solid #4A4A4A;
+    background: #232323;
+    width: 12px; /* vertical */
+    height: 12px; /* horizontal */
+    margin: 0px 0px 0px 0px;
+}
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background: #606060;
+    min-height: 20px;
+    border-radius: 5px;
+}
+QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover {
+    background: #707070;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical,
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    border: none;
+    background: none;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical,
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}

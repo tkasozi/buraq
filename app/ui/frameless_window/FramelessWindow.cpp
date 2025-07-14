@@ -24,14 +24,6 @@ FramelessWindow::FramelessWindow(QWidget *parent)
 	m_titleBar = new QWidget(this);
 	m_titleBar->setFixedHeight(35); // Set your desired title bar height
 	m_titleBar->setObjectName("customTitleBar"); // For styling
-	m_titleBar->setStyleSheet(
-			"#customTitleBar { background-color: #2C3E50; border-bottom: 1px solid #1A242F; }"
-			"QPushButton { background-color: transparent; color: white; border: none; font-size: 14px; padding: 5px; }"
-			"QPushButton:hover { background-color: #34495E; }"
-			"QPushButton#closeButton:hover { background-color: #E74C3C; }" // Specific hover for close
-			"QLabel#titleText { color: white; padding-left: 10px; font-weight: bold; }"
-	);
-
 
 	QHBoxLayout *titleBarLayout = new QHBoxLayout(m_titleBar);
 	titleBarLayout->setContentsMargins(0, 0, 0, 0);
@@ -57,7 +49,6 @@ FramelessWindow::FramelessWindow(QWidget *parent)
 
 	// Content Area (example)
 	QWidget *contentArea = new QWidget(this);
-	contentArea->setStyleSheet("background-color: #ECF0F1;"); // Example content background
 	QVBoxLayout *contentLayout = new QVBoxLayout(contentArea);
 	QLabel *contentLabel = new QLabel("Frameless Window Content Area", contentArea);
 	contentLabel->setAlignment(Qt::AlignCenter);

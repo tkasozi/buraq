@@ -100,11 +100,8 @@ void ToolBar::addFileMenu()
 
     // --- START CHANGES FOR QPushButton ---
     // Create a QPushButton to act as the menu trigger
-    QPushButton* fileMenuButton = new QPushButton("File", this);
-    // fileMenuButton->setFixedHeight(35);
-    fileMenuButton->setFixedWidth(30);
-    // fileMenuButton->setIcon(createIconFromBase64(ICON_FILE_MENU_BASE64)); // Set icon
-    fileMenuButton->setToolTip("File Operations"); // Optional: Add a tooltip
+    const auto fileMenuButton = new QPushButton("File", this);
+    fileMenuButton->setObjectName("TextButton");
 
     // Add the button to the toolbar. By default, it will be on the left if added first.
     addWidget(fileMenuButton);
@@ -158,7 +155,7 @@ void ToolBar::onFileMenuButtonClicked()
     {
         // Map the button's bottom-left corner to global screen coordinates
         // This makes the menu appear directly below the button.
-        QPoint pos = button->mapToGlobal(QPoint(0, button->height()));
+        const QPoint pos = button->mapToGlobal(QPoint(0, button->height()));
         m_fileMenu->popup(pos); // Show the menu at the calculated position
     }
 }

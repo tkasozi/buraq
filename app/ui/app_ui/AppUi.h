@@ -37,7 +37,7 @@ public:
 	// No manual delete, no manual nullptr.
 	~AppUi() override = default;
 
-	Editor *getEditor() const;
+Editor *getEditor() const;
 	EditorMargin *getEditorMargin() const;
 
 	PluginManager *getLangPluginManager() const;

@@ -5,42 +5,38 @@
 #include <QApplication>
 #include <QFile>
 #include <QDebug>
-#include <QPalette> // Include QPalette
+#include <QPalette>
+#include <QEvent>
 
-enum AppTheme
-{
+enum AppTheme {
     LightTheme,
     DarkTheme
 };
 
-class ThemeManager final : public QObject
+class ThemeManager : public QObject
 {
     Q_OBJECT
-
 public:
     static ThemeManager& instance();
 
     void setAppTheme(AppTheme theme);
     AppTheme currentTheme() const { return m_currentTheme; }
+    static AppTheme getThemeFromPalette(const QPalette &palette);
+
+    signals:
+        void themeChanged(AppTheme theme);
 
 protected:
-    // Override the event method to catch QEvent::ApplicationPaletteChange
-    bool event(QEvent *event) override; // NEW: Override event()
-signals:
-    void themeChanged(AppTheme theme);
-
-private slots:
-    void onApplicationPaletteChanged(const QPalette& oldPalette); // New slot
+    // This is the method that will be called when an event is filtered.
+    // It's part of the QEventFilter interface.
+    bool eventFilter(QObject *watched, QEvent *event) override; // NEW: eventFilter override
 
 private:
-    explicit ThemeManager(QObject* parent = nullptr);
+    explicit ThemeManager(QObject *parent = nullptr);
     ThemeManager(const ThemeManager&) = delete;
     ThemeManager& operator=(const ThemeManager&) = delete;
 
     AppTheme m_currentTheme;
-
-    // Helper to determine theme from palette
-    static AppTheme getThemeFromPalette(const QPalette& palette);
 };
 
 #endif // THEME_MANAGER_H

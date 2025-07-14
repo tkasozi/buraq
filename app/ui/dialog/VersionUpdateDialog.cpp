@@ -18,18 +18,18 @@ VersionUpdateDialog::VersionUpdateDialog(QWidget *parent)
 	content = std::make_unique<QWidget>(this);
 
 	action = std::make_unique<QWidget>(this);
-	auto action_layout = new QHBoxLayout(action.get());
+	const auto action_layout = new QHBoxLayout(action.get());
 
 	updateButton = std::make_unique<QPushButton>("Update", action.get());
-	updateButton->setObjectName("updateButton"); // Set the object name
+	updateButton->setObjectName("TextButton"); // Set the object name
 
 	cancelButton = std::make_unique<QPushButton>("Later", action.get());
-	cancelButton->setObjectName("laterButton");   // Set the object name
+	cancelButton->setObjectName("TextButton");   // Set the object name
 
 	action_layout->addWidget(updateButton.get());
 	action_layout->addWidget(cancelButton.get());
 
-	auto layout = new QVBoxLayout(this);
+	const auto layout = new QVBoxLayout(this);
 	layout->addWidget(content.get());
 	layout->addWidget(action.get());
 	setLayout(layout);

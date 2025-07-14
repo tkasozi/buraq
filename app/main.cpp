@@ -14,10 +14,13 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 
-	// It's generally cross-platform and modern-looking and better dark theme compatibility.
-	QApplication::setStyle("Fusion");
+	// Initialize the ThemeManager instance
+	ThemeManager& themeManager = ThemeManager::instance();
+	app.installEventFilter(&themeManager);
 
-	ThemeManager::instance().setAppTheme(DarkTheme);
+	// Set the initial theme. This ensures the correct stylesheet is loaded
+	// at startup, even before any system palette change events might occur.
+	themeManager.setAppTheme(themeManager.getThemeFromPalette(app.palette())); // Initialize based on current system palette
 
 	// Load configuration settings
 	Config::singleton();

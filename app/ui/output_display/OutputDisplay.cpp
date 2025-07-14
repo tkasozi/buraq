@@ -33,9 +33,9 @@ void init_main_out_area(QPlainTextEdit *, QVBoxLayout *, int);
 
 OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi)
 {
-	setStyleSheet(
-//		"background-color : #252525;"
-		"border:0px;");
+// 	setStyleSheet(
+// //		"background-color : #252525;"
+// 		"border:0px;");
 
 	auto layout = new QVBoxLayout(this);
 	layout->setSpacing(0);
@@ -140,8 +140,8 @@ QLabel *OutputDisplay::createLabel(const QString &text, QString state)
 	label->setFont(QFont("Arial", 32));
 
 	//@formatter:off
-	label->setStyleSheet(
-		std::equal(state.begin(), state.end(), "error") ? "color: #FF6347;" : "color: #F9F6EE;");
+	// label->setStyleSheet(
+	// 	std::equal(state.begin(), state.end(), "error") ? "color: #FF6347;" : "color: #F9F6EE;");
 	//@formatter:on
 
 	label->setAlignment(Qt::AlignLeft);

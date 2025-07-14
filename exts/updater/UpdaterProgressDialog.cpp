@@ -32,7 +32,7 @@ void UpdateProgressDialog::setupUi()
 	setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::WindowTitleHint);
 
 	m_statusLabel = new QLabel("Initializing update...", this);
-	m_statusLabel->setStyleSheet("font-weight: bold;");
+	// m_statusLabel->setStyleSheet("font-weight: bold;");
 
 	m_progressBar = new QProgressBar(this);
 	m_progressBar->setRange(0, 100);
@@ -78,9 +78,9 @@ void UpdateProgressDialog::onUpdateFinished(bool success, const QString& finalMe
 
 	if (success) {
 		m_progressBar->setValue(100);
-		m_progressBar->setStyleSheet("QProgressBar::chunk { background-color: #4CAF50; }"); // Green for success
+		// m_progressBar->setStyleSheet("QProgressBar::chunk { background-color: #4CAF50; }"); // Green for success
 	} else {
-		m_progressBar->setStyleSheet("QProgressBar::chunk { background-color: #F44336; }"); // Red for failure
+		// m_progressBar->setStyleSheet("QProgressBar::chunk { background-color: #F44336; }"); // Red for failure
 		m_finishButton->setVisible(true); // Show the "Finish" button
 	}
 

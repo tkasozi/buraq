@@ -264,7 +264,7 @@ void Config::processStyles(const QDomElement& element) const
     }
 }
 
-void Config::processStyleBlock(QDomElement& element, StyleSheetStruct& aStruct) const
+void Config::processStyleBlock(const QDomElement& element, StyleSheetStruct& aStruct) const
 {
     // includes styles
     if (element.hasAttribute("inherits") && element.attributes().item(0).nodeValue() == "commonStyle")
@@ -276,7 +276,7 @@ void Config::processStyleBlock(QDomElement& element, StyleSheetStruct& aStruct) 
         aStruct.height = mainStyles->commonStyle.height;
     }
 
-    auto styleNodes = element.childNodes();
+    const auto styleNodes = element.childNodes();
     for (int i = 0; i < styleNodes.size(); ++i)
     {
         auto temp = styleNodes.item(i).toElement();

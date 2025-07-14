@@ -145,7 +145,7 @@ private:
 
 	void processStyles(const QDomElement &element) const;
 
-	void processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct) const;
+	void processStyleBlock(const QDomElement &element, StyleSheetStruct &aStruct) const;
 
 	static void loadConfig(Config *_thi);
 };

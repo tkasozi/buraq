@@ -153,7 +153,7 @@ echo "--- Configuring CMake project (Build Type: ${BUILD_TYPE}) ---"
 # The -S option specifies the source directory.
 # The -B option specifies the build directory (created if it doesn't exist).
 "${CMAKE_EXE}" -S "${SOURCE_DIR}"  -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
- -DCMAKE_MAKE_PROGRAM="${CMAKE_MAKE_PROGRAM}" \
+ -DCMAKE_MAKE_PROGRAM="${CMAKE_EXE}" \
  -G "MinGW Makefiles" -B "${BUILD_DIR}" \
  -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}" \
  -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \

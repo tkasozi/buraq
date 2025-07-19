@@ -12,12 +12,13 @@
 
 CodeRunner::CodeRunner(QWidget *appUi) : IconButton(nullptr),
                                          appUi(appUi),
-                                         minion(nullptr),
-                                         workerThread(nullptr)
+                                         workerThread(nullptr),
+                                         minion(nullptr)
 {
 
+    setObjectName("CodeRunner");
     setIcon(QIcon(Config::singleton().getAppIcons()->executeIcon));
-    setFixedSize(32, 32);
+    // setFixedSize(32, 32);
 
     // set tooltip for the run buttons
     setToolTip(
@@ -40,16 +41,16 @@ void CodeRunner::runCode()
 
     std::function<QVariant()> task = [this]() -> QVariant
     {
-        auto *appUi_ = dynamic_cast<AppUi *>(appUi);
+        const auto appUi_ = dynamic_cast<AppUi *>(appUi);
 
-        if (!appUi_->getEditor())
+        if (appUi_ == nullptr || !appUi_->getEditor())
         {
             // editor must be defined
             return {};
         }
 
         // Run selected code
-        QString script = appUi_->getEditor()->textCursor().selectedText();
+        QString script = appUi_->getEditor()->selectedText();
         if (script.isEmpty())
         {
             // run entire file
@@ -62,7 +63,7 @@ void CodeRunner::runCode()
         }
 
         // Removes Paragraph Separator (PS) character
-        auto cleaned = script.replace("\u2029", "\n");
+        const auto cleaned = script.replace("\u2029", "\n");
 
         if (!appUi_->getLangPluginManager())
         {
@@ -81,7 +82,7 @@ void CodeRunner::runCode()
 void CodeRunner::setupWorkerThread()
 {
     workerThread = new QThread(this);
-    workerThread->setObjectName("CodeRunner");
+    workerThread->setObjectName("CodeRunnerThread");
 
     // 2. Create Minion (no parent initially, will be managed by thread lifecycle)
     minion = new Minion();
@@ -168,7 +169,7 @@ void CodeRunner::setupSignals()
     // Signal to execute the code
     connect(this, &IconButton::clicked, this, &CodeRunner::runCode);
 
-    auto *appUi_ = dynamic_cast<AppUi *>(appUi);
+    const auto appUi_ = dynamic_cast<AppUi *>(appUi);
     // Signal to update status bar in AppUI component for the running process
     connect(this, &CodeRunner::statusUpdate, appUi_, &AppUi::processStatusSlot);
 

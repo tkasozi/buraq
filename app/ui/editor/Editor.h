@@ -6,22 +6,22 @@
 #define IT_TOOLS_EDITOR_H2
 
 #include <QPlainTextEdit>
-#include <QVBoxLayout>
-#include <QRect>
+#include <QWidget>
 #include <QFile>
 #include <QTimer>
 #include <QRegularExpression>
 #include <QStack>
 
+#include "EditorMargin.h"
 #include "IToolsAPI.h"
 
-class Editor : public QPlainTextEdit {
+class Editor final : public QWidget {
 
 Q_OBJECT
 
 protected:
 
-	void focusInEvent(QFocusEvent *e) override;
+	// void focusInEvent(QFocusEvent *e) override;
 
 	void keyPressEvent(QKeyEvent *e) override;
 
@@ -47,6 +47,10 @@ public:
 	~Editor() override  = default;
 
 	void openAndParseFile(const QString &filePath, QFile::OpenModeFlag modeFlag = QFile::OpenModeFlag::ReadOnly);
+	// Add forwarding methods if external code calls QPlainTextEdit methods on Editor
+	[[nodiscard]] QString toPlainText() const { return m_plainTextEdit->toPlainText(); }
+	[[nodiscard]] QString selectedText() const { return m_plainTextEdit->textCursor().selectedText(); }
+	void setPlainText(const QString &text) const { m_plainTextEdit->setPlainText(text); }
 
 private slots:
 
@@ -60,7 +64,8 @@ private slots:
 
 private:
 
-	std::unique_ptr<QWidget> lineNumberArea;
+	std::unique_ptr<QPlainTextEdit> m_plainTextEdit; // FIX: Internal QPlainTextEdit
+	std::unique_ptr<EditorMargin> editorMargin;      // Your margin widget
 	QWidget *appUi;
 	QStack<QString> history;
 	QString currentFile;

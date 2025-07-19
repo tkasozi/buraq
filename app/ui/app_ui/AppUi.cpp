@@ -128,7 +128,7 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     layoutB->setContentsMargins(0, 0, 0, 0);
 
     // Editor helper component.
-    editorMargin = std::make_unique<EditorMargin>(this);
+    // editorMargin = std::make_unique<EditorMargin>(this);
     // The text or script editor.
     itoolsEditor = std::make_unique<Editor>(this);
     // Handles file nav
@@ -141,7 +141,7 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     placeHolderLayout->setContentsMargins(0, 0, 0, 0);
 
     placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
-    placeHolderLayout->addWidget(editorMargin.get(), 0, 2, 12, 1, Qt::AlignmentFlag::AlignTop);
+    // placeHolderLayout->addWidget(editorMargin.get(), 0, 2, 12, 1, Qt::AlignmentFlag::AlignTop);
     placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 1);
 
     // add main content area

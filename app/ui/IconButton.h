@@ -38,18 +38,18 @@ class IconButton : public ToolButton
 public:
     explicit IconButton(QWidget *ptr = nullptr) : ToolButton(ptr) {};
     explicit IconButton(const QString &fileName) : ToolButton(fileName) {};
-    explicit IconButton(const QString &fileName, const int w = 32, const int h = 32, const QString & = "")
+    explicit IconButton(const QString &fileName, const int w = 24, const int h = 24, const QString & = "")
         : ToolButton(fileName)
     {
         setFixedSize(w, h);
-        setIconSize(QSize(24, 24));
+        setIconSize(QSize(18, 18));
     }
 
-    explicit IconButton(const QIcon &icon, const int w = 32, const int h = 32)
+    explicit IconButton(const QIcon &icon, const int w = 24, const int h = 24)
         : ToolButton(icon)
     {
         setFixedSize(w, h);
-        setIconSize(QSize(24, 24));
+        setIconSize(QSize(18, 18));
     }
 
     ~IconButton() override = default;

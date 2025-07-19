@@ -160,7 +160,7 @@ void CustomDrawer::createFileLabel(
 
     const auto label = new FilePathLabel(filePath, nullptr);
 
-    QObject::connect(label, &FilePathLabel::clicked, this, &CustomDrawer::onFileLabelClick);
+    connect(label, &FilePathLabel::clicked, this, &CustomDrawer::onFileLabelClick);
 
     const auto mainVLayout = qobject_cast<QVBoxLayout*>(layout());
     mainVLayout->addWidget(label);

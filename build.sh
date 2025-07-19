@@ -152,8 +152,8 @@ echo ""
 echo "--- Configuring CMake project (Build Type: ${BUILD_TYPE}) ---"
 # The -S option specifies the source directory.
 # The -B option specifies the build directory (created if it doesn't exist).
+#-DCMAKE_MAKE_PROGRAM="${CMAKE_EXE}" \
 "${CMAKE_EXE}" -S "${SOURCE_DIR}"  -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
- -DCMAKE_MAKE_PROGRAM="${CMAKE_EXE}" \
  -G "MinGW Makefiles" -B "${BUILD_DIR}" \
  -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}" \
  -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
@@ -169,7 +169,7 @@ echo "--- Building project using CMake (Jobs: ${NUM_JOBS}) ---"
 # --config is mostly for multi-configuration generators (like Visual Studio).
 # For single-config (Makefiles, Ninja), CMAKE_BUILD_TYPE is used at configure time.
 # The -- -j${NUM_JOBS} part passes the parallel job count to the underlying build tool (make/ninja).
-"$CMAKE_EXE"  --build "${BUILD_DIR}" --config "${BUILD_TYPE}" -- -j"${NUM_JOBS}"
+"$CMAKE_EXE" --build "${BUILD_DIR}" --config "${BUILD_TYPE}" -- -j"${NUM_JOBS}"
 echo "Build complete."
 
 echo ""

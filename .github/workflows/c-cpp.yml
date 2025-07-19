@@ -18,6 +18,11 @@ permissions:
 jobs:
   build-and-package:
     runs-on: windows-latest # Or a specific Windows version
+    env:
+      # Explicitly set VCPKG_DEFAULT_TRIPLET on the job level.
+      # This ensures it's available for all steps that use Vcpkg.
+      VCPKG_DEFAULT_TRIPLET: x64-mingw-dynamic
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

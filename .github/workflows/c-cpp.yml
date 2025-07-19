@@ -34,7 +34,7 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: >-
+          install: |
             mingw-w64-x86_64-toolchain # Essential: Provides gcc, g++, and make (mingw32-make.exe)
             # Add any other non-C++ tools needed by your build process here.
             # You might still need git, rsync, etc. if your build.sh uses them directly

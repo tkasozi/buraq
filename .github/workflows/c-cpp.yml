@@ -45,6 +45,14 @@ jobs:
           # If you need static linking, use x64-mingw-static.
           # Ensure this matches what your CMake project expects.
           vcpkgTriplet: 'x64-mingw-dynamic' # Or x64-mingw-static if you prefer static linking
+          # Cache the installed packages (binaries)
+          # This is the most important part for speeding up builds.
+          # The cache key needs to reflect changes in your dependencies and the compiler.
+          # Use a hash of vcpkg.json, the triplet, and potentially compiler version.
+          # lukka/run-vcpkg tries to automate this with vcpkgJsonGlob.
+          # vcpkgCacheKeySuffix is a good place to add compiler version if relevant
+          vcpkgCacheKeySuffix: | # This allows multi-line suffix for more specificity
+             ${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-
 
       # --- MSYS2 Setup (Minimal) ---
       # Now, you only install build tools that Vcpkg doesn't provide

@@ -35,10 +35,11 @@ jobs:
           msystem: MINGW64
           update: true
           install: |
-            mingw-w64-x86_64-toolchain # Essential: Provides gcc, g++, and make (mingw32-make.exe)
+            # Essential: Provides gcc, g++, and make (mingw32-make.exe)
             # Add any other non-C++ tools needed by your build process here.
             # You might still need git, rsync, etc. if your build.sh uses them directly
             # and they aren't pre-installed or provided by Vcpkg's host tools.
+            mingw-w64-x86_64-toolchain
 
       # --- NEW ORDER: Step 2: Setup Vcpkg and Install Dependencies with Cache ---
       # This step depends on the MinGW toolchain being available from the previous step.

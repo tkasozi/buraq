@@ -34,6 +34,7 @@ jobs:
             mingw-w64-x86_64-qt6-base
             mingw-w64-x86_64-qt6-svg
             mingw-w64-x86_64-boost
+            mingw-w64-x86_64-sqlite3
 
       - name: Download Inno Setup
         run: |

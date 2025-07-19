@@ -19,84 +19,42 @@ jobs:
   build-and-package:
     runs-on: windows-latest # Or a specific Windows version
     env:
-      # Explicitly set VCPKG_DEFAULT_TRIPLET on the job level.
-      # This ensures it's available for all steps that use Vcpkg.
-      VCPKG_DEFAULT_TRIPLET: x64-mingw-dynamic
+      VCPKG_DEFAULT_TRIPLET: x64-mingw-dynamic # Ensure triplet is consistently set
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      # --- Vcpkg Setup and Install ---
-      # It's highly recommended to use vcpkg as a git submodule in your repo
-      # For example: git submodule add https://github.com/microsoft/vcpkg.git vcpkg
-      # Then configure `vcpkgDirectory` to point to it.
-      - name: Setup Vcpkg and Install Dependencies
-        uses: lukka/run-vcpkg@v11 # Use the latest stable version
         with:
-          # If vcpkg is a submodule at './vcpkg', this is the default and can be omitted.
-          # Otherwise, specify the path to your vcpkg clone.
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          # Point to your vcpkg.json file. Relative to the repository root.
-          vcpkgJsonGlob: '**/vcpkg.json' # Adjust if your vcpkg.json is not in the root
-          # This tells vcpkg to run `vcpkg install` based on the vcpkg.json
-          runVcpkgInstall: true
-          # Define the triplet. For MinGW-w64 on Windows, it's typically x64-mingw-dynamic.
-          # If you need static linking, use x64-mingw-static.
-          # Ensure this matches what your CMake project expects.
-          vcpkgTriplet: 'x64-mingw-dynamic' # Or x64-mingw-static if you prefer static linking
-          # Cache the installed packages (binaries)
-          # This is the most important part for speeding up builds.
-          # The cache key needs to reflect changes in your dependencies and the compiler.
-          # Use a hash of vcpkg.json, the triplet, and potentially compiler version.
-          # lukka/run-vcpkg tries to automate this with vcpkgJsonGlob.
-          # vcpkgCacheKeySuffix is a good place to add compiler version if relevant
-          vcpkgCacheKeySuffix: | # This allows multi-line suffix for more specificity
-             ${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-
+          submodules: true
 
-      # --- MSYS2 Setup (Minimal) ---
-      # Now, you only install build tools that Vcpkg doesn't provide
-      # (like git, curl, or specific system tools, but usually not compilers/make/cmake
-      # which Vcpkg can provide or integrate with).
-      # Since lukka/run-vcpkg can often handle the toolchain for CMake,
-      # you might not even need msys2/setup-msys2 for compiler/make/cmake.
-      # However, if your build.sh script *still* relies on direct access to
-      # pacman-installed tools or you explicitly want a MinGW environment, keep it minimal.
-      - name: Setup MSYS2 (for MinGW) for essential build tools
+      # --- NEW ORDER: Step 1: Setup MSYS2 for build environment ---
+      # This provides the MinGW-w64 toolchain (GCC, make) that Vcpkg will use.
+      - name: Setup MSYS2 for build environment (Provides MinGW toolchain)
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
           update: true
-          # Only install tools not provided by vcpkg or already on the runner,
-          # e.g., git (often pre-installed), or other utilities.
-          # You might not need `gcc`, `cmake`, `make` here if Vcpkg manages the toolchain.
           install: >-
-            # Any other non-C++-library tools your build.sh script might need
-            # e.g., rsync, sed, awk, or specific Windows tools.
-            # For a clean Vcpkg integration, you ideally don't install compilers/make/cmake here.
-            # If `build.sh` needs `mingw32-make.exe` for specific steps outside CMake, ensure it's on PATH.
-            # The run-vcpkg action sets CMAKE_TOOLCHAIN_FILE automatically.
+            mingw-w64-x86_64-toolchain # Essential: Provides gcc, g++, and make (mingw32-make.exe)
+            # Add any other non-C++ tools needed by your build process here.
+            # You might still need git, rsync, etc. if your build.sh uses them directly
+            # and they aren't pre-installed or provided by Vcpkg's host tools.
 
-      #       --- Build your application with CMake ---
-      #      - name: Build with CMake
-      #        shell: msys2 {0} # Continue using the MSYS2 shell for your build script
-      #        run: |
-      #          # IMPORTANT: When using Vcpkg, CMake needs to be told to use the Vcpkg toolchain file.
-      #          # The lukka/run-vcpkg action usually sets VCPKG_ROOT and CMAKE_TOOLCHAIN_FILE environment variables.
-      #          # You should remove the -DCMAKE_MAKE_PROGRAM, -DCMAKE_C_COMPILER, -DCMAKE_CXX_COMPILER
-      #          # and -DCMAKE_TOOLCHAIN_FILE from your build.sh's CMake configure step,
-      #          # and let Vcpkg's toolchain file manage these.
-      #          # If your build.sh is complex, you might need to adapt it.
-      #
-      #          # Example of how your cmake configure command would look, without manual compiler/toolchain flags:
-      #          # (Assuming your build.sh wraps this)
-      #          # cd "${{ github.workspace }}/build"
-      #          # cmake -S "${{ github.workspace }}" -DCMAKE_BUILD_TYPE="${{ env.BUILD_TYPE }}" \
-      #          #   -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-      #          #   -G "MinGW Makefiles" # Or "Ninja" if you prefer
-      #
-      #          # Then run your build script:
-      #          ./build.sh --clean # Ensure your build.sh respects the VCPKG_ROOT env var for CMake
+      # --- NEW ORDER: Step 2: Setup Vcpkg and Install Dependencies with Cache ---
+      # This step depends on the MinGW toolchain being available from the previous step.
+      - name: Setup Vcpkg and Install Dependencies with Cache
+        uses: lukka/run-vcpkg@v11
+        id: vcpkg # Give this step an ID to access its outputs
+        with:
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          vcpkgJsonGlob: '**/vcpkg.json'
+          runVcpkgInstall: true
+          vcpkgTriplet: '${{ env.VCPKG_DEFAULT_TRIPLET }}'
+          vcpkgCacheKeySuffix: |
+            ${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-
+            # You might also want to add a hash of a specific compiler version here
+            # if your toolchain is very sensitive to precise compiler versions.
+            # e.g., gcc-${{ env.GCC_VERSION }} if you set GCC_VERSION env var.
 
       - name: Download Inno Setup
         run: |
@@ -128,30 +86,40 @@ jobs:
           
           echo "CMAKE_PREFIX_PATH is set to: $CMAKE_PREFIX_PATH"
           
+          echo "VCPKG_ROOT is: $VCPKG_ROOT"
+          echo "CMAKE_TOOLCHAIN_FILE is: $CMAKE_TOOLCHAIN_FILE"
+          
+          # build.sh script's CMake configure command should now implicitly
+          # use the Vcpkg toolchain via the CMAKE_TOOLCHAIN_FILE env var.
+          # Ensure it does NOT manually set compiler or toolchain paths.
           ./build.sh --clean
           
           echo "PATH: $PATH"
           
-          # ls -Al "D:/a/_temp/msys64/mingw64/bin/"
+          #          # ls -Al "D:/a/_temp/msys64/mingw64/bin/"
+          #          
+          #          mkdir ./build/Release
+          #          mkdir ./build/Release/plugins
+          #
+          #          cp ./build/bin/ITools.exe ./build/Release
+          #          
+          #          cp ./build/bin/*.dll ./build/Release
+          #          cp ./build/bin/qt.conf ./build/Release
+          #          cp ./build/bin/workflow.ico ./build/Release
+          #          
+          #          mkdir ./build/Release/plugins/managed
+          #          cp -r ./build/bin/plugins/managed/* ./build/Release/plugins/managed
+          #          
+          #          mkdir ./build/Release/plugins/ext
+          #          cp ./build/bin/plugins/ext/* ./build/Release/plugins/ext
+          #          
+          #          D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/Release/ITools.exe"
+          #          
+          #          echo "--- Listing deployment directory contents ---"
+          echo "*******Build Dir**************"
+          ls -alh ./build
           
-          mkdir ./build/Release
-          mkdir ./build/Release/plugins
-
-          cp ./build/bin/ITools.exe ./build/Release
-          
-          cp ./build/bin/*.dll ./build/Release
-          cp ./build/bin/qt.conf ./build/Release
-          cp ./build/bin/workflow.ico ./build/Release
-          
-          mkdir ./build/Release/plugins/managed
-          cp -r ./build/bin/plugins/managed/* ./build/Release/plugins/managed
-          
-          mkdir ./build/Release/plugins/ext
-          cp ./build/bin/plugins/ext/* ./build/Release/plugins/ext
-          
-          D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/Release/ITools.exe"
-          
-          echo "--- Listing deployment directory contents ---"
+          echo "*******Build/Release Dir**************"
           ls -alh ./build/Release
         env:
           MINGW_COMPILER_BIN_DIR: /mingw64/bin

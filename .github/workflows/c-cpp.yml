@@ -32,6 +32,7 @@ jobs:
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-make
             mingw-w64-x86_64-qt6-base
+            mingw-w64-x86_64-qt6-svg
 
       - name: Download Inno Setup
         run: |

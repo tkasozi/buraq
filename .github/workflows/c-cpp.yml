@@ -30,8 +30,8 @@ jobs:
 
       - name: pacman
         uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
+#        with:
+#          msystem: MINGW64
         run: |
            pacman -Ss mingw-w64-x86_64-gcc
 

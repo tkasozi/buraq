@@ -19,8 +19,7 @@ jobs:
   build-and-package:
     runs-on: windows-latest # Or a specific Windows version
     env:
-      VCPKG_DEFAULT_TRIPLET: x64-mingw-dynamic # Ensure triplet is consistently set
-      GCC_VERSION:
+      VCPKG_DEFAULT_TRIPLET: x64-windows # Ensure triplet is consistently set
 
     steps:
       - name: Checkout repository
@@ -32,11 +31,11 @@ jobs:
       # This provides the MinGW-w64 toolchain (GCC, make) that Vcpkg will use.
       - name: Setup MSYS2 for build environment (Provides MinGW toolchain)
         uses: msys2/setup-msys2@v2
+        if: false
         with:
           msystem: MINGW64
           update: true
           install: |
-            mingw-w64-x86_64-toolchain
 
       # --- Step 2: Setup Vcpkg and Install Dependencies with Cache ---
       # This step depends on the MinGW toolchain being available from the previous step.

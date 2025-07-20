@@ -28,6 +28,15 @@ jobs:
         with:
           submodules: true
 
+      - name: pacman
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+        run: |
+           pacman -Ss mingw-w64-x86_64-gcc
+
+        shell: bash
+
       # --- NEW ORDER: Step 1: Setup MSYS2 for build environment ---
       # This provides the MinGW-w64 toolchain (GCC, make) that Vcpkg will use.
       - name: Setup MSYS2 for build environment (Provides MinGW toolchain)
@@ -69,6 +78,7 @@ jobs:
         id: dotnet-project
         run: |
          cd ManagedLibrary
+          pacman -Ss mingw-w64-x86_64-gcc
           
          ./build.sh
         shell: bash

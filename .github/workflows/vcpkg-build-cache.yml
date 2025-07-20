@@ -1,0 +1,111 @@
+name: Build with Vcpkg and CMake (GitHub Packages Caching)
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest # Or your specific Windows runner if different
+    permissions:
+      contents: read # Needed for checkout
+      packages: write # VERY IMPORTANT: Allows pushing/pulling from GitHub Packages
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true # If vcpkg is a submodule in your it-tools-editor repo
+          path: it-tools-editor
+
+      # Step 1: Set up MSYS2 with essential tools (including Ninja)
+      # This replaces the need to find Ninja later.
+      - name: Set up MSYS2 with Build Tools
+        uses: msys2/setup-msys2@v2
+        with:
+          msys2-architecture: x86_64
+          # Install toolchain, git, and critically, ninja
+          install: >
+            mingw-w64-x86_64-toolchain
+            git
+            ninja
+          # If you need specific MSYS2 shells for later steps, you can set a default
+          # shell: mingw64
+
+      # Step 2: Clone Vcpkg if not part of the main repo as a submodule
+      # Adjust 'path' if you place vcpkg elsewhere.
+      - name: Clone Vcpkg Repository
+        # Only run if vcpkg wasn't checked out as a submodule in the main repo
+        if: ${{ github.workspace }}/it-tools-editor/vcpkg != '' && !contains(github.workspace, 'it-tools-editor/vcpkg') # Crude check, refine if needed
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          ref: master # Or a specific commit/tag for stability (e.g., '2024.06.20')
+          path: vcpkg # Clones vcpkg into ${{ github.workspace }}/vcpkg
+
+      # Step 3: Bootstrap Vcpkg
+      # This compiles the vcpkg executable itself.
+      - name: Bootstrap Vcpkg
+        run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
+        shell: cmd # Use cmd shell for .bat file execution
+
+      # Step 4: Cache Vcpkg's Asset Downloads (Optional but Recommended)
+      # This caches downloaded source code archives, build tools, etc., preventing re-downloads.
+      - name: Cache Vcpkg Asset Downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/vcpkg/downloads # Vcpkg's common asset cache
+            ${{ github.workspace }}/vcpkg/toolsrc # Location where vcpkg builds/stores helper tools
+          key: ${{ runner.os }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-assets-
+
+      # Step 5: Configure Vcpkg to use GitHub Packages for Binary Caching
+      # This is the core of the new binary caching strategy.
+      - name: Configure Vcpkg for GitHub Packages Binary Caching
+        env:
+          VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
+          USERNAME: ${{ github.repository_owner }} # Your GitHub username or organization
+          FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }} # The PAT secret
+        run: |
+          # Fetch nuget.exe using vcpkg's internal command
+          $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
+          
+          if (-not $nuget_path) {
+              Write-Error "Failed to get nuget.exe path from vcpkg fetch nuget."
+              exit 1
+          }
+          
+          # Add the GitHub Packages source to NuGet configuration
+          # Vcpkg will then automatically pick this up via VCPKG_BINARY_SOURCES
+          & "$nuget_path" sources add `
+            -Source "${{ env.FEED_URL }}" `
+            -StorePasswordInClearText `
+            -Name GitHubPackages `
+            -UserName "${{ env.USERNAME }}" `
+            -Password "${{ env.GH_PACKAGES_TOKEN }}" # Use env var to avoid direct secret printing
+        shell: pwsh # PowerShell is best for string manipulation and splatting
+
+      # Step 6: Configure CMake and trigger Vcpkg install
+      # Vcpkg will automatically use the configured binary cache.
+      - name: Configure CMake and Install Vcpkg Dependencies
+        working-directory: ${{ github.workspace }}/it-tools-editor
+        env:
+          # Crucial: This tells vcpkg to look for binary packages using NuGet.
+          # It uses the feed configured in the previous step.
+          VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
+          # Optional: Specify Vcpkg install options, e.g., debug output
+          # VCPKG_INSTALL_OPTIONS: "--debug"
+        run: |
+          cmake -B build ^
+                -S . ^
+                -G "Ninja" ^
+                -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake ^
+                -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic # Adjust triplet as per your needs
+        shell: cmd # Use cmd shell for typical Windows commands and path syntax
+
+      # Step 7: Build the Project
+      - name: Build Project
+        working-directory: ${{ github.workspace }}/it-tools-editor/build
+        run: cmake --build .
+        shell: cmd

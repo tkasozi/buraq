@@ -7,7 +7,7 @@ on:
 #     - 19-prepare-a-pre-release-v0012
 
 env:
-  APP_NAME: "ITools"
+  APP_NAME: "IT-Tools"
   CI: True
   DOTNET_VERSION: 9.0
   CMAKE_EXE: "cmake"
@@ -48,7 +48,7 @@ jobs:
           runVcpkgInstall: true
           vcpkgTriplet: '${{ env.VCPKG_DEFAULT_TRIPLET }}'
           vcpkgCacheKeySuffix: |
-            ${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-gcc-${{ env.GCC_VERSION }}
+            ${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-
 
       - name: Download Inno Setup
         run: |

@@ -20,6 +20,8 @@ jobs:
     runs-on: windows-latest # Or a specific Windows version
     env:
       VCPKG_DEFAULT_TRIPLET: x64-mingw-dynamic # Ensure triplet is consistently set
+      VCPKG_CXX_FLAGS: -O0
+      VCPKG_C_FLAGS: -O0
 
     steps:
       - name: Checkout repository

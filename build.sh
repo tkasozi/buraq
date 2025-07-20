@@ -153,8 +153,10 @@ echo "--- Configuring CMake project (Build Type: ${BUILD_TYPE}) ---"
 # The -S option specifies the source directory.
 # The -B option specifies the build directory (created if it doesn't exist).
 "${CMAKE_EXE}" -S "${SOURCE_DIR}"  -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
- -G "Ninja" -B "${BUILD_DIR}" \
+ -G "Ninja" \
+ -B "${BUILD_DIR}" \
  -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+ -DVCPKG_TARGET_TRIPLET="${VCPKG_DEFAULT_TRIPLET}" \
  -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
  -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe \
  -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe

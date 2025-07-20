@@ -65,7 +65,6 @@ jobs:
         id: dotnet-project
         run: |
          cd ManagedLibrary
-          pacman -Ss mingw-w64-x86_64-gcc
           
          ./build.sh
         shell: bash

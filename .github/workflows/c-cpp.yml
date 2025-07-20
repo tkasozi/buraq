@@ -20,8 +20,7 @@ jobs:
     runs-on: windows-latest # Or a specific Windows version
     env:
       VCPKG_DEFAULT_TRIPLET: x64-mingw-dynamic # Ensure triplet is consistently set
-      VCPKG_CXX_FLAGS: -O0
-      VCPKG_C_FLAGS: -O0
+      GCC_VERSION:
 
     steps:
       - name: Checkout repository
@@ -38,6 +37,9 @@ jobs:
           update: true
           install: |
             mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-gcc=14.1.0-1
+            mingw-w64-x86_64-g++=14.1.0-1
+            mingw-w64-x86_64-make
 
       # --- NEW ORDER: Step 2: Setup Vcpkg and Install Dependencies with Cache ---
       # This step depends on the MinGW toolchain being available from the previous step.
@@ -50,7 +52,7 @@ jobs:
           runVcpkgInstall: true
           vcpkgTriplet: '${{ env.VCPKG_DEFAULT_TRIPLET }}'
           vcpkgCacheKeySuffix: |
-            ${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-
+            ${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-gcc-${{ env.GCC_VERSION }}
 
       - name: Download Inno Setup
         run: |

@@ -35,6 +35,8 @@ jobs:
           msystem: MINGW64
           update: true
           install: |
+            coreutils
+            bash
 
       # --- Step 2: Setup Vcpkg and Install Dependencies with Cache ---
       # This step depends on the MinGW toolchain being available from the previous step.

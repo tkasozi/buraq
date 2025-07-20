@@ -28,15 +28,6 @@ jobs:
         with:
           submodules: true
 
-      - name: pacman
-#        uses: msys2/setup-msys2@v2
-#        with:
-#          msystem: MINGW64
-        run: |
-           pacman -Ss mingw-w64-x86_64-gcc
-
-        shell: bash
-
       # --- NEW ORDER: Step 1: Setup MSYS2 for build environment ---
       # This provides the MinGW-w64 toolchain (GCC, make) that Vcpkg will use.
       - name: Setup MSYS2 for build environment (Provides MinGW toolchain)
@@ -46,8 +37,8 @@ jobs:
           update: true
           install: |
             mingw-w64-x86_64-toolchain
-            mingw-w64-x86_64-gcc=14.3.0
-            mingw-w64-x86_64-g++=14.3.0
+            mingw-w64-x86_64-gcc=5.1.0-1
+            mingw-w64-x86_64-g++=5.1.0-1
             mingw-w64-x86_64-make
 
       # --- NEW ORDER: Step 2: Setup Vcpkg and Install Dependencies with Cache ---

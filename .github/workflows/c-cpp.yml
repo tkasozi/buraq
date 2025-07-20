@@ -31,7 +31,6 @@ jobs:
       # This provides the MinGW-w64 toolchain (GCC, make) that Vcpkg will use.
       - name: Setup MSYS2 for build environment (Provides MinGW toolchain)
         uses: msys2/setup-msys2@v2
-        if: false
         with:
           msystem: MINGW64
           update: true

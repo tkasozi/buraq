@@ -50,7 +50,6 @@ jobs:
       - name: Setup Vcpkg and Install Dependencies with Cache
         uses: lukka/run-vcpkg@v11
         id: vcpkg # Give this step an ID to access its outputs
-        if: false
         with:
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'

@@ -15,6 +15,7 @@ jobs:
         with:
           submodules: true # If vcpkg is a submodule in your it-tools-editor repo
           path: it-tools-editor
+          fetch-depth: '0'
 
       # Step 1: Set up MSYS2 with essential tools (including Ninja)
       # This replaces the need to find Ninja later.
@@ -40,6 +41,7 @@ jobs:
           repository: microsoft/vcpkg
           ref: master # Or a specific commit/tag for stability (e.g., '2024.06.20')
           path: vcpkg # Clones vcpkg into ${{ github.workspace }}/vcpkg
+          fetch-depth: '0' # Fetch full history
 
       # Step 3: Bootstrap Vcpkg
       # This compiles the vcpkg executable itself.

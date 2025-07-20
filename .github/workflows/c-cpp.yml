@@ -42,7 +42,7 @@ jobs:
             mingw-w64-x86_64-make
             mingw-w64-x86_64-ninja
 
-      - name: Read application executable name
+      - name: Ninja installation
         id: app-name
         run: echo "CMAKE_MAKE_PROGRAM=$(where ninja)" >> $GITHUB_ENV
       # --- Step 2: Setup Vcpkg and Install Dependencies with Cache ---

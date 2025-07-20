@@ -42,13 +42,9 @@ jobs:
             mingw-w64-x86_64-make
             mingw-w64-x86_64-ninja
 
-      - name: Check Ninja Installation
-        shell: cmd # Use cmd shell for Windows commands
-        run: |
-          echo "--- PATH Environment Variable ---"
-          echo %PATH%
-          echo "--- Where Ninja ---"
-          where ninja || echo "Ninja not found in PATH"
+      - name: Read application executable name
+        id: app-name
+        run: echo "CMAKE_MAKE_PROGRAM=$(where ninja)" >> $GITHUB_ENV
       # --- Step 2: Setup Vcpkg and Install Dependencies with Cache ---
       # This step depends on the MinGW toolchain being available from the previous step.
       - name: Setup Vcpkg and Install Dependencies with Cache

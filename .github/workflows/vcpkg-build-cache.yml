@@ -70,6 +70,7 @@ jobs:
           USERNAME: ${{ github.repository_owner }} # Your GitHub username or organization
           FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }} # The PAT secret
+          VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: |
           # Fetch nuget.exe using vcpkg's internal command
           $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }

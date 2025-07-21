@@ -4,7 +4,7 @@ on: [ push, pull_request ]
 
 jobs:
   upload_repo:
-    runs-on: ubuntu-latest # Or windows-latest, macos-latest
+    runs-on: windows-latest # Or ubuntu-latest, windows-latest, macos-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

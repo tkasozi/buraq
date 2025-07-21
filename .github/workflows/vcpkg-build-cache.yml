@@ -114,8 +114,8 @@ jobs:
           }
           Write-Host "API Key for GitHubPackages set successfully."
           
-      # MODIFIED DEBUG STEP: Debug NuGet Push/Pull Capabilities
-      # REMOVE --api-key from the push command.
+       # MODIFIED DEBUG STEP: Debug NuGet Push/Pull Capabilities
+       # REMOVE --api-key from the push command.
       - name: Debug NuGet Push/Pull Capabilities
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe

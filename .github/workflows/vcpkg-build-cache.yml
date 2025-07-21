@@ -13,6 +13,29 @@ jobs:
           path: it-tools-editor
           fetch-depth: 0
 
+      - name: Archive and Upload it-tools-editor as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+            name: it-tools-editor-artifact # Name your artifact
+            path: it-tools-editor/                  # Path to the directory to upload
+            retention-days: 1
+
+      - name: Clone Vcpkg Repository
+        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          ref: master
+          path: vcpkg
+          fetch-depth: 0
+
+      - name: Archive and Upload vcpkg as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vcpkg-artifact # Name your artifact
+          path: vcpkg/                  # Path to the directory to upload
+          retention-days: 1
+
   build:
     needs: upload_repo
     runs-on: ${{ matrix.os }}
@@ -35,6 +58,18 @@ jobs:
             vcpkg_triplet: x64-osx
             cmake_line_continuation: '\'
     steps:
+      - name: Restore it-tools-editor-artifact
+        uses: actions/download-artifact@v4
+        with:
+            name: it-tools-editor-artifact
+            path: restored-repo
+
+      - name: Restore vcpkg-artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vcpkg-artifact
+          path: restored-repo
+
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:

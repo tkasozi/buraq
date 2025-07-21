@@ -22,20 +22,10 @@ jobs:
             vcpkg_triplet: x64-osx
             cmake_shell: bash
             cmake_line_continuation: '\'
-
     runs-on: ${{ matrix.os }}
-
-    env:
-      build_type: ${{ matrix.build_type }}
-      os: ${{ matrix.os }}
-      vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
-      shell: ${{ matrix.cmake_shell }}
-      cmake_line_continuation: ${{ matrix.cmake_line_continuation }}
-
     permissions:
       contents: read
       packages: write
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -49,7 +39,7 @@ jobs:
       # (outside of vcpkg for Qt) still strictly require MSYS2/MinGW tools.
       # If your project only needs CMake, Ninja, and Visual Studio for Windows, you can REMOVE THIS STEP ENTIRELY.
       - name: Set up MSYS2 with Build Tools (Windows Only, if needed)
-        if: runner.os == 'Windows' && env.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
+        if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
         uses: msys2/setup-msys2@v2
         with:
           msys2-architecture: x86_64
@@ -60,7 +50,6 @@ jobs:
             ninja
           path-type: minimal
           msystem: MINGW64
-
       # IMPORTANT: If you switch to x64-windows triplet for Windows,
       # you will NOT need the MSYS2 setup step unless your *application*
       # (not its vcpkg dependencies) relies on specific MSYS2 tools.
@@ -73,9 +62,8 @@ jobs:
           ref: master
           path: vcpkg
           fetch-depth: 0
-
       - name: Bootstrap Vcpkg
-        shell: ${{ env.cmake_shell }}
+        shell: ${{ matrix.cmake_shell }}
         run: |
           if ("${{ runner.os }}" -eq "Windows") {
             ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
@@ -89,15 +77,15 @@ jobs:
           path: |
             ${{ github.workspace }}/vcpkg/downloads
             ${{ github.workspace }}/vcpkg/toolsrc
-          key: ${{ runner.os }}-${{ env.build_type }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
+          key: ${{ runner.os }}-${{ matrix.build_type }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-vcpkg-assets-
 
       - name: Configure NuGet for GitHub Packages
-        shell: ${{ env.cmake_shell }}
         env:
           USERNAME: ${{ github.repository_owner }}
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+        shell: ${{ matrix.cmake_shell }}
         run: |
           if ("${{ runner.os }}" -eq "Windows") {
             $nugetConfigPath = Join-Path $env:APPDATA "NuGet\NuGet.Config"
@@ -136,12 +124,11 @@ jobs:
             echo '</configuration>' >> ~/.nuget/NuGet/NuGet.Config
             echo "Created NuGet.Config at ~/.nuget/NuGet/NuGet.Config"
           }
-
       - name: Set NuGet API Key for GitHub Packages
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        shell: ${{ env.cmake_shell }}
+        shell: ${{ matrix.cmake_shell }}
         run: |
           if ("${{ runner.os }}" -eq "Windows") {
             $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
@@ -153,20 +140,19 @@ jobs:
             mono "$NUGET_PATH" setapikey "${{ env.GH_PACKAGES_TOKEN }}" -Source "GitHubPackages" -NonInteractive 2>&1 | cat
           }
           Write-Host "API Key for GitHubPackages set successfully."
-
       - name: Configure CMake and Install Vcpkg Dependencies
         working-directory: ${{ github.workspace }}/it-tools-editor
         env:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        shell: ${{ env.cmake_shell }}
+        shell: ${{ matrix.cmake_shell }}
         run: |
           # Determine Ninja path dynamically (for Windows, on Linux/macOS 'ninja' is typically in PATH)
           if ("${{ runner.os }}" -eq "Windows") {
               # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
               # For MinGW (x64-mingw-dynamic), find it from msys2 setup
-              if ("${{ env.vcpkg_triplet }}" -eq "x64-windows") {
+              if ("${{ matrix.vcpkg_triplet }}" -eq "x64-windows") {
                   $cmake_make_program_arg = "" # Let CMake find its bundled Ninja (often with VS)
               } else { # For MinGW
                   $ninja_path = (Get-Command ninja -ErrorAction SilentlyContinue).Path
@@ -182,24 +168,22 @@ jobs:
               $host_triplet_arg = "" # Not typically set for Linux/macOS like this
           }
 
-          cmake -B build ${{ env.cmake_line_continuation }}
-                -S . ${{ env.cmake_line_continuation }}
-                -G "Ninja" ${{ env.cmake_line_continuation }}
-                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" ${{ env.cmake_line_continuation }}
-                -DVCPKG_TARGET_TRIPLET=${{ env.vcpkg_triplet }} ${{ env.cmake_line_continuation }}
-                -DCMAKE_BUILD_TYPE=${{ env.build_type }} ${{ env.cmake_line_continuation }}
-                $host_triplet_arg ${{ env.cmake_line_continuation }}
+          cmake -B build ${{ matrix.cmake_line_continuation }}
+                -S . ${{ matrix.cmake_line_continuation }}
+                -G "Ninja" ${{ matrix.cmake_line_continuation }}
+                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" ${{ matrix.cmake_line_continuation }}
+                -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} ${{ matrix.cmake_line_continuation }}
+                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ matrix.cmake_line_continuation }}
+                $host_triplet_arg ${{ matrix.cmake_line_continuation }}
                 $cmake_make_program_arg
-
       - name: Build Project
         working-directory: ${{ github.workspace }}/it-tools-editor/build
-        shell: ${{ env.cmake_shell }}
-        run: cmake --build . --config ${{ env.build_type }}
-
+        shell: ${{ matrix.cmake_shell }}
+        run: cmake --build . --config ${{ matrix.build_type }}
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}-${{ env.build_type }}-build-artifacts
+          name: ${{ runner.os }}-${{ matrix.build_type }}-build-artifacts
           path: ${{ github.workspace }}/it-tools-editor/build/ # Adjust to your actual build output path
           retention-days: 5
         if: success()

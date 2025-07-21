@@ -245,15 +245,18 @@ jobs:
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           # Example of how you'd use them (assuming you have a line_continuation variable defined):
+#               -G "Ninja"  \
+#               "${cmake_make_program_arg}"
           cmake -B build \
                -S . \
-               -G "Ninja"  \
+               -G "Visual Studio 17 2022" \
+               -A x64 \
                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
                -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} \
+               -DVCPKG_DEFAULT_HOST_TRIPLET=${{ matrix.vcpkg_triplet }} \
                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
-               "${host_triplet_arg}" \
-               "${cmake_make_program_arg}"
+               "${host_triplet_arg}"
 
       - name: Build Project (Windows - MSVC)
         if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-windows'  && success()

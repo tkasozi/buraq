@@ -34,13 +34,13 @@ jobs:
 
       - name: Update MSYS2 Packages (Full System Update)
         run: |
-            # Update package databases and core system packages
-            pacman -Syyu --noconfirm
-            # Update remaining packages, including new dependencies/upgrades
-            pacman -Suu --noconfirm || exit 1
-            # Print GCC version after update for diagnostic
-            echo "GCC version after update:"
-            C:/mingw64/bin/x86_64-w64-mingw32-g++.exe --version
+          # Update package databases and core system packages
+          pacman -Syyu --noconfirm
+          # Update remaining packages, including new dependencies/upgrades
+          pacman -Suu --noconfirm || exit 1
+          # Print GCC version after update for diagnostic
+          echo "GCC version after update:"
+          C:/mingw64/bin/x86_64-w64-mingw32-g++.exe --version
         shell: msys2 {0} # Must run within the MSYS2 environment
 
       # Step 2: Clone Vcpkg if not part of the main repo as a submodule
@@ -154,14 +154,13 @@ jobs:
           
           Write-Host "Found Ninja at: $ninja_path" # Diagnostic: Print the path
 
-          # -DCMAKE_MAKE_PROGRAM="$ninja_path" `
-
           cmake -B build `
                 -S . `
-                -G "MinGW Makefiles" `
+                -G "Ninja" `
                 -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
                 -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic `
                 -DVCPKG_DEFAULT_HOST_TRIPLET=x64-mingw-dynamic `
+                -DCMAKE_MAKE_PROGRAM="$ninja_path" `
                 -DVCPKG_ROOT=${{ github.workspace }}/vcpkg
         shell: pwsh # Use cmd shell for typical Windows commands and path syntax
 

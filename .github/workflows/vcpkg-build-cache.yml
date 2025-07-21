@@ -25,6 +25,13 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      build_type: ${{ matrix.build_type }}
+      os: ${{ matrix.os }}
+      vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
+      shell: ${{ matrix.cmake_shell }}
+      cmake_line_continuation: ${{ matrix.cmake_line_continuation }}
+
     permissions:
       contents: read
       packages: write
@@ -36,15 +43,6 @@ jobs:
           submodules: true
           path: it-tools-editor
           fetch-depth: 0
-
-      - name: Job Environment
-        env:
-          build_type: ${{ matrix.build_type }}
-          os: ${{ matrix.os }}
-          vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
-          shell: ${{ matrix.cmake_shell }}
-          cmake_line_continuation: ${{ matrix.cmake_line_continuation }}
-        run: |
 
       # MODIFIED/CONDITIONAL STEP: Set up MSYS2 with Build Tools (Windows Only)
       # This step is now only conditionally needed if your *other* project dependencies

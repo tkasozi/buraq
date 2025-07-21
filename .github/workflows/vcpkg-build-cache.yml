@@ -3,7 +3,18 @@ name: Matrix Build and Deploy
 on: [ push, pull_request ]
 
 jobs:
+  upload_repo:
+    runs-on: ubuntu-latest # Or windows-latest, macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          path: it-tools-editor
+          fetch-depth: 0
+
   build:
+    needs: upload_repo
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read

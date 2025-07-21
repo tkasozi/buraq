@@ -16,7 +16,7 @@ jobs:
       - name: Archive and Upload it-tools-editor as Artifact
         uses: actions/upload-artifact@v4
         with:
-            name: it-tools-editor-artifact
+            name: it-tools-editor
             path: ${{ github.workspace }}/it-tools-editor/
 
       - name: Clone Vcpkg Repository
@@ -31,8 +31,21 @@ jobs:
       - name: Archive and Upload vcpkg as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vcpkg-artifact
+          name: vcpkg
           path: ${{ github.workspace }}/vcpkg/
+
+      - name: List Downloaded Repo Contents (Verification)
+        run: |
+          pwd
+
+          echo "Listing contents of the downloaded repository:"
+          ls -al  ${{ github.workspace }}/
+
+          echo "*************************"
+          ls -al  ${{ github.workspace }}/it-tools-editor
+          
+          echo "*************************"
+          ls -al  ${{ github.workspace }}/vcpkg
 
   build:
     needs: upload_repo
@@ -56,24 +69,14 @@ jobs:
       - name: Restore job artifact
         uses: actions/download-artifact@v4
         with:
-            name: it-tools-editor-artifact
+            name: it-tools-editor
             path: ${{ github.workspace }}/it-tools-editor
 
       - name: Restore vcpkg-artifact
         uses: actions/download-artifact@v4
         with:
-          name: vcpkg-artifact
+          name: vcpkg
           path: ${{ github.workspace }}/vcpkg
-
-      - name: List Downloaded Repo Contents (Verification)
-        run: |
-          pwd
-          
-          echo "Listing contents of the downloaded repository:"
-          ls -al  ${{ github.workspace }}/
-          
-          echo "*************************"
-          ls -al  ${{ github.workspace }}/it-tools-editor
 #
 #      - name: Checkout Repository
 #        uses: actions/checkout@v4

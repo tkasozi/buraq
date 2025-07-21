@@ -10,7 +10,6 @@ jobs:
       fail-fast: true
       matrix:
         os: [ windows-latest, ubuntu-latest, macos-latest ]
-        experimental: [ false ]
         build_type: [ Release ]
         include:
           - os: windows-latest
@@ -39,7 +38,6 @@ jobs:
       fail-fast: true
       matrix:
         os: [ windows-latest, ubuntu-latest, macos-latest ]
-        experimental: [ false ]
         build_type: [ Release ]
         include:
           - os: windows-latest
@@ -55,8 +53,12 @@ jobs:
             cmake_shell: bash
             cmake_line_continuation: '\'
     steps:
-      - name: Test
-        run: |
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          path: it-tools-editor
+          fetch-depth: 0
 
 #jobs:
 #  build:

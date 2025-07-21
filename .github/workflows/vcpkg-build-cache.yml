@@ -35,12 +35,11 @@ jobs:
     needs: init
     runs-on: ${{ fromJSON(needs.init.matrix.os) }}
     strategy:
-      matrix:
-        os: [ "" ]
+      matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
     steps:
       - name: Test
         run: |
-
+          echo "Testing for ${{ matrix.os }} / Node ${{ matrix.node }}"
 #jobs:
 #  build:
 #    strategy:

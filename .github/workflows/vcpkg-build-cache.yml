@@ -24,6 +24,7 @@ jobs:
             cmake_line_continuation: '\'
 
     runs-on: ${{ matrix.os }}
+    environment: ${{ matrix }}
 
     permissions:
       contents: read

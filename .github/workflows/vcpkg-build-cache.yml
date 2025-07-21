@@ -148,7 +148,9 @@ jobs:
                 -G "Ninja" `
                 -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
                 -DCMAKE_MAKE_PROGRAM="$ninja_path" `
-                -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic # Adjust triplet as per your needs
+                -DVCPKG_DEFAULT_HOST_TRIPLET:STRING=x64-mingw-dynamic ` # Adjust triplet as per your needs
+                -DVCPKG_TARGET_TRIPLET:STRING=x64-mingw-dynamic `
+                -DVCPKG_ROOT=${{ github.workspace }}/vcpkg
         shell: pwsh # Use cmd shell for typical Windows commands and path syntax
 
       # Step 7: Build the Project

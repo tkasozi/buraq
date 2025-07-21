@@ -95,7 +95,7 @@ jobs:
         env:
           # Crucial: This tells vcpkg to look for binary packages using NuGet.
           # It uses the feed configured in the previous step.
-          VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
+          VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite,interactive"
           # Optional: Specify Vcpkg install options, e.g., debug output
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}

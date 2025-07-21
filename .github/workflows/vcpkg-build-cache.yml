@@ -31,10 +31,6 @@ jobs:
           # If you need specific MSYS2 shells for later steps, you can set a default
           # shell: mingw64
 
-      - name: Check Ninja Installation
-        id: Find-Ninja
-        run: echo "CMAKE_MAKE_PROGRAM=$(where ninja)" >> $GITHUB_ENV
-
       # Step 2: Clone Vcpkg if not part of the main repo as a submodule
       # Adjust 'path' if you place vcpkg elsewhere.
       - name: Clone Vcpkg Repository
@@ -82,6 +78,7 @@ jobs:
               exit 1
           }
           
+          echo "CMAKE_MAKE_PROGRAM=$(where ninja)" >> $GITHUB_ENV
           echo "${{ env.CMAKE_MAKE_PROGRAM }}"
           
           # Add the GitHub Packages source to NuGet configuration

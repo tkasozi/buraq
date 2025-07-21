@@ -113,10 +113,9 @@ jobs:
               exit 1
           }
           Write-Host "API Key for GitHubPackages set successfully."
-          shell: pwsh
           
-          # MODIFIED DEBUG STEP: Debug NuGet Push/Pull Capabilities
-          # REMOVE --api-key from the push command.
+      # MODIFIED DEBUG STEP: Debug NuGet Push/Pull Capabilities
+      # REMOVE --api-key from the push command.
       - name: Debug NuGet Push/Pull Capabilities
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
@@ -173,8 +172,8 @@ jobs:
             exit 1
           }
           
-          Write-Host "Dummy package pushed successfully (or skipped if duplicate)."
-        shell: pwsh
+         Write-Host "Dummy package pushed successfully (or skipped if duplicate)."
+
       # Step 6: Configure CMake and trigger Vcpkg install
       # Vcpkg will automatically use the configured binary cache.
       - name: Configure CMake and Install Vcpkg Dependencies

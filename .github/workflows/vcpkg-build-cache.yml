@@ -64,21 +64,21 @@ jobs:
             name: it-tools-editor-artifact
             path: ${{ github.workspace }}/it-tools-editor
 
-      - name: List Downloaded Repo Contents (Verification)
-        run: |
-            pwd
-          
-            echo "Listing contents of the downloaded repository:"
-            ls -al  ${{ github.workspace }}/
-          
-            echo "*************************"
-            ls -al  ${{ github.workspace }}/it-tools-editor
-
       - name: Restore vcpkg-artifact
         uses: actions/download-artifact@v4
         with:
           name: vcpkg-artifact
           path: ${{ github.workspace }}/vcpkg
+
+      - name: List Downloaded Repo Contents (Verification)
+        run: |
+          pwd
+          
+          echo "Listing contents of the downloaded repository:"
+          ls -al  ${{ github.workspace }}/
+          
+          echo "*************************"
+          ls -al  ${{ github.workspace }}/it-tools-editor
 #
 #      - name: Checkout Repository
 #        uses: actions/checkout@v4

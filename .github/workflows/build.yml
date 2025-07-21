@@ -5,7 +5,7 @@ on: [ push, pull_request ]
 env:
   APP_NAME: "IT-Tools"
   CI: True
-  DOTNET_VERSION: 9.0.7
+  DOTNET_VERSION: 9.0.303
   CMAKE_EXE: "cmake"
 
 permissions:
@@ -208,7 +208,7 @@ jobs:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-          CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
+          CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/"$(which dotnet)"/runtimes/win-x64/native
         shell: bash
         run: |
           echo "****************${{ env.DOTNET_ROOT }}/packs******************"

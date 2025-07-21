@@ -3,9 +3,9 @@ name: Matrix Build and Deploy
 on: [ push, pull_request ]
 
 jobs:
-  build:
+  init:
     runs-on: windows-latest
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: ${{ matrix.os }}
     strategy:
       fail-fast: true
       matrix:

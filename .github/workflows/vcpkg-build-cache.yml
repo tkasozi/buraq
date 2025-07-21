@@ -5,6 +5,9 @@ on: [ push, pull_request ]
 jobs:
   init:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: true
       matrix:
@@ -52,6 +55,16 @@ jobs:
             ninja
           path-type: minimal
           msystem: MINGW64
+
+      - name: Bootstrap Vcpkg
+        shell: ${{ matrix.cmake_shell }}
+        run: |
+          if ("${{ runner.os }}" -eq "Windows") {
+            ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
+          } else {
+            ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
+          }
+      
 
 #jobs:
 #  build:

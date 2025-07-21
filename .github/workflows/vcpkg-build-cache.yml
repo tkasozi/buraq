@@ -67,13 +67,13 @@ jobs:
           fetch-depth: 0
 
       - name: Bootstrap Vcpkg
+        shell: ${{ matrix.cmake_shell }}
         run: |
           if ("${{ runner.os }}" -eq "Windows") {
             ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
           } else {
             ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
           }
-        shell: '${{ matrix.cmake_shell }}'
 
       - name: Cache Vcpkg Asset Downloads
         uses: actions/cache@v4

@@ -26,17 +26,17 @@ jobs:
             cmake_shell: bash
             cmake_line_continuation: '\'
     outputs:
-      matrix: ${{ toJSON(matrix) }}
+      matrix: '${{ toJSON(matrix) }}'
     steps:
       - run: |
-          echo "${{ toJSON(matrix) }}" > matrix.json
+          echo '${{ toJSON(matrix) }}' > matrix.json
           
           # Debug
           cat matrix.json
 
   config:
     needs: init
-    runs-on: ${{ fromJSON(needs.init.matrix.os) }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
     steps:

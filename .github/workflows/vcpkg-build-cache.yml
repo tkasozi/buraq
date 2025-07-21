@@ -32,7 +32,7 @@ jobs:
           # shell: mingw64
 
       - name: Check Ninja Installation
-        shell: cmd # Use cmd shell for Windows commands
+        id: Find-Ninja
         run: echo "CMAKE_MAKE_PROGRAM=$(where ninja)" >> $GITHUB_ENV
 
       # Step 2: Clone Vcpkg if not part of the main repo as a submodule

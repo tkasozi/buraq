@@ -212,7 +212,7 @@ jobs:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
         shell: bash
         run: |
-          echo "****************${{ env.DOTNET_ROOT }}/packs******************"
+          echo "******Dotnet at ${{ env.DOTNET_ROOT }}/packs: **********"
           ls -al "${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64"
           
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
@@ -262,6 +262,7 @@ jobs:
                -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} "${line_continuation}" \
                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} "${line_continuation}" \
                -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
+               -DNET="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
                "${host_triplet_arg}" "${line_continuation}" \
                "${cmake_make_program_arg}"
 

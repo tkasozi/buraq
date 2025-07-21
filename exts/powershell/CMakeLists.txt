@@ -12,13 +12,19 @@ set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 set(PLUGIN_SUBDIR "ext")
 set(PLUGIN_FULL_OUTPUT_DIR "${PLUGIN_BASE_OUTPUT_DIR}/${PLUGIN_SUBDIR}")
 
-find_file(NETHOST_DLL NAMES nethost.dll REQUIRED)
-get_filename_component(CMAKE_DOTNET_TARGET_FRAMEWORK "${NETHOST_DLL}" DIRECTORY)
-message("CMAKE_DOTNET_TARGET_FRAMEWORK: ${CMAKE_DOTNET_TARGET_FRAMEWORK}")
+find_file(NETHOST_DLL
+        NAMES "nethost.dll"
+        PATHS
+        "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
+        REQUIRED
+)
+
+get_filename_component(CMAKE_DOTNET_TARGET "${NETHOST_DLL}" DIRECTORY)
+message("CMAKE_DOTNET_TARGET_FRAMEWORK: ${CMAKE_DOTNET_TARGET}")
 
 # --- Include Directories ---
 target_include_directories(${PROJECT_NAME} PUBLIC
-        "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
+        "${CMAKE_DOTNET_TARGET}"
         "${CMAKE_SOURCE_DIR}/include"
 )
 
@@ -26,7 +32,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 foreach (NET_LIB nethost.lib nethost.dll)
     # 1. Define a variable holding the path to the source DLL you want to copy.
     #    Using CMAKE_CURRENT_SOURCE_DIR makes the path relative to the current CMakeLists.txt
-    set(MANAGED_DLL_SOURCE "${CMAKE_DOTNET_TARGET_FRAMEWORK}/${NET_LIB}")
+    set(MANAGED_DLL_SOURCE "${CMAKE_DOTNET_TARGET}/${NET_LIB}")
     if (EXISTS ${MANAGED_DLL_SOURCE})
         # --- DEPLOY MANAGED DEPENDENCIES ---
         # 2. Define the destination directory.
@@ -48,7 +54,7 @@ foreach (NET_LIB nethost.lib nethost.dll)
                 COMMENT "Copying managed dependency ${MANAGED_DLL_SOURCE}"
         )
     else ()
-        message(FATAL_ERROR "${MANAGED_DLL_SOURCE} not found at ${CMAKE_DOTNET_TARGET_FRAMEWORK}.")
+        message(FATAL_ERROR "${MANAGED_DLL_SOURCE} not found at ${CMAKE_DOTNET_TARGET}.")
     endif ()
 endforeach (NET_LIB)
 
@@ -62,8 +68,8 @@ endif ()
 # Glob all files in the source assets directory
 file(GLOB ASSET_FILES "${MANAGED_LIBRARY_PUBLISH_DIR}/*") # Gets files directly in the folder
 
-if (EXISTS ${CMAKE_DOTNET_TARGET_FRAMEWORK})
-    target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_DOTNET_TARGET_FRAMEWORK}")
+if (EXISTS ${CMAKE_DOTNET_TARGET})
+    target_link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_DOTNET_TARGET}")
     target_link_libraries(${PROJECT_NAME} PRIVATE nethost)
 endif ()
 

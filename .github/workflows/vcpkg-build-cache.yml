@@ -26,11 +26,21 @@ jobs:
             cmake_shell: bash
             cmake_line_continuation: '\'
     steps:
-      - name: Test ${{ matrix.cmake_shell }}
-        run: |
-          echo "Testing ${{ matrix.cmake_shell }}"
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          path: it-tools-editor
+          fetch-depth: 0
   config:
-    runs-on:  ${{ fromJSON(needs.init.matrix.os) }}
+    runs-on: ${{ fromJSON(needs.init.matrix.os) }}
+    strategy:
+      matrix:
+        os: [ "" ]
+    steps:
+      - name: Test
+        run: |
+
 #jobs:
 #  build:
 #    strategy:

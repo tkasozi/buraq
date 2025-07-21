@@ -109,16 +109,6 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
 
-      - name: Cache Vcpkg Asset Downloads
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/vcpkg/downloads
-            ${{ github.workspace }}/vcpkg/toolsrc
-          key: ${{ runner.os }}-${{ matrix.build_type }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-assets-
-
       - name: Configure NuGet for GitHub Packages (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -255,15 +245,15 @@ jobs:
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           # Example of how you'd use them (assuming you have a line_continuation variable defined):
-          cmake -B build "${line_continuation}" \
-               -S . "${line_continuation}" \
-               -G "Ninja" "${line_continuation}" \
-               -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" "${line_continuation}" \
-               -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} "${line_continuation}" \
-               -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} "${line_continuation}" \
+          cmake -B build \
+               -S . \
+               -G "Ninja"  \
+               -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+               -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} \
+               -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
                -DNET="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
-               "${host_triplet_arg}" "${line_continuation}" \
+               "${host_triplet_arg}" \
                "${cmake_make_program_arg}"
 
       - name: Build Project

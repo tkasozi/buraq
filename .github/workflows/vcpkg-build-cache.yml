@@ -23,6 +23,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msys2-architecture: x86_64
+          path-type: minimal
           # Install toolchain, git, and critically, ninja
           install: >
             mingw-w64-x86_64-toolchain
@@ -100,7 +101,7 @@ jobs:
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: |
-          $ninja_path = (where ninja | Select-Object -First 1)
+          $ninja_path = (Get-Command ninja -ErrorAction SilentlyContinue).Path
           if (-not $ninja_path) {
             Write-Error "Ninja not found in PATH!"
             exit 1

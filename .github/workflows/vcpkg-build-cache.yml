@@ -167,7 +167,7 @@ jobs:
           
           Write-Host "Attempting to push $dummyPackageNupkg to GitHub Packages..."
           # Use -Verbosity and -Debug on the push command where they are valid
-          & "$nuget_path" push "$dummyPackageNupkg" -Source "GitHubPackages" -SkipDuplicate -Verbosity detailed 2>&1 | Write-Host
+          & "$nuget_path" push "$dummyPackageNupkg" -Source "GitHubPackages" -SkipDuplicate -Verbosity detailed --api-key "${{ env.GH_PACKAGES_TOKEN }}" 2>&1 | Write-Host
           if ($LASTEXITCODE -ne 0) {
               Write-Error "Dummy package push failed! This is the core issue with authentication."
               exit 1

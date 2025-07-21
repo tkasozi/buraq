@@ -116,9 +116,6 @@ jobs:
           USERNAME: ${{ github.repository_owner }}
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: |
-          echo "List: --- "
-          ls -alh
-          
           $nugetConfigPath = Join-Path $env:APPDATA "NuGet\NuGet.Config"
           $nugetConfigContent = @"
           <?xml version="1.0" encoding="utf-8"?>

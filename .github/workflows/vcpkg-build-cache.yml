@@ -127,6 +127,7 @@ jobs:
           # Optional: Specify Vcpkg install options, e.g., debug output
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          VCPKG_NUGET_CONFIG: "$env:APPDATA\NuGet\NuGet.Config"
         run: |
           $ninja_path = (Get-Command ninja -ErrorAction SilentlyContinue).Path
           if (-not $ninja_path) {

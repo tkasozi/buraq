@@ -16,8 +16,8 @@ jobs:
       - name: Archive and Upload it-tools-editor as Artifact
         uses: actions/upload-artifact@v4
         with:
-            name: it-tools-editor-artifact # Name your artifact
-            path: it-tools-editor/                  # Path to the directory to upload
+            name: it-tools-editor-artifact
+            path: it-tools-editor/
             retention-days: 1
 
       - name: Clone Vcpkg Repository
@@ -32,8 +32,8 @@ jobs:
       - name: Archive and Upload vcpkg as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vcpkg-artifact # Name your artifact
-          path: vcpkg/                  # Path to the directory to upload
+          name: vcpkg-artifact
+          path: vcpkg/
           retention-days: 1
 
   build:
@@ -58,17 +58,17 @@ jobs:
             vcpkg_triplet: x64-osx
             cmake_line_continuation: '\'
     steps:
-      - name: Restore it-tools-editor-artifact
+      - name: Restore job artifact
         uses: actions/download-artifact@v4
         with:
-            name: it-tools-editor-artifact
-            path: ${{ github.workspace }}/it-tools-editor
+            name: it-tools-editor-artifact, vcpkg-artifact
+            path: ${{ github.workspace }}
 
-      - name: Restore vcpkg-artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: vcpkg-artifact
-          path: ${{ github.workspace }}/vcpkg
+#      - name: Restore vcpkg-artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: vcpkg-artifact
+#          path: ${{ github.workspace }}/vcpkg
 
       - name: List Downloaded Repo Contents (Verification)
         run: |

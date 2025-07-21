@@ -25,13 +25,12 @@ jobs:
             vcpkg_triplet: x64-osx
             cmake_shell: bash
             cmake_line_continuation: '\'
+    outputs:
+      matrix: ${{ toJSON(strategy.matrix) }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-          path: it-tools-editor
-          fetch-depth: 0
+      - run: |
+          echo "Outputting matrix: ${{ toJSON(strategy.matrix) }}"
+
   config:
     needs: init
     runs-on: ${{ fromJSON(needs.init.matrix.os) }}

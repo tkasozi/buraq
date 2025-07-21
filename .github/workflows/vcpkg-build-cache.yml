@@ -19,33 +19,6 @@ jobs:
             name: it-tools-editor
             path: ${{ github.workspace }}/it-tools-editor/
 
-      - name: Clone Vcpkg Repository
-        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
-        uses: actions/checkout@v4
-        with:
-          repository: microsoft/vcpkg
-          ref: master
-          path: vcpkg
-          fetch-depth: 0
-
-      - name: Archive and Upload vcpkg as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vcpkg
-          path: ${{ github.workspace }}/vcpkg/
-
-      - name: List Downloaded Repo Contents (Verification)
-        run: |
-          pwd
-
-          echo "Listing contents of the downloaded repository:"
-          ls -al  ${{ github.workspace }}/
-
-          echo "*************************"
-          ls -al  ${{ github.workspace }}/it-tools-editor
-          
-          echo "*************************"
-          ls -al  ${{ github.workspace }}/vcpkg
 
   build:
     needs: upload_repo
@@ -72,27 +45,14 @@ jobs:
             name: it-tools-editor
             path: ${{ github.workspace }}/it-tools-editor
 
-      - name: Restore vcpkg-artifact
-        uses: actions/download-artifact@v4
+      - name: Clone Vcpkg Repository
+        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
+        uses: actions/checkout@v4
         with:
-          name: vcpkg
-          path: ${{ github.workspace }}/vcpkg
-#
-#      - name: Checkout Repository
-#        uses: actions/checkout@v4
-#        with:
-#          submodules: true
-#          path: it-tools-editor
-#          fetch-depth: 0
-#
-#      - name: Clone Vcpkg Repository
-#        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
-#        uses: actions/checkout@v4
-#        with:
-#          repository: microsoft/vcpkg
-#          ref: master
-#          path: vcpkg
-#          fetch-depth: 0
+          repository: microsoft/vcpkg
+          ref: master
+          path: vcpkg
+          fetch-depth: 0
 
       - name: Set up MSYS2 with Build Tools (Windows Only, if needed)
         if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used

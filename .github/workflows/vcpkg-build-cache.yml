@@ -33,6 +33,7 @@ jobs:
           path: it-tools-editor
           fetch-depth: 0
   config:
+    needs: init
     runs-on: ${{ fromJSON(needs.init.matrix.os) }}
     strategy:
       matrix:

@@ -5,7 +5,7 @@ on: [ push, pull_request ]
 env:
   APP_NAME: "IT-Tools"
   CI: True
-  DOTNET_VERSION: 9.0.303
+  DOTNET_VERSION: 9.0.7
   CMAKE_EXE: "cmake"
 
 permissions:

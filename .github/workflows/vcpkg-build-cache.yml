@@ -106,8 +106,6 @@ jobs:
             exit 1
           }
           
-          echo $ninja_path
-          
           cmake -B build ^
                 -S . ^
                 -G "Ninja" ^

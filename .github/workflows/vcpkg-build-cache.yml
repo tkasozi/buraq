@@ -108,7 +108,7 @@ jobs:
                 -S . ^
                 -G "Ninja" ^
                 -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake ^
-                -DCMAKE_MAKE_PROGRAM="$(where ninja)" ^
+                -DCMAKE_MAKE_PROGRAM="${{ env.CMAKE_MAKE_PROGRAM }}" ^
                 -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic # Adjust triplet as per your needs
         shell: cmd # Use cmd shell for typical Windows commands and path syntax
 

@@ -203,7 +203,7 @@ jobs:
         shell: bash
         run: |
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
-          ls "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
+          ls -al "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
           
           
           if [[ "${{ runner.os }}" == "Windows" ]]; then

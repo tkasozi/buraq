@@ -29,7 +29,7 @@ jobs:
       matrix: ${{ toJSON(strategy.matrix) }}
     steps:
       - run: |
-          echo "Outputting matrix: ${{ toJSON(strategy.matrix) }}"
+          echo "Outputting matrix: ${{ toJSON(matrix) }}"
 
   config:
     needs: init

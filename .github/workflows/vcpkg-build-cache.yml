@@ -4,7 +4,7 @@ on: [ push, pull_request ]
 
 jobs:
   upload_repo:
-    runs-on: windows-latest # Or ubuntu-latest, windows-latest, macos-latest
+    runs-on: ubuntu-latest # Or windows-latest, macos-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -19,6 +19,21 @@ jobs:
             name: it-tools-editor-artifact
             path: ${{ github.workspace }}/it-tools-editor/
 
+      - name: Clone Vcpkg Repository
+        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          ref: master
+          path: vcpkg
+          fetch-depth: 0
+
+      - name: Archive and Upload vcpkg as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vcpkg-artifact
+          path: ${{ github.workspace }}/vcpkg/
+
   build:
     needs: upload_repo
     runs-on: ${{ matrix.os }}
@@ -26,7 +41,7 @@ jobs:
       contents: read
       packages: write
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ windows-latest ]
         build_type: [ Release ]
@@ -44,14 +59,11 @@ jobs:
             name: it-tools-editor-artifact
             path: ${{ github.workspace }}
 
-      - name: Clone Vcpkg Repository
-        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
-        uses: actions/checkout@v4
+      - name: Restore vcpkg-artifact
+        uses: actions/download-artifact@v4
         with:
-          repository: microsoft/vcpkg
-          ref: master
-          path: vcpkg
-          fetch-depth: 0
+          name: vcpkg-artifact
+          path: ${{ github.workspace }}/vcpkg
 
       - name: List Downloaded Repo Contents (Verification)
         run: |

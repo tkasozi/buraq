@@ -23,6 +23,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msys2-architecture: x86_64
+          update: true
           path-type: minimal
           # Install toolchain, git, and critically, ninja
           install: >

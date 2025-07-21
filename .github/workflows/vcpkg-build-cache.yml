@@ -4,8 +4,8 @@ on: [ push, pull_request ]
 
 jobs:
   init:
-    runs-on: windows-latest
-    continue-on-error: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: true
       matrix:

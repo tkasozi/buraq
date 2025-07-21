@@ -131,17 +131,19 @@ jobs:
           
           # Try to list packages from your feed (pull test)
           Write-Host "--- NuGet List Test ---"
-          & "$nuget_path" list -Source "GitHubPackages" -Verbosity detailed -Debug 2>&1 | Write-Host
+          # Removed -Debug and -Verbosity from list command as they are invalid
+          & "$nuget_path" list -Source "GitHubPackages" 2>&1 | Write-Host
           if ($LASTEXITCODE -ne 0) {
-              Write-Error "NuGet list test failed! Check credentials/source."
+              Write-Error "NuGet list test failed! Check credentials/source or connectivity."
               exit 1
           }
+          Write-Host "NuGet list test passed (no direct error from 'nuget list')."
           
-          # Try to push a dummy package (push test)
-          # NOTE: This creates a dummy package and pushes it. It creates clutter but verifies push.
-          # REMOVE THIS STEP AFTER DEBUGGING!
+          
+          # Try to push a dummy package (push test) - REMOVE THIS AFTER DEBUGGING!
+          # This step will only run if the 'list' command succeeded.
           Write-Host "--- NuGet Push Test ---"
-          $dummyPackageId = "DummyTestPackage.${{ github.run_id }}.${{ github.run_attempt }}"
+          $dummyPackageId = "DummyTestPackage.${{ github.run_id }}.${{ github.run_attempt }}-${{ runner.os }}" # Add OS for uniqueness
           $dummyPackageVersion = "1.0.0"
           $dummyPackageNupkg = "$dummyPackageId.$dummyPackageVersion.nupkg"
           
@@ -151,26 +153,28 @@ jobs:
             <metadata>
               <id>$dummyPackageId</id>
               <version>$dummyPackageVersion</version>
-              <authors>Test</authors>
-              <description>A dummy package for CI testing.</description>
+              <authors>CI Test User</authors>
+              <description>A dummy package for CI testing of NuGet push.</description>
             </metadata>
           </package>
           "@ | Out-Null
           
+          Write-Host "Creating dummy package '$dummyPackageId.nuspec'..."
           & "$nuget_path" pack "$dummyPackageId.nuspec" -OutputDirectory . -NoDefaultExcludes 2>&1 | Write-Host
           if ($LASTEXITCODE -ne 0) {
               Write-Error "Dummy package creation failed."
               exit 1
           }
           
-          Write-Host "Attempting to push $dummyPackageNupkg..."
+          Write-Host "Attempting to push $dummyPackageNupkg to GitHub Packages..."
+          # Use -Verbosity and -Debug on the push command where they are valid
           & "$nuget_path" push "$dummyPackageNupkg" -Source "GitHubPackages" -SkipDuplicate -Verbosity detailed -Debug 2>&1 | Write-Host
           if ($LASTEXITCODE -ne 0) {
-              Write-Error "Dummy package push failed! This is the core issue."
+              Write-Error "Dummy package push failed! This is the core issue with authentication."
               exit 1
           }
           Write-Host "Dummy package pushed successfully (or skipped if duplicate)."
-          shell: pwsh
+        shell: pwsh
 
       # Step 6: Configure CMake and trigger Vcpkg install
       # Vcpkg will automatically use the configured binary cache.

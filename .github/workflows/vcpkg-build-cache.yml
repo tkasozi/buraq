@@ -92,10 +92,9 @@ jobs:
           New-Item -ItemType Directory -Force -Path (Split-Path $nugetConfigPath)
           $nugetConfigContent | Out-File $nugetConfigPath
           Write-Host "Created NuGet.Config at $nugetConfigPath"
-          shell: pwsh
           
-          # NEW CRITICAL STEP: Set API Key for the GitHub Packages Source using nuget.exe setapikey
-          # This explicitly tells nuget.exe about the API key for the source.
+      # NEW CRITICAL STEP: Set API Key for the GitHub Packages Source using nuget.exe setapikey
+      # This explicitly tells nuget.exe about the API key for the source.
       - name: Set NuGet API Key for GitHub Packages
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe

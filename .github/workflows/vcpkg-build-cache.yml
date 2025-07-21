@@ -78,6 +78,7 @@ jobs:
               exit 1
           }
           
+          where ninja
           echo "CMAKE_MAKE_PROGRAM=$(where ninja)" >> $GITHUB_ENV
           echo "${{ env.CMAKE_MAKE_PROGRAM }}"
           

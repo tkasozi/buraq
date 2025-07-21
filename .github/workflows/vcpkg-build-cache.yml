@@ -159,7 +159,7 @@ jobs:
           "@ | Out-Null
           
           Write-Host "Creating dummy package '$dummyPackageId.nuspec'..."
-          & "$nuget_path" pack "$dummyPackageId.nuspec" -OutputDirectory . -NoDefaultExcludes --api-key "${{ env.GH_PACKAGES_TOKEN }}"  2>&1 | Write-Host
+          & "$nuget_path" pack "$dummyPackageId.nuspec" -OutputDirectory . -NoDefaultExcludes  2>&1 | Write-Host
           if ($LASTEXITCODE -ne 0) {
               Write-Error "Dummy package creation failed."
               exit 1

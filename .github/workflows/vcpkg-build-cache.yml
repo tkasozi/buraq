@@ -58,8 +58,6 @@ jobs:
       # you will NOT need the MSYS2 setup step unless your *application*
       # (not its vcpkg dependencies) relies on specific MSYS2 tools.
       # The 'windows-latest' runner comes with Visual Studio and basic Git/CMake pre-installed.
-
-
       - name: Clone Vcpkg Repository
         if: "${{ github.workspace }}/it-tools-editor/vcpkg" == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
         uses: actions/checkout@v4

@@ -62,13 +62,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
             name: it-tools-editor-artifact
-            path: it-tools-editor
+            path: ${{ github.workspace }}/it-tools-editor
 
       - name: Restore vcpkg-artifact
         uses: actions/download-artifact@v4
         with:
           name: vcpkg-artifact
-          path: vcpkg
+          path: ${{ github.workspace }}/vcpkg
 #
 #      - name: Checkout Repository
 #        uses: actions/checkout@v4

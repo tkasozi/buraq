@@ -59,7 +59,7 @@ jobs:
       - name: Restore job artifact
         uses: actions/download-artifact@v4
         with:
-            name: it-tools-editor-artifact, vcpkg-artifact
+            name: it-tools-editor-artifact
             path: ${{ github.workspace }}
 
       - name: Restore vcpkg-artifact

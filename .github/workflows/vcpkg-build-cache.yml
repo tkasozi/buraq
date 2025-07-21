@@ -216,9 +216,9 @@ jobs:
           host_triplet_arg="" # Not typically set for Linux/macOS like this
           fi
 
-         # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
-         # Example of how you'd use them (assuming you have a line_continuation variable defined):
-         cmake -B build "${line_continuation}" \
+          # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
+          # Example of how you'd use them (assuming you have a line_continuation variable defined):
+          cmake -B build "${line_continuation}" \
                -S . "${line_continuation}" \
                -G "Ninja" "${line_continuation}" \
                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" "${line_continuation}" \
@@ -226,6 +226,7 @@ jobs:
                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} "${line_continuation}" \
                "${host_triplet_arg}" "${line_continuation}" \
                "${cmake_make_program_arg}"
+
 
 #jobs:
 #  build:

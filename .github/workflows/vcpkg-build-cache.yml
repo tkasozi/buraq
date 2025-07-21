@@ -77,11 +77,7 @@ jobs:
               Write-Error "Failed to get nuget.exe path from vcpkg fetch nuget."
               exit 1
           }
-          
-          where ninja
-          echo "CMAKE_MAKE_PROGRAM=$(where ninja)" >> $GITHUB_ENV
-          echo "${{ env.CMAKE_MAKE_PROGRAM }}"
-          
+
           # Add the GitHub Packages source to NuGet configuration
           # Vcpkg will then automatically pick this up via VCPKG_BINARY_SOURCES
           & "$nuget_path" sources add `
@@ -104,11 +100,19 @@ jobs:
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: |
+          $ninja_path = (where ninja | Select-Object -First 1)
+          if (-not $ninja_path) {
+            Write-Error "Ninja not found in PATH!"
+            exit 1
+          }
+          
+          echo $ninja_path
+          
           cmake -B build ^
                 -S . ^
                 -G "Ninja" ^
                 -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake ^
-                -DCMAKE_MAKE_PROGRAM="${{ env.CMAKE_MAKE_PROGRAM }}" ^
+                -DCMAKE_MAKE_PROGRAM="$ninja_path" ^
                 -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic # Adjust triplet as per your needs
         shell: cmd # Use cmd shell for typical Windows commands and path syntax
 

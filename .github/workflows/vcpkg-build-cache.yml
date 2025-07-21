@@ -82,6 +82,8 @@ jobs:
               exit 1
           }
           
+          echo "${{ env.CMAKE_MAKE_PROGRAM }}"
+          
           # Add the GitHub Packages source to NuGet configuration
           # Vcpkg will then automatically pick this up via VCPKG_BINARY_SOURCES
           & "$nuget_path" sources add `

@@ -16,15 +16,12 @@ jobs:
         include:
           - os: windows-latest
             vcpkg_triplet: x64-windows # <--- CHANGED FROM x64-mingw-dynamic
-            cmake_shell: pwsh
             cmake_line_continuation: '`'
           - os: ubuntu-latest
             vcpkg_triplet: x64-linux
-            cmake_shell: bash
             cmake_line_continuation: '\'
           - os: macos-latest
             vcpkg_triplet: x64-osx
-            cmake_shell: bash
             cmake_line_continuation: '\'
     steps:
       - name: Checkout Repository
@@ -56,14 +53,15 @@ jobs:
           path-type: minimal
           msystem: MINGW64
 
-      - name: Bootstrap Vcpkg
-#        shell: ${{ matrix.cmake_shell }}
-        run: |
-          if ("${{ runner.os }}" -eq "Windows") {
-            ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
-          } else {
-            ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
-          }
+      - name: Bootstrap Vcpkg (Windows)
+        if: runner.os == 'Windows'
+        run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
+        shell: pwsh
+
+      - name: Bootstrap Vcpkg (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
+        shell: bash
 
 #jobs:
 #  build:

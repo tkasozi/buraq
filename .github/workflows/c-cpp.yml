@@ -11,7 +11,7 @@ env:
   CI: True
   DOTNET_VERSION: 9.0
   CMAKE_EXE: "cmake"
-  
+
 permissions:
   contents: write
 
@@ -73,6 +73,8 @@ jobs:
       - name: Build Managed project
         id: dotnet-project
         run: |
+          ls -alh
+          
          cd ManagedLibrary
           
          ./build.sh

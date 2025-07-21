@@ -100,19 +100,19 @@ jobs:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: |
-          # Find nuget.exe
-          $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
-          if (-not $nuget_path) { Write-Error "Failed to get nuget.exe path."; exit 1 }
-          
-          Write-Host "Setting API Key for GitHubPackages source..."
-          # Use the setapikey command. The key is the PAT.
-          # -Source is used to specify which registered source the API key is for.
-          & "$nuget_path" setapikey "${{ env.GH_PACKAGES_TOKEN }}" -Source "GitHubPackages" -NonInteractive 2>&1 | Write-Host
-          if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to set API Key for GitHubPackages."
-              exit 1
-          }
-          Write-Host "API Key for GitHubPackages set successfully."
+            # Find nuget.exe
+            $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
+            if (-not $nuget_path) { Write-Error "Failed to get nuget.exe path."; exit 1 }
+            
+            Write-Host "Setting API Key for GitHubPackages source..."
+            # Use the setapikey command. The key is the PAT.
+            # -Source is used to specify which registered source the API key is for.
+            & "$nuget_path" setapikey "${{ env.GH_PACKAGES_TOKEN }}" -Source "GitHubPackages" -NonInteractive 2>&1 | Write-Host
+            if ($LASTEXITCODE -ne 0) {
+                Write-Error "Failed to set API Key for GitHubPackages."
+                exit 1
+            }
+            Write-Host "API Key for GitHubPackages set successfully."
 
       - name: Debug NuGet Push/Pull Capabilities
         env:

@@ -1,177 +1,210 @@
-name: Build with Vcpkg and CMake (GitHub Packages Caching)
+name: Matrix Build and Deploy
 
 on: [ push, pull_request ]
 
+#on:
+#  push:
+#    branches:
+#      - main
+#      - develop
+#  pull_request:
+#    branches:
+#      - main
+#      - develop
+
 jobs:
   build:
-    runs-on: windows-latest # Or your specific Windows runner if different
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        build_type: [Debug, Release]
+        include:
+          - os: windows-latest
+            vcpkg_triplet: x64-windows # <--- CHANGED FROM x64-mingw-dynamic
+            cmake_shell: pwsh
+            cmake_line_continuation: "`"
+          - os: ubuntu-latest
+            vcpkg_triplet: x64-linux
+            cmake_shell: bash
+            cmake_line_continuation: "\"
+          - os: macos-latest
+            vcpkg_triplet: x64-osx
+            cmake_shell: bash
+            cmake_line_continuation: "\"
+
+    runs-on: ${{ matrix.os }}
+
     permissions:
-      contents: read # Needed for checkout
-      packages: write # VERY IMPORTANT: Allows pushing/pulling from GitHub Packages
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          submodules: true # If vcpkg is a submodule in your it-tools-editor repo
+          submodules: true
           path: it-tools-editor
-          fetch-depth: '0'
+          fetch-depth: 0
 
-      # Step 1: Set up MSYS2 with essential tools (including Ninja)
-      # This replaces the need to find Ninja later.
-      - name: Set up MSYS2 with Build Tools
+      # MODIFIED/CONDITIONAL STEP: Set up MSYS2 with Build Tools (Windows Only)
+      # This step is now only conditionally needed if your *other* project dependencies
+      # (outside of vcpkg for Qt) still strictly require MSYS2/MinGW tools.
+      # If your project only needs CMake, Ninja, and Visual Studio for Windows, you can REMOVE THIS STEP ENTIRELY.
+      - name: Set up MSYS2 with Build Tools (Windows Only, if needed)
+        if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
         uses: msys2/setup-msys2@v2
         with:
           msys2-architecture: x86_64
           update: true
-          path-type: minimal
-          # Install toolchain, git, and critically, ninja
           install: >
             mingw-w64-x86_64-toolchain
             git
             ninja
-          # If you need specific MSYS2 shells for later steps, you can set a default
-          # shell: mingw64
+          path-type: minimal
+          msystem: MINGW64
 
-      # NEW STEP 1 of 2: Update MSYS2 Runtime (first pass, may cause restart)
-      - name: Update MSYS2 Core Packages
-        run: |
-          # Update package databases and core system packages that might require a restart
-          pacman -Syu --noconfirm --noprogressbar || exit 0
-        shell: msys2 {0}
+      # IMPORTANT: If you switch to x64-windows triplet for Windows,
+      # you will NOT need the MSYS2 setup step unless your *application*
+      # (not its vcpkg dependencies) relies on specific MSYS2 tools.
+      # The 'windows-latest' runner comes with Visual Studio and basic Git/CMake pre-installed.
 
-      # NEW STEP 2 of 2: Complete MSYS2 Update (second pass after potential restart)
-      - name: Complete MSYS2 Package Update
-        run: |
-          # Complete any remaining updates after the potential restart
-          pacman -Su --noconfirm --noprogressbar || exit 1
-          echo "GCC version after update:"
-          C:/mingw64/bin/x86_64-w64-mingw32-g++.exe --version
-        shell: msys2 {0}
 
-      # Step 2: Clone Vcpkg if not part of the main repo as a submodule
-      # Adjust 'path' if you place vcpkg elsewhere.
       - name: Clone Vcpkg Repository
-        # Only run if vcpkg wasn't checked out as a submodule in the main repo
-        if: ${{ github.workspace }}/it-tools-editor/vcpkg != '' && !contains(github.workspace, 'it-tools-editor/vcpkg') # Crude check, refine if needed
+        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
         uses: actions/checkout@v4
         with:
           repository: microsoft/vcpkg
-          ref: master # Or a specific commit/tag for stability (e.g., '2024.06.20')
-          path: vcpkg # Clones vcpkg into ${{ github.workspace }}/vcpkg
-          fetch-depth: '0' # Fetch full history
+          ref: master
+          path: vcpkg
+          fetch-depth: 0
 
-      # Step 3: Bootstrap Vcpkg
-      # This compiles the vcpkg executable itself.
       - name: Bootstrap Vcpkg
-        run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
-        shell: cmd # Use cmd shell for .bat file execution
+        run: |
+          if ("${{ runner.os }}" -eq "Windows") {
+            ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
+          } else {
+            ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
+          }
+        shell: ${{ matrix.cmake_shell }}
 
-      # Step 4: Cache Vcpkg's Asset Downloads (Optional but Recommended)
-      # This caches downloaded source code archives, build tools, etc., preventing re-downloads.
       - name: Cache Vcpkg Asset Downloads
         uses: actions/cache@v4
         with:
           path: |
-            ${{ github.workspace }}/vcpkg/downloads # Vcpkg's common asset cache
-            ${{ github.workspace }}/vcpkg/toolsrc # Location where vcpkg builds/stores helper tools
-          key: ${{ runner.os }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
+            ${{ github.workspace }}/vcpkg/downloads
+            ${{ github.workspace }}/vcpkg/toolsrc
+          key: ${{ runner.os }}-${{ matrix.build_type }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-vcpkg-assets-
 
-      # CRITICAL MODIFIED STEP: Configure NuGet.Config for GitHub Packages
-      # This step creates the package source and user credentials in NuGet.Config
       - name: Configure NuGet for GitHub Packages
         env:
           USERNAME: ${{ github.repository_owner }}
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+        shell: ${{ matrix.cmake_shell }}
         run: |
-          # Create NuGet.Config in the user's NuGet configuration directory
-          $nugetConfigPath = Join-Path $env:APPDATA "NuGet\NuGet.Config"
-          
-          $nugetConfigContent = @"
-          <?xml version="1.0" encoding="utf-8"?>
-          <configuration>
-            <packageSources>
-              <clear />
-              <add key="GitHubPackages" value="https://nuget.pkg.github.com/$env:USERNAME/index.json" />
-            </packageSources>
-            <packageSourceCredentials>
-              <GitHubPackages>
-                <add key="Username" value="$env:USERNAME" />
-                <add key="ClearTextPassword" value="$env:GH_PACKAGES_TOKEN" />
-              </GitHubPackages>
-            </packageSourceCredentials>
-          </configuration>
-          "@
-          
-          # Ensure the directory exists
-          New-Item -ItemType Directory -Force -Path (Split-Path $nugetConfigPath)
-          $nugetConfigContent | Out-File $nugetConfigPath
-          Write-Host "Created NuGet.Config at $nugetConfigPath"
+          if ("${{ runner.os }}" -eq "Windows") {
+            $nugetConfigPath = Join-Path $env:APPDATA "NuGet\NuGet.Config"
+            $nugetConfigContent = @"
+            <?xml version="1.0" encoding="utf-8"?>
+            <configuration>
+              <packageSources>
+                <clear />
+                <add key="GitHubPackages" value="https://nuget.pkg.github.com/$env:USERNAME/index.json" />
+              </packageSources>
+              <packageSourceCredentials>
+                <GitHubPackages>
+                  <add key="Username" value="$env:USERNAME" />
+                  <add key="ClearTextPassword" value="$env:GH_PACKAGES_TOKEN" />
+                </GitHubPackages>
+              </packageSourceCredentials>
+            </configuration>
+            "@
+            New-Item -ItemType Directory -Force -Path (Split-Path $nugetConfigPath)
+            $nugetConfigContent | Out-File $nugetConfigPath
+            Write-Host "Created NuGet.Config at $nugetConfigPath"
+          } else {
+            mkdir -p ~/.nuget/NuGet
+            echo '<?xml version="1.0" encoding="utf-8"?>' > ~/.nuget/NuGet/NuGet.Config
+            echo '<configuration>' >> ~/.nuget/NuGet/NuGet.Config
+            echo '  <packageSources>' >> ~/.nuget/NuGet/NuGet.Config
+            echo '    <clear />' >> ~/.nuget/NuGet/NuGet.Config
+            echo '    <add key="GitHubPackages" value="https://nuget.pkg.github.com/'"${{ env.USERNAME }}"'/index.json" />' >> ~/.nuget/NuGet/NuGet.Config
+            echo '  </packageSources>' >> ~/.nuget/NuGet/NuGet.Config
+            echo '  <packageSourceCredentials>' >> ~/.nuget/NuGet/NuGet.Config
+            echo '    <GitHubPackages>' >> ~/.nuget/NuGet/NuGet.Config
+            echo '      <add key="Username" value="'"${{ env.USERNAME }}"'" />' >> ~/.nuget/NuGet/NuGet.Config
+            echo '      <add key="ClearTextPassword" value="'"${{ env.GH_PACKAGES_TOKEN }}"'" />' >> ~/.nuget/NuGet/NuGet.Config
+            echo '    </GitHubPackages>' >> ~/.nuget/NuGet/NuGet.Config
+            echo '  </packageSourceCredentials>' >> ~/.nuget/NuGet/NuGet.Config
+            echo '</configuration>' >> ~/.nuget/NuGet/NuGet.Config
+            echo "Created NuGet.Config at ~/.nuget/NuGet/NuGet.Config"
+          }
 
-      # NEW CRITICAL STEP: Set API Key for the GitHub Packages Source using nuget.exe setapikey
-      # This explicitly tells nuget.exe about the API key for the source.
       - name: Set NuGet API Key for GitHub Packages
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+        shell: ${{ matrix.cmake_shell }}
         run: |
-          # Find nuget.exe
-          $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
-          
-          if (-not $nuget_path) { Write-Error "Failed to get nuget.exe path."; exit 1 }
-          
-          Write-Host "Setting API Key for GitHubPackages source..."
-          
-          # Use the setapikey command. The key is the PAT.
-          # -Source is used to specify which registered source the API key is for.
-          & "$nuget_path" setapikey "${{ env.GH_PACKAGES_TOKEN }}" -Source "GitHubPackages" -NonInteractive 2>&1 | Write-Host
-          if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to set API Key for GitHubPackages."
-              exit 1
+          if ("${{ runner.os }}" -eq "Windows") {
+            $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
+            if (-not $nuget_path) { Write-Error "Failed to get nuget.exe path."; exit 1 }
+            & "$nuget_path" setapikey "${{ env.GH_PACKAGES_TOKEN }}" -Source "GitHubPackages" -NonInteractive 2>&1 | Write-Host
+          } else {
+            NUGET_PATH=$(mono "${{ env.VCPKG_EXE }}" fetch nuget | tail -n 1)
+            if [ -z "$NUGET_PATH" ]; then echo "Failed to get nuget.exe path." && exit 1; fi
+            mono "$NUGET_PATH" setapikey "${{ env.GH_PACKAGES_TOKEN }}" -Source "GitHubPackages" -NonInteractive 2>&1 | cat
           }
-          
           Write-Host "API Key for GitHubPackages set successfully."
 
-      - name: Update Vcpkg (Port Files)
-        run: |
-          ${{ github.workspace }}/vcpkg/vcpkg.exe update
-        shell: cmd
-
-      # Step 6: Configure CMake and trigger Vcpkg install
-      # Vcpkg will automatically use the configured binary cache.
       - name: Configure CMake and Install Vcpkg Dependencies
         working-directory: ${{ github.workspace }}/it-tools-editor
         env:
-          # Crucial: This tells vcpkg to look for binary packages using NuGet.
-          # It uses the feed configured in the previous step.
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
-          # Optional: Specify Vcpkg install options, e.g., debug output
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-          VCPKG_NUGET_CONFIG: "$env:APPDATA\NuGet\NuGet.Config"
+        shell: ${{ matrix.cmake_shell }}
         run: |
-          $ninja_path = (Get-Command ninja -ErrorAction SilentlyContinue).Path
-          if (-not $ninja_path) {
-            Write-Error "Ninja not found in PATH!"
-            exit 1
+          # Determine Ninja path dynamically (for Windows, on Linux/macOS 'ninja' is typically in PATH)
+          if ("${{ runner.os }}" -eq "Windows") {
+              # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
+              # For MinGW (x64-mingw-dynamic), find it from msys2 setup
+              if ("${{ matrix.vcpkg_triplet }}" -eq "x64-windows") {
+                  $cmake_make_program_arg = "" # Let CMake find its bundled Ninja (often with VS)
+              } else { # For MinGW
+                  $ninja_path = (Get-Command ninja -ErrorAction SilentlyContinue).Path
+                  if (-not $ninja_path) { Write-Error "Ninja not found!"; exit 1 }
+                  $cmake_make_program_arg = "-DCMAKE_MAKE_PROGRAM=`"$ninja_path`""
+              }
+              # If using x64-windows, VCPKG_DEFAULT_HOST_TRIPLET should align
+              $host_triplet_arg = "-DVCPKG_DEFAULT_HOST_TRIPLET=x64-windows"
+          } else {
+              NINJA_PATH=$(which ninja)
+              if [ -z "$NINJA_PATH" ]; then echo "Ninja not found!" && exit 1; fi
+              cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=$NINJA_PATH"
+              $host_triplet_arg = "" # Not typically set for Linux/macOS like this
           }
-          
-          Write-Host "Found Ninja at: $ninja_path" # Diagnostic: Print the path
 
-          cmake -B build `
-                -S . `
-                -G "Ninja" `
-                -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
-                -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic `
-                -DVCPKG_DEFAULT_HOST_TRIPLET=x64-mingw-dynamic `
-                -DCMAKE_MAKE_PROGRAM="$ninja_path" `
-                -DVCPKG_ROOT=${{ github.workspace }}/vcpkg
-        shell: pwsh # Use cmd shell for typical Windows commands and path syntax
+          cmake -B build ${{ matrix.cmake_line_continuation }}
+                -S . ${{ matrix.cmake_line_continuation }}
+                -G "Ninja" ${{ matrix.cmake_line_continuation }}
+                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" ${{ matrix.cmake_line_continuation }}
+                -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} ${{ matrix.cmake_line_continuation }}
+                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ matrix.cmake_line_continuation }}
+                $host_triplet_arg ${{ matrix.cmake_line_continuation }}
+                $cmake_make_program_arg
 
-      # Step 7: Build the Project
       - name: Build Project
         working-directory: ${{ github.workspace }}/it-tools-editor/build
-        run: cmake --build .
-        shell: cmd
+        shell: ${{ matrix.cmake_shell }}
+        run: cmake --build . --config ${{ matrix.build_type }}
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-${{ matrix.build_type }}-build-artifacts
+          path: ${{ github.workspace }}/it-tools-editor/build/ # Adjust to your actual build output path
+          retention-days: 5
+        if: success()

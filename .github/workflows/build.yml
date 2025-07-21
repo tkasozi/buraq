@@ -202,6 +202,10 @@ jobs:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native
         shell: bash
         run: |
+          echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
+          ls "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
+          
+          
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
             # For MinGW (x64-mingw-dynamic), find it from msys2 setup

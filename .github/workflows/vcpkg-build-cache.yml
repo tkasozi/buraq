@@ -17,8 +17,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: it-tools-editor-artifact
-            path: it-tools-editor/
-            retention-days: 1
+            path: ${{ github.workspace }}/it-tools-editor/
 
       - name: Clone Vcpkg Repository
         if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
@@ -33,8 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vcpkg-artifact
-          path: vcpkg/
-          retention-days: 1
+          path: ${{ github.workspace }}/vcpkg/
 
   build:
     needs: upload_repo

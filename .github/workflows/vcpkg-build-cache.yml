@@ -29,6 +29,8 @@ jobs:
       - name: Test ${{ matrix.cmake_shell }}
         run: |
           echo "Testing ${{ matrix.cmake_shell }}"
+  config:
+    runs-on:  ${{ fromJSON(needs.init.matrix.os) }}
 #jobs:
 #  build:
 #    strategy:

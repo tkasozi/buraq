@@ -25,24 +25,39 @@ jobs:
             vcpkg_triplet: x64-osx
             cmake_shell: bash
             cmake_line_continuation: '\'
-    outputs:
-      matrix: '${{ toJSON(matrix) }}'
     steps:
-      - run: |
-          echo Sample '${{ toJSON(matrix) }}' > matrix.json
-          
-          # Debug
-          cat matrix.json
-
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          path: it-tools-editor
+          fetch-depth: 0
   config:
     needs: init
     runs-on: ${{ matrix.os }}
     strategy:
-      matrix: '${{ fromJSON(needs.init.outputs.matrix) }}'
+      fail-fast: true
+      matrix:
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        experimental: [ false ]
+        build_type: [ Release ]
+        include:
+          - os: windows-latest
+            vcpkg_triplet: x64-windows # <--- CHANGED FROM x64-mingw-dynamic
+            cmake_shell: pwsh
+            cmake_line_continuation: '`'
+          - os: ubuntu-latest
+            vcpkg_triplet: x64-linux
+            cmake_shell: bash
+            cmake_line_continuation: '\'
+          - os: macos-latest
+            vcpkg_triplet: x64-osx
+            cmake_shell: bash
+            cmake_line_continuation: '\'
     steps:
       - name: Test
         run: |
-          echo "Testing for ${{ matrix.os }} / Node ${{ matrix.node }}"
+
 #jobs:
 #  build:
 #    strategy:

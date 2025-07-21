@@ -64,31 +64,31 @@ jobs:
 
       # Step 5: Configure Vcpkg to use GitHub Packages for Binary Caching
       # This is the core of the new binary caching strategy.
-      - name: Configure Vcpkg for GitHub Packages Binary Caching
-        env:
-          VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
-          USERNAME: ${{ github.repository_owner }} # Your GitHub username or organization
-          FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }} # The PAT secret
-          VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: |
-          # Fetch nuget.exe using vcpkg's internal command
-          $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
-          
-          if (-not $nuget_path) {
-              Write-Error "Failed to get nuget.exe path from vcpkg fetch nuget."
-              exit 1
-          }
-
-          # Add the GitHub Packages source to NuGet configuration
-          # Vcpkg will then automatically pick this up via VCPKG_BINARY_SOURCES
-          & "$nuget_path" sources add `
-            -Source "${{ env.FEED_URL }}" `
-            -StorePasswordInClearText `
-            -Name GitHubPackages `
-            -UserName "${{ env.USERNAME }}" `
-            -Password "${{ env.GH_PACKAGES_TOKEN }}" # Use env var to avoid direct secret printing
-        shell: pwsh # PowerShell is best for string manipulation and splatting
+#      - name: Configure Vcpkg for GitHub Packages Binary Caching
+#        env:
+#          VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
+#          USERNAME: ${{ github.repository_owner }} # Your GitHub username or organization
+#          FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+#          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }} # The PAT secret
+#          VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+#        run: |
+#          # Fetch nuget.exe using vcpkg's internal command
+#          $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
+#
+#          if (-not $nuget_path) {
+#              Write-Error "Failed to get nuget.exe path from vcpkg fetch nuget."
+#              exit 1
+#          }
+#
+#          # Add the GitHub Packages source to NuGet configuration
+#          # Vcpkg will then automatically pick this up via VCPKG_BINARY_SOURCES
+#          & "$nuget_path" sources add `
+#            -Source "${{ env.FEED_URL }}" `
+#            -StorePasswordInClearText `
+#            -Name GitHubPackages `
+#            -UserName "${{ env.USERNAME }}" `
+#            -Password "${{ env.GH_PACKAGES_TOKEN }}" # Use env var to avoid direct secret printing
+#        shell: pwsh # PowerShell is best for string manipulation and splatting
 
       # ... (after "Configure Vcpkg for GitHub Packages Binary Caching" step) ...
 
@@ -131,7 +131,6 @@ jobs:
           
           # Try to list packages from your feed (pull test)
           Write-Host "--- NuGet List Test ---"
-          # Removed -Debug and -Verbosity from list command as they are invalid
           & "$nuget_path" list -Source "GitHubPackages" 2>&1 | Write-Host
           if ($LASTEXITCODE -ne 0) {
               Write-Error "NuGet list test failed! Check credentials/source or connectivity."
@@ -160,7 +159,7 @@ jobs:
           "@ | Out-Null
           
           Write-Host "Creating dummy package '$dummyPackageId.nuspec'..."
-          & "$nuget_path" pack "$dummyPackageId.nuspec" -OutputDirectory . -NoDefaultExcludes 2>&1 | Write-Host
+          & "$nuget_path" pack "$dummyPackageId.nuspec" -OutputDirectory . -NoDefaultExcludes --api-key "${{ env.GH_PACKAGES_TOKEN }}"  2>&1 | Write-Host
           if ($LASTEXITCODE -ne 0) {
               Write-Error "Dummy package creation failed."
               exit 1

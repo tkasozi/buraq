@@ -36,14 +36,14 @@ jobs:
       - name: Update MSYS2 Core Packages
         run: |
           # Update package databases and core system packages that might require a restart
-          pacman -Syu --noconfirm || exit 0 # Exit with 0 as success is expected even if it restarts the shell
+          pacman -Syu --noconfirm --noprogressbar || exit 0
         shell: msys2 {0}
 
       # NEW STEP 2 of 2: Complete MSYS2 Update (second pass after potential restart)
       - name: Complete MSYS2 Package Update
         run: |
           # Complete any remaining updates after the potential restart
-          pacman -Su --noconfirm || exit 1
+          pacman -Su --noconfirm --noprogressbar || exit 1
           echo "GCC version after update:"
           C:/mingw64/bin/x86_64-w64-mingw32-g++.exe --version
         shell: msys2 {0}

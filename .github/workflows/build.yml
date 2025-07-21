@@ -211,8 +211,8 @@ jobs:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
         shell: bash
         run: |
-          echo "****************${{ env.DOTNET_ROOT }}******************"
-          ls -al "${{ env.DOTNET_ROOT }}"
+          echo "****************${{ env.DOTNET_ROOT }}/packs******************"
+          ls -al "${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64"
           
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
           ls -al "${CMAKE_DOTNET_TARGET_FRAMEWORK}"

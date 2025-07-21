@@ -62,11 +62,11 @@ jobs:
             name: it-tools-editor-artifact, vcpkg-artifact
             path: ${{ github.workspace }}
 
-#      - name: Restore vcpkg-artifact
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: vcpkg-artifact
-#          path: ${{ github.workspace }}/vcpkg
+      - name: Restore vcpkg-artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vcpkg-artifact
+          path: ${{ github.workspace }}/vcpkg
 
       - name: List Downloaded Repo Contents (Verification)
         run: |

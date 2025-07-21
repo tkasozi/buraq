@@ -14,10 +14,11 @@ jobs:
         include:
           - version: 9
             experimental: true
+            cmake_shell: "temp"
     steps:
       - name: Test ${{ matrix.cmake_shell }}
         run: |
-          echo "Testing"
+          echo "Testing ${{ matrix.cmake_shell }}"
 #jobs:
 #  build:
 #    strategy:

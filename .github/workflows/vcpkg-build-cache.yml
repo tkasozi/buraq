@@ -7,8 +7,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-        build_type: [Debug, Release]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        build_type: [ Debug, Release ]
         include:
           - os: windows-latest
             vcpkg_triplet: x64-windows # <--- CHANGED FROM x64-mingw-dynamic

@@ -64,7 +64,6 @@ jobs:
           } else {
             ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
           }
-      
 
 #jobs:
 #  build:

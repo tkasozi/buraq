@@ -2,6 +2,15 @@ name: Matrix Build and Deploy
 
 on: [ push, pull_request ]
 
+env:
+  APP_NAME: "IT-Tools"
+  CI: True
+  DOTNET_VERSION: 9.0
+  CMAKE_EXE: "cmake"
+
+permissions:
+  contents: write
+
 jobs:
   init:
     runs-on: ubuntu-latest # Or windows-latest, macos-latest

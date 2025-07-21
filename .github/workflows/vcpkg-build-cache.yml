@@ -81,9 +81,12 @@ jobs:
       - name: Build Managed project
         id: dotnet-project
         run: |
+          ls -alh
+          
           cd ManagedLibrary
           
           ./build.sh
+
         shell: bash
 
       - name: Bootstrap Vcpkg (Windows)

@@ -109,11 +109,11 @@ jobs:
           
           Write-Host "Found Ninja at: $ninja_path" # Diagnostic: Print the path
 
-          cmake -B build ^
-                -S . ^
-                -G "Ninja" ^
-                -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake ^
-                -DCMAKE_MAKE_PROGRAM="$ninja_path" ^
+          cmake -B build `
+                -S . `
+                -G "Ninja" `
+                -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
+                -DCMAKE_MAKE_PROGRAM="$ninja_path" `
                 -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic # Adjust triplet as per your needs
         shell: pwsh # Use cmd shell for typical Windows commands and path syntax
 

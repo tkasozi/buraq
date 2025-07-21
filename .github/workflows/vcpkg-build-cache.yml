@@ -167,7 +167,7 @@ jobs:
           
           Write-Host "Attempting to push $dummyPackageNupkg to GitHub Packages..."
           # REMOVED: --api-key. It should now pick up the key saved by setapikey.
-          & "$nuget_path" push "$dummyPackageNupkg" -Source "GitHubPackages" -SkipDuplicate -Verbosity detailed -Debug 2>&1 | Write-Host
+          & "$nuget_path" push "$dummyPackageNupkg" -Source "GitHubPackages" -SkipDuplicate -Verbosity detailed 2>&1 | Write-Host
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Dummy package push failed! This is the core issue with authentication."
             exit 1

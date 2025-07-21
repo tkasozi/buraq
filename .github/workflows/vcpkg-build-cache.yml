@@ -97,7 +97,8 @@ jobs:
           # It uses the feed configured in the previous step.
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
           # Optional: Specify Vcpkg install options, e.g., debug output
-          # VCPKG_INSTALL_OPTIONS: "--debug"
+          VCPKG_INSTALL_OPTIONS: "--debug"
+          VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: |
           cmake -B build ^
                 -S . ^

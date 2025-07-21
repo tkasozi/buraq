@@ -38,7 +38,7 @@ jobs:
     needs: init
     runs-on: ${{ matrix.os }}
     strategy:
-      matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
+      matrix: '${{ fromJSON(needs.init.outputs.matrix) }}'
     steps:
       - name: Test
         run: |

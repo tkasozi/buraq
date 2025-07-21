@@ -57,6 +57,7 @@ jobs:
             cmake_line_continuation: '\'
     steps:
       - name: Restore job artifact
+        if: false
         uses: actions/download-artifact@v4
         with:
             name: it-tools-editor-artifact

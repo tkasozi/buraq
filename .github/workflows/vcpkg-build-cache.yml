@@ -67,6 +67,25 @@ jobs:
           path-type: minimal
           msystem: MINGW64
 
+      - name: Download Inno Setup
+        run: |
+          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
+          Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
+        shell: powershell
+
+      - name: Setup .NET SDK ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build Managed project
+        id: dotnet-project
+        run: |
+          cd ManagedLibrary
+          
+          ./build.sh
+        shell: bash
+
       - name: Bootstrap Vcpkg (Windows)
         if: runner.os == 'Windows'
         run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
@@ -227,55 +246,7 @@ jobs:
                "${host_triplet_arg}" "${line_continuation}" \
                "${cmake_make_program_arg}"
 
-
-#jobs:
-#  build:
-#    steps:
-#
-#      - name: Configure CMake and Install Vcpkg Dependencies
-#        working-directory: ${{ github.workspace }}/it-tools-editor
-#        env:
-#          VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
-#          VCPKG_INSTALL_OPTIONS: "--debug"
-#          VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-#        shell: ${{ matrix.cmake_shell }}
-#        run: |
-#          # Determine Ninja path dynamically (for Windows, on Linux/macOS 'ninja' is typically in PATH)
-#          if ("${{ runner.os }}" -eq "Windows") {
-#              # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
-#              # For MinGW (x64-mingw-dynamic), find it from msys2 setup
-#              if ("${{ matrix.vcpkg_triplet }}" -eq "x64-windows") {
-#                  $cmake_make_program_arg = "" # Let CMake find its bundled Ninja (often with VS)
-#              } else { # For MinGW
-#                  $ninja_path = (Get-Command ninja -ErrorAction SilentlyContinue).Path
-#                  if (-not $ninja_path) { Write-Error "Ninja not found!"; exit 1 }
-#                  $cmake_make_program_arg = "-DCMAKE_MAKE_PROGRAM=`"$ninja_path`""
-#              }
-#              # If using x64-windows, VCPKG_DEFAULT_HOST_TRIPLET should align
-#              $host_triplet_arg = "-DVCPKG_DEFAULT_HOST_TRIPLET=x64-windows"
-#          } else {
-#              NINJA_PATH=$(which ninja)
-#              if [ -z "$NINJA_PATH" ]; then echo "Ninja not found!" && exit 1; fi
-#              cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=$NINJA_PATH"
-#              $host_triplet_arg = "" # Not typically set for Linux/macOS like this
-#          }
-#
-#          cmake -B build ${{ matrix.cmake_line_continuation }}
-#                -S . ${{ matrix.cmake_line_continuation }}
-#                -G "Ninja" ${{ matrix.cmake_line_continuation }}
-#                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" ${{ matrix.cmake_line_continuation }}
-#                -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} ${{ matrix.cmake_line_continuation }}
-#                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ matrix.cmake_line_continuation }}
-#                $host_triplet_arg ${{ matrix.cmake_line_continuation }}
-#                $cmake_make_program_arg
-#      - name: Build Project
-#        working-directory: ${{ github.workspace }}/it-tools-editor/build
-#        shell: ${{ matrix.cmake_shell }}
-#        run: cmake --build . --config ${{ matrix.build_type }}
-#      - name: Upload Build Artifacts
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: ${{ runner.os }}-${{ matrix.build_type }}-build-artifacts
-#          path: ${{ github.workspace }}/it-tools-editor/build/ # Adjust to your actual build output path
-#          retention-days: 5
-#        if: success()
+      - name: Build Project
+        working-directory: ${{ github.workspace }}/it-tools-editor/build
+        shell: bash
+        run: cmake --build . --config ${{ matrix.build_type }}

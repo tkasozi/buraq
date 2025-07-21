@@ -66,6 +66,8 @@ jobs:
 
       - name: List Downloaded Repo Contents (Verification)
         run: |
+            pwd
+          
             echo "Listing contents of the downloaded repository:"
             ls -al  ${{ github.workspace }}/
           

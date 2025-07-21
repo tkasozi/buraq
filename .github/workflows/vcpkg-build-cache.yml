@@ -62,29 +62,29 @@ jobs:
         uses: actions/download-artifact@v4
         with:
             name: it-tools-editor-artifact
-            path: restored-repo
+            path: it-tools-editor
 
       - name: Restore vcpkg-artifact
         uses: actions/download-artifact@v4
         with:
           name: vcpkg-artifact
-          path: restored-repo
-
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-          path: it-tools-editor
-          fetch-depth: 0
-
-      - name: Clone Vcpkg Repository
-        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
-        uses: actions/checkout@v4
-        with:
-          repository: microsoft/vcpkg
-          ref: master
           path: vcpkg
-          fetch-depth: 0
+
+#      - name: Checkout Repository
+#        uses: actions/checkout@v4
+#        with:
+#          submodules: true
+#          path: it-tools-editor
+#          fetch-depth: 0
+#
+#      - name: Clone Vcpkg Repository
+#        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
+#        uses: actions/checkout@v4
+#        with:
+#          repository: microsoft/vcpkg
+#          ref: master
+#          path: vcpkg
+#          fetch-depth: 0
 
       - name: Set up MSYS2 with Build Tools (Windows Only, if needed)
         if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
@@ -126,6 +126,9 @@ jobs:
           USERNAME: ${{ github.repository_owner }}
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: |
+            echo "List: --- "
+            ls
+          
             $nugetConfigPath = Join-Path $env:APPDATA "NuGet\NuGet.Config"
             $nugetConfigContent = @"
             <?xml version="1.0" encoding="utf-8"?>

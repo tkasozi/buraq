@@ -32,6 +32,17 @@ jobs:
           # If you need specific MSYS2 shells for later steps, you can set a default
           # shell: mingw64
 
+      - name: Update MSYS2 Packages (Full System Update)
+        run: |
+            # Update package databases and core system packages
+            pacman -Syyu --noconfirm
+            # Update remaining packages, including new dependencies/upgrades
+            pacman -Suu --noconfirm || exit 1
+            # Print GCC version after update for diagnostic
+            echo "GCC version after update:"
+            C:/mingw64/bin/x86_64-w64-mingw32-g++.exe --version
+        shell: msys2 {0} # Must run within the MSYS2 environment
+
       # Step 2: Clone Vcpkg if not part of the main repo as a submodule
       # Adjust 'path' if you place vcpkg elsewhere.
       - name: Clone Vcpkg Repository

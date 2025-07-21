@@ -117,7 +117,7 @@ jobs:
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: |
           echo "List: --- "
-          ls
+          ls -alh
           
           $nugetConfigPath = Join-Path $env:APPDATA "NuGet\NuGet.Config"
           $nugetConfigContent = @"
@@ -197,7 +197,7 @@ jobs:
             ${{ runner.os }}-vcpkg-assets-
 
       - name: Configure CMake and Install Vcpkg Dependencies
-        working-directory: ${{ github.workspace }}/it-tools-editor
+        working-directory: ${{ github.workspace }}
         env:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
           VCPKG_INSTALL_OPTIONS: "--debug"
@@ -250,6 +250,6 @@ jobs:
                "${cmake_make_program_arg}"
 
       - name: Build Project
-        working-directory: ${{ github.workspace }}/it-tools-editor/build
+        working-directory: ${{ github.workspace }}/build
         shell: bash
         run: cmake --build . --config ${{ matrix.build_type }}

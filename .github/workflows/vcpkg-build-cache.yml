@@ -7,18 +7,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-        build_type: [Debug, Release]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        build_type: [ Debug, Release ]
         include:
           - os: windows-latest
-            vcpkg_triplet: x64-mingw-dynamic
-            # cmake_shell and cmake_line_continuation will be derived from `runner.os` in the steps
+            vcpkg_triplet: x64-windows # <--- CHANGED FROM x64-mingw-dynamic
+            cmake_shell: pwsh
+            cmake_line_continuation: '`'
           - os: ubuntu-latest
             vcpkg_triplet: x64-linux
-            # cmake_shell and cmake_line_continuation will be derived from `runner.os` in the steps
+            cmake_shell: bash
+            cmake_line_continuation: '\'
           - os: macos-latest
             vcpkg_triplet: x64-osx
-            # cmake_shell and cmake_line_continuation will be derived from `runner.os` in the steps
+            cmake_shell: bash
+            cmake_line_continuation: '\'
 
     runs-on: ${{ matrix.os }}
 
@@ -34,8 +37,12 @@ jobs:
           path: it-tools-editor
           fetch-depth: 0
 
-      - name: Set up MSYS2 with Build Tools (Windows Only)
-        if: runner.os == 'Windows'
+      # MODIFIED/CONDITIONAL STEP: Set up MSYS2 with Build Tools (Windows Only)
+      # This step is now only conditionally needed if your *other* project dependencies
+      # (outside of vcpkg for Qt) still strictly require MSYS2/MinGW tools.
+      # If your project only needs CMake, Ninja, and Visual Studio for Windows, you can REMOVE THIS STEP ENTIRELY.
+      - name: Set up MSYS2 with Build Tools (Windows Only, if needed)
+        if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
         uses: msys2/setup-msys2@v2
         with:
           msys2-architecture: x86_64
@@ -47,6 +54,10 @@ jobs:
           path-type: minimal
           msystem: MINGW64
 
+      # IMPORTANT: If you switch to x64-windows triplet for Windows,
+      # you will NOT need the MSYS2 setup step unless your *application*
+      # (not its vcpkg dependencies) relies on specific MSYS2 tools.
+      # The 'windows-latest' runner comes with Visual Studio and basic Git/CMake pre-installed.
       - name: Clone Vcpkg Repository
         if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
         uses: actions/checkout@v4
@@ -57,14 +68,13 @@ jobs:
           fetch-depth: 0
 
       - name: Bootstrap Vcpkg
+        shell: ${{ matrix.cmake_shell }}
         run: |
-          if ("${{ runner.os }}" == "Windows") {
+          if ("${{ runner.os }}" -eq "Windows") {
             ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
           } else {
             ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
           }
-        # Explicitly setting shell for this step
-        shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
 
       - name: Cache Vcpkg Asset Downloads
         uses: actions/cache@v4
@@ -80,10 +90,9 @@ jobs:
         env:
           USERNAME: ${{ github.repository_owner }}
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        # Explicitly setting shell for this step
-        shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+        shell: ${{ matrix.cmake_shell }}
         run: |
-          if ("${{ runner.os }}" == "Windows") {
+          if ("${{ runner.os }}" -eq "Windows") {
             $nugetConfigPath = Join-Path $env:APPDATA "NuGet\NuGet.Config"
             $nugetConfigContent = @"
             <?xml version="1.0" encoding="utf-8"?>
@@ -125,10 +134,9 @@ jobs:
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        # Explicitly setting shell for this step
-        shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+        shell: ${{ matrix.cmake_shell }}
         run: |
-          if ("${{ runner.os }}" == "Windows") {
+          if ("${{ runner.os }}" -eq "Windows") {
             $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
             if (-not $nuget_path) { Write-Error "Failed to get nuget.exe path."; exit 1 }
             & "$nuget_path" setapikey "${{ env.GH_PACKAGES_TOKEN }}" -Source "GitHubPackages" -NonInteractive 2>&1 | Write-Host
@@ -145,38 +153,40 @@ jobs:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        # Explicitly setting shell for this step
-        shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+        shell: ${{ matrix.cmake_shell }}
         run: |
-          # Determine line continuation character based on shell
-          if ("${{ runner.os }}" == "Windows") {
-            $line_continuation = "`"
-            $ninja_path = (Get-Command ninja -ErrorAction SilentlyContinue).Path
-            if (-not $ninja_path) { Write-Error "Ninja not found!"; exit 1 }
-            $cmake_make_program_arg = "-DCMAKE_MAKE_PROGRAM=`"$ninja_path`""
-            $host_triplet_arg = "-DVCPKG_DEFAULT_HOST_TRIPLET=x64-windows"
+          # Determine Ninja path dynamically (for Windows, on Linux/macOS 'ninja' is typically in PATH)
+          if ("${{ runner.os }}" -eq "Windows") {
+              # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
+              # For MinGW (x64-mingw-dynamic), find it from msys2 setup
+              if ("${{ matrix.vcpkg_triplet }}" -eq "x64-windows") {
+                  $cmake_make_program_arg = "" # Let CMake find its bundled Ninja (often with VS)
+              } else { # For MinGW
+                  $ninja_path = (Get-Command ninja -ErrorAction SilentlyContinue).Path
+                  if (-not $ninja_path) { Write-Error "Ninja not found!"; exit 1 }
+                  $cmake_make_program_arg = "-DCMAKE_MAKE_PROGRAM=`"$ninja_path`""
+              }
+              # If using x64-windows, VCPKG_DEFAULT_HOST_TRIPLET should align
+              $host_triplet_arg = "-DVCPKG_DEFAULT_HOST_TRIPLET=x64-windows"
           } else {
-            $line_continuation = "\"
-            NINJA_PATH=$(which ninja)
-            if [ -z "$NINJA_PATH" ]; then echo "Ninja not found!" && exit 1; fi
-            cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=$NINJA_PATH"
-            $host_triplet_arg = ""
+              NINJA_PATH=$(which ninja)
+              if [ -z "$NINJA_PATH" ]; then echo "Ninja not found!" && exit 1; fi
+              cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=$NINJA_PATH"
+              $host_triplet_arg = "" # Not typically set for Linux/macOS like this
           }
 
-          # Construct CMake command with dynamic line continuation
-          cmake -B build ${line_continuation}
-                -S . ${line_continuation}
-                -G "Ninja" ${line_continuation}
-                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" ${line_continuation}
-                -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} ${line_continuation}
-                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${line_continuation}
-                ${host_triplet_arg} ${line_continuation}
-                ${cmake_make_program_arg}
+          cmake -B build ${{ matrix.cmake_line_continuation }}
+                -S . ${{ matrix.cmake_line_continuation }}
+                -G "Ninja" ${{ matrix.cmake_line_continuation }}
+                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" ${{ matrix.cmake_line_continuation }}
+                -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} ${{ matrix.cmake_line_continuation }}
+                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ${{ matrix.cmake_line_continuation }}
+                $host_triplet_arg ${{ matrix.cmake_line_continuation }}
+                $cmake_make_program_arg
 
       - name: Build Project
         working-directory: ${{ github.workspace }}/it-tools-editor/build
-        # Explicitly setting shell for this step
-        shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+        shell: ${{ matrix.cmake_shell }}
         run: cmake --build . --config ${{ matrix.build_type }}
 
       - name: Upload Build Artifacts

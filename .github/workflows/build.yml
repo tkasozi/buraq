@@ -199,6 +199,7 @@ jobs:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/9.0.5/runtimes/win-x64/native
         shell: bash
         run: |
           if [[ "${{ runner.os }}" == "Windows" ]]; then
@@ -243,6 +244,7 @@ jobs:
                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" "${line_continuation}" \
                -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} "${line_continuation}" \
                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} "${line_continuation}" \
+               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
                "${host_triplet_arg}" "${line_continuation}" \
                "${cmake_make_program_arg}"
 

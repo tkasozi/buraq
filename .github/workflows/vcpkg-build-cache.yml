@@ -143,11 +143,12 @@ jobs:
           
           Write-Host "Found Ninja at: $ninja_path" # Diagnostic: Print the path
 
+          # -DCMAKE_MAKE_PROGRAM="$ninja_path" `
+
           cmake -B build `
                 -S . `
-                -G "Ninja" `
+                -G "MinGW Makefiles" `
                 -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
-                -DCMAKE_MAKE_PROGRAM="$ninja_path" `
                 -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic `
                 -DVCPKG_DEFAULT_HOST_TRIPLET=x64-mingw-dynamic `
                 -DVCPKG_ROOT=${{ github.workspace }}/vcpkg

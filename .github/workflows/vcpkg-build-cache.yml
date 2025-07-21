@@ -58,18 +58,18 @@ jobs:
             vcpkg_triplet: x64-osx
             cmake_line_continuation: '\'
     steps:
-      - name: Restore it-tools-editor-artifact
-        uses: actions/download-artifact@v4
-        with:
-            name: it-tools-editor-artifact
-            path: it-tools-editor
-
-      - name: Restore vcpkg-artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: vcpkg-artifact
-          path: vcpkg
-
+#      - name: Restore it-tools-editor-artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#            name: it-tools-editor-artifact
+#            path: it-tools-editor
+#
+#      - name: Restore vcpkg-artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: vcpkg-artifact
+#          path: vcpkg
+#
 #      - name: Checkout Repository
 #        uses: actions/checkout@v4
 #        with:

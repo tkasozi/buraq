@@ -117,6 +117,11 @@ jobs:
           
           Write-Host "API Key for GitHubPackages set successfully."
 
+      - name: Update Vcpkg (Port Files)
+        run: |
+          ${{ github.workspace }}/vcpkg/vcpkg.exe update
+        shell: cmd
+
       # Step 6: Configure CMake and trigger Vcpkg install
       # Vcpkg will automatically use the configured binary cache.
       - name: Configure CMake and Install Vcpkg Dependencies

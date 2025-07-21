@@ -183,26 +183,26 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ runner.os }}" == "Windows" ]]; then
-          # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
-          # For MinGW (x64-mingw-dynamic), find it from msys2 setup
+            # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
+            # For MinGW (x64-mingw-dynamic), find it from msys2 setup
           
-          # Initialize variables for the Windows case
-          cmake_make_program_arg=""
-          host_triplet_arg="-DVCPKG_DEFAULT_HOST_TRIPLET=x64-windows" # Default for Windows host
+            # Initialize variables for the Windows case
+            cmake_make_program_arg=""
+            host_triplet_arg="-DVCPKG_DEFAULT_HOST_TRIPLET=x64-windows" # Default for Windows host
           
-          if [[ "${{ matrix.vcpkg_triplet }}" == "x64-windows" ]]; then
-          # If using x64-windows triplet, CMake usually finds Ninja automatically
-          # so cmake_make_program_arg remains empty.
-          true # No-op
-          else # For MinGW (x64-mingw-dynamic)
-          # Use 'command -v' for a more robust way to find executables in PATH than 'which'
-          ninja_path=$(command -v ninja)
-          if [[ -z "$ninja_path" ]]; then
-          echo "Error: Ninja not found in PATH for MinGW build!" >&2
-          exit 1
-          fi
-          # Ensure path is correctly quoted for CMake if it contains spaces
-          cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
+            if [[ "${{ matrix.vcpkg_triplet }}" == "x64-windows" ]]; then
+            # If using x64-windows triplet, CMake usually finds Ninja automatically
+            # so cmake_make_program_arg remains empty.
+            true # No-op
+            else # For MinGW (x64-mingw-dynamic)
+            # Use 'command -v' for a more robust way to find executables in PATH than 'which'
+            ninja_path=$(command -v ninja)
+            if [[ -z "$ninja_path" ]]; then
+            echo "Error: Ninja not found in PATH for MinGW build!" >&2
+            exit 1
+            fi
+            # Ensure path is correctly quoted for CMake if it contains spaces
+            cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
           fi
           else # For Linux/macOS
           

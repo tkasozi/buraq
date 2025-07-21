@@ -249,7 +249,7 @@ jobs:
           # Example of how you'd use them (assuming you have a line_continuation variable defined):
           cmake -B build \
                -S . \
-               -G ${{ matrix.generator }} \
+               -G "${{ matrix.generator }}" \
                -A ${{ matrix.arch }} \
                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
                -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} \

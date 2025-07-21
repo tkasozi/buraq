@@ -29,7 +29,7 @@ jobs:
       matrix: '${{ toJSON(matrix) }}'
     steps:
       - run: |
-          echo '${{ toJSON(matrix) }}' > matrix.json
+          echo Sample '${{ toJSON(matrix) }}' > matrix.json
           
           # Debug
           cat matrix.json

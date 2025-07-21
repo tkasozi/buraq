@@ -37,6 +37,12 @@ jobs:
           path: it-tools-editor
           fetch-depth: 0
 
+      - name: Job Environment
+        env:
+          shell: ${{ matrix.cmake_shell }}
+          shell: ${{ matrix.cmake_shell }}
+        run: |
+
       # MODIFIED/CONDITIONAL STEP: Set up MSYS2 with Build Tools (Windows Only)
       # This step is now only conditionally needed if your *other* project dependencies
       # (outside of vcpkg for Qt) still strictly require MSYS2/MinGW tools.
@@ -68,8 +74,7 @@ jobs:
           fetch-depth: 0
 
       - name: Bootstrap Vcpkg
-        env:
-          shell: ${{ matrix.cmake_shell }}
+        shell: ${{ env.cmake_shell }}
         run: |
           if ("${{ runner.os }}" -eq "Windows") {
             ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
@@ -88,10 +93,10 @@ jobs:
             ${{ runner.os }}-vcpkg-assets-
 
       - name: Configure NuGet for GitHub Packages
+        shell: ${{ env.cmake_shell }}
         env:
           USERNAME: ${{ github.repository_owner }}
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        shell: ${{ matrix.cmake_shell }}
         run: |
           if ("${{ runner.os }}" -eq "Windows") {
             $nugetConfigPath = Join-Path $env:APPDATA "NuGet\NuGet.Config"

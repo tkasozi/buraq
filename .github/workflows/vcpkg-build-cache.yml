@@ -61,7 +61,7 @@ jobs:
 
 
       - name: Clone Vcpkg Repository
-        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
+        if: "${{ github.workspace }}/it-tools-editor/vcpkg" == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
         uses: actions/checkout@v4
         with:
           repository: microsoft/vcpkg

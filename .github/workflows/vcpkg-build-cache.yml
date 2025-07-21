@@ -117,69 +117,10 @@ jobs:
           
           Write-Host "API Key for GitHubPackages set successfully."
 
-      - name: Debug NuGet Push/Pull Capabilities
-        env:
-          VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
-          USERNAME: ${{ github.repository_owner }}
-          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }} # No longer used directly by push, but might be for other internal parts of vcpkg
-          FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-        run: |
-          # Find nuget.exe (re-finding here for clarity, can optimize if needed)
-          $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
-          if (-not $nuget_path) { Write-Error "Failed to get nuget.exe path."; exit 1 }
-          
-          Write-Host "Attempting a test NuGet push/pull operation..."
-          
-          # Try to list packages from your feed (pull test)
-          Write-Host "--- NuGet List Test ---"
-          & "$nuget_path" list -Source "GitHubPackages" 2>&1 | Write-Host
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "NuGet list test failed! Check credentials/source or connectivity."
-            exit 1
-          }
-          Write-Host "NuGet list test passed (no direct error from 'nuget list')."
-          
-          # Try to push a dummy package (push test) - REMOVE THIS AFTER DEBUGGING!
-          # This step will only run if the 'list' command succeeded.
-          Write-Host "--- NuGet Push Test ---"
-          $dummyPackageId = "DummyTestPackage.${{ github.run_id }}.${{ github.run_attempt }}-${{ runner.os }}"
-          $dummyPackageVersion = "1.0.0"
-          $dummyPackageNupkg = "$dummyPackageId.$dummyPackageVersion.nupkg"
-          
-          New-Item -Path . -Name "$dummyPackageId.nuspec" -ItemType File -Value @"
-          <?xml version="1.0" encoding="utf-8"?>
-          <package>
-          <metadata>
-          <id>$dummyPackageId</id>
-          <version>$dummyPackageVersion</version>
-          <authors>CI Test User</authors>
-          <description>A dummy package for CI testing of NuGet push.</description>
-          </metadata>
-          </package>
-          "@ | Out-Null
-          
-          Write-Host "Creating dummy package '$dummyPackageId.nuspec'..."
-          & "$nuget_path" pack "$dummyPackageId.nuspec" -OutputDirectory . -NoDefaultExcludes 2>&1 | Write-Host
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Dummy package creation failed."
-            exit 1
-          }
-          
-          Write-Host "Attempting to push $dummyPackageNupkg to GitHub Packages..."
-          # REMOVED: --api-key. It should now pick up the key saved by setapikey.
-          & "$nuget_path" push "$dummyPackageNupkg" -Source "GitHubPackages" -SkipDuplicate -Verbosity detailed 2>&1 | Write-Host
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Dummy package push failed! This is the core issue with authentication."
-            exit 1
-          }
-          
-          Write-Host "Dummy package pushed successfully (or skipped if duplicate)."
-
       # Step 6: Configure CMake and trigger Vcpkg install
       # Vcpkg will automatically use the configured binary cache.
       - name: Configure CMake and Install Vcpkg Dependencies
         working-directory: ${{ github.workspace }}/it-tools-editor
-        if: false
         env:
           # Crucial: This tells vcpkg to look for binary packages using NuGet.
           # It uses the feed configured in the previous step.

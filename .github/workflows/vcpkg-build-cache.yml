@@ -57,7 +57,7 @@ jobs:
           msystem: MINGW64
 
       - name: Bootstrap Vcpkg
-        shell: ${{ matrix.cmake_shell }}
+#        shell: ${{ matrix.cmake_shell }}
         run: |
           if ("${{ runner.os }}" -eq "Windows") {
             ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat

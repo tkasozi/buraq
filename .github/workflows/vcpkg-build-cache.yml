@@ -90,6 +90,32 @@ jobs:
             -Password "${{ env.GH_PACKAGES_TOKEN }}" # Use env var to avoid direct secret printing
         shell: pwsh # PowerShell is best for string manipulation and splatting
 
+      # ... (after "Configure Vcpkg for GitHub Packages Binary Caching" step) ...
+
+      - name: Create NuGet.Config for GitHub Packages
+        env:
+          USERNAME: ${{ github.repository_owner }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+        run: |
+          $NuGetConfigContent = @"
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+              <add key="GitHubPackages" value="https://nuget.pkg.github.com/$env:USERNAME/index.json" />
+            </packageSources>
+            <packageSourceCredentials>
+              <GitHubPackages>
+                <add key="Username" value="$env:USERNAME" />
+                <add key="ClearTextPassword" value="$env:GH_PACKAGES_TOKEN" />
+              </GitHubPackages>
+            </packageSourceCredentials>
+          </configuration>
+          "@
+          $NuGetConfigContent | Out-File "$env:APPDATA\NuGet\NuGet.Config"
+          Write-Host "NuGet.Config created at $env:APPDATA\NuGet\NuGet.Config"
+        shell: pwsh
+
       # Step 6: Configure CMake and trigger Vcpkg install
       # Vcpkg will automatically use the configured binary cache.
       - name: Configure CMake and Install Vcpkg Dependencies

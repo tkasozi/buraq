@@ -257,19 +257,19 @@ jobs:
 
       - name: Build Project (Windows - MSVC)
         if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-windows'  && success()
-        working-directory: ${{ github.workspace }}/it-tools-editor/build
+        working-directory: ${{ github.workspace }}/build
         run: cmake --build . --config ${{ matrix.build_type }}
         # Use cmd to ensure vcvars64.bat context persists from the configure step
         shell: cmd
 
       - name: Build Project (Windows - MinGW)
         if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-mingw-dynamic' && success()
-        working-directory: ${{ github.workspace }}/it-tools-editor/build
+        working-directory: ${{ github.workspace }}/build
         run: cmake --build . --config ${{ matrix.build_type }}
         shell: pwsh # Use pwsh to continue the MinGW context
 
       - name: Build Project (Linux/macOS)
         if: runner.os != 'Windows'  && success()
-        working-directory: ${{ github.workspace }}/it-tools-editor/build
+        working-directory: ${{ github.workspace }}/build
         run: cmake --build . --config ${{ matrix.build_type }}
         shell: bash

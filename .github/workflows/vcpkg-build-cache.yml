@@ -43,7 +43,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: it-tools-editor
-          path: ${{ github.workspace }}/it-tools-editor
+          path: ${{ github.workspace }}
 
       - name: Clone Vcpkg Repository
         if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')

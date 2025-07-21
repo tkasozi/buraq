@@ -64,6 +64,14 @@ jobs:
             name: it-tools-editor-artifact
             path: ${{ github.workspace }}/it-tools-editor
 
+      - name: List Downloaded Repo Contents (Verification)
+        run: |
+            echo "Listing contents of the downloaded repository:"
+            ls -al  ${{ github.workspace }}/
+          
+            echo "*************************"
+            ls -al  ${{ github.workspace }}/it-tools-editor
+
       - name: Restore vcpkg-artifact
         uses: actions/download-artifact@v4
         with:

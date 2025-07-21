@@ -3,18 +3,20 @@ name: Matrix Build and Deploy
 on: [ push, pull_request ]
 
 jobs:
-  test:
+  build:
     runs-on: windows-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: true
       matrix:
-        version: [ 6, 7, 8 ]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
         experimental: [ false ]
+        build_type: [ Debug, Release ]
         include:
-          - version: 9
-            experimental: true
-            cmake_shell: "temp"
+          - os: windows-latest
+            vcpkg_triplet: x64-windows # <--- CHANGED FROM x64-mingw-dynamic
+            cmake_shell: pwsh
+            cmake_line_continuation: '`'
     steps:
       - name: Test ${{ matrix.cmake_shell }}
         run: |

@@ -59,7 +59,7 @@ jobs:
       # (not its vcpkg dependencies) relies on specific MSYS2 tools.
       # The 'windows-latest' runner comes with Visual Studio and basic Git/CMake pre-installed.
       - name: Clone Vcpkg Repository
-        if: "${{ github.workspace }}/it-tools-editor/vcpkg" == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
+        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
         uses: actions/checkout@v4
         with:
           repository: microsoft/vcpkg

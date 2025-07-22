@@ -321,7 +321,7 @@ jobs:
               /DAppArchSupport="${{ matrix.arch }}compatible" `
               /DAppName="${{ env.APP_NAME }}" `
               /DAppExeName="${{ env.APP_NAME }}.exe" `
-              /DAppOutputBaseFilename="setup-${{ runner.os }}-${{ matrix.build_type }}-${{ APP_VERSION }}" `
+              /DAppOutputBaseFilename="setup-${{ runner.os }}-${{ matrix.build_type }}-${{ env.APP_VERSION }}" `
               /F"setup-${{ runner.os }}-${{ matrix.build_type }}"
         shell: powershell
 

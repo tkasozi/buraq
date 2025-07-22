@@ -303,6 +303,26 @@ jobs:
           APP_BINARY: ${{ github.workspace }}/build/build/${{ secrets.APP_NAME }}
         shell: powershell
 
+      - name: Generate installer with Inno Setup
+        if: runner.os == 'Windows'  && success()
+        env:
+          APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
+          OUTPUT_DIR: ${{ github.workspace }}/Output
+          APP_BINARY: ${{ github.workspace }}/build/build/${{ secrets.APP_NAME }}
+        run: |
+            $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+            $innoScriptPath = "${{ github.workspace }}/it-tools.iss"
+            $outputDirForInno = "${{ github.workspace }}\InstallerOutput"
+            
+            & "$innoSetupExe" "$innoScriptPath" `
+              /DAppVersion="${{ env.APP_VERSION }}" `
+              /DOutputDir="$outputDirForInno" ` # Passing OUTPUT_DIR
+              /DAppBinaryDir="${{ env.APP_BINARY }}" `
+              /DAppName="${{ env.APP_NAME }}" `
+              /DAppExeName="${{ env.APP_NAME }}.exe" `
+              /F"setup-${{ runner.os }}-${{ matrix.build_type }}"
+        shell: powershell
+
       - name: Show Created files after Inno Setup
         run: ls -al ./build/build
         shell: bash

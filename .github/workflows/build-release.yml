@@ -261,14 +261,14 @@ jobs:
       - name: Build Project (Windows - MSVC)
         if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-windows'  && success()
         working-directory: ${{ github.workspace }}/build
-        run: cmake --build . --config ${{ matrix.build_type }}
+        run: cmake --build ${{ matrix.build_type }} --config ${{ matrix.build_type }}
         # Use cmd to ensure vcvars64.bat context persists from the configure step
         shell: cmd
 
       - name: Build Project (Windows - MinGW)
         if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-mingw-dynamic' && success()
         working-directory: ${{ github.workspace }}/build
-        run: cmake --build . --config ${{ matrix.build_type }}
+        run: cmake --build ${{ matrix.build_type }} --config ${{ matrix.build_type }}
         shell: pwsh # Use pwsh to continue the MinGW context
 
       - name: Build Project (Linux/macOS)
@@ -314,10 +314,6 @@ jobs:
         with:
           filename: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
           directory: ${{ github.workspace }}/Output
-
-      - name: List Downloaded Artifacts
-        run: ls -R ./windows-release-build/
-        shell: bash
 
       - name: Upload to GitHub Release
         uses: actions/upload-release-asset@v1

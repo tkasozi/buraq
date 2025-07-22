@@ -318,6 +318,7 @@ jobs:
               /DAppVersion="${{ env.APP_VERSION }}" `
               /DOutputDir="$outputDirForInno" `
               /DAppBinaryDir="${{ env.APP_BINARY }}" `
+              /DAppArchSupport="${{ matrix.arch }}compatible" `
               /DAppName="${{ env.APP_NAME }}" `
               /DAppExeName="${{ env.APP_NAME }}.exe" `
               /DAppOutputBaseFilename="setup-${{ runner.os }}-${{ matrix.build_type }}" `

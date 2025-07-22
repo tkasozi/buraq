@@ -14,12 +14,17 @@
 #endif 
 
 #ifndef AppBinaryDir
-#define AppBinaryDir "./build/build"
+#define AppBinaryDir "./cmake-build-release/build"
 #endif
 
 #ifndef AppOutputBaseFilename
 #define AppOutputBaseFilename "setup-{#AppName}-{#AppVersion}"
 #endif
+
+#ifndef AppArchSupport
+#define AppArchSupport "x64compatible"
+#endif
+
 
 #define AppPublisher "ITools Projectxx, Inc."
 #define AppURL "https://tkasozi.github.io/it-tools-editor/"
@@ -37,18 +42,12 @@ AppSupportURL={#AppURL}
 AppUpdatesURL={#AppURL}
 DefaultDirName={autopf}\{#AppName}
 UninstallDisplayIcon={app}\{#AppExeName}
-; "ArchitecturesAllowed=x64compatible" specifies that Setup cannot run
-; on anything but x64 and Windows 11 on Arm.
-ArchitecturesAllowed=x64compatible
-; "ArchitecturesInstallIn64BitMode=x64compatible" requests that the
-; install be done in "64-bit mode" on x64 or Windows 11 on Arm,
-; meaning it should use the native 64-bit Program Files directory and
-; the 64-bit view of the registry.
-ArchitecturesInstallIn64BitMode=x64compatible
+ArchitecturesAllowed={#AppArchSupport}
+ArchitecturesInstallIn64BitMode={#AppArchSupport}
 ChangesAssociations=yes
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
-;PrivilegesRequired=lowest
+PrivilegesRequired=lowest
 OutputBaseFilename={#AppOutputBaseFilename}
 SetupIconFile="app\icons\workflow.ico"
 SolidCompression=yes

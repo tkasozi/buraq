@@ -270,10 +270,6 @@ jobs:
         run: cmake --build . --config ${{ matrix.build_type }}
         shell: bash
 
-      - name: Show Created files after build
-        run: ls -al .; echo "*****************************\n\n"; ls -al ./build; ls -al ./build/build
-        shell: bash
-
       - name: Download Inno Setup
         if: runner.os == 'Windows'  && success()
         run: |
@@ -319,8 +315,8 @@ jobs:
 
         shell: powershell
 
-      - name: Show Created files after Inno Setup
-        run: ls -al ./build/build
+      - name: Show Created files after build
+        run: ls -al .; echo "*****************************\n\n"; ls -al ./build; ls -al ./build/build; echo "**** APP_NAME:${{ env.APP_NAME }}***"
         shell: bash
 
       - name: Create release archive

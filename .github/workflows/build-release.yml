@@ -277,7 +277,7 @@ jobs:
         run: cmake --build . --config ${{ matrix.build_type }}
         shell: bash
 
-      - name: Show Created files
+      - name: Show Created files after build
         run: ls -al .; echo "*****************************\n\n"; ls -al ./build; ls -al ./build/build
         shell: bash
 
@@ -309,6 +309,10 @@ jobs:
           APP_BINARY: ${{ github.workspace }}/build/build/${{ secrets.APP_NAME }}
         shell: powershell
 
+      - name: Show Created files after Inno Setup
+        run: ls -al ./build/build
+        shell: bash
+
       - name: Create release archive
         uses: thedoctor0/zip-release@master
         with:
@@ -319,7 +323,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use the default GITHUB_TOKEN for release uploads
-            ASSET_NAME: ${{ env.APP_NAME }}-${{ matrix.build_type }}-${{ github.event.release.tag_name }}-${{ runner.os }}
+            ASSET_NAME: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}
         with:
             upload_url: ${{ github.event.release.upload_url }}
             asset_path: ${{ github.workspace }}/OUTPUT/${{ env.ASSET_NAME }}.zip

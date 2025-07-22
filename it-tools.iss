@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define AppName "ITools"
-#define AppVersion "0.0.15"
+#define AppVersion "{cm:APP_VERSION}"
 #define AppPublisher "ITools Projectxx, Inc."
 #define AppURL "https://tkasozi.github.io/it-tools-editor/"
-#define AppExeName "ITools.exe"
+#define AppExeName "{cm:APP_NAME}.exe"
 #define AppAssocName AppName + " File"
 #define AppAssocExt ".myp"
 #define AppAssocKey StringChange(AppAssocName, " ", "") + AppAssocExt

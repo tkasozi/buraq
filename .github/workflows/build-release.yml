@@ -79,12 +79,6 @@ jobs:
           path-type: minimal
           msystem: MINGW64
 
-      - name: Download Inno Setup
-        run: |
-          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
-          Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
-        shell: powershell
-
       - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}
         uses: actions/setup-dotnet@v4
         with:
@@ -304,7 +298,7 @@ jobs:
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ${{ github.workspace }}/it-tools.iss
         env:
-          APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
+          APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
           APP_BINARY: ${{ github.workspace }}/build/build/${{ secrets.APP_NAME }}
         shell: powershell

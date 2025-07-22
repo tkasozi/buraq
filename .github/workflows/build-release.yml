@@ -3,7 +3,6 @@ name: Matrix Build and Deploy
 on: [ push, pull_request ]
 
 env:
-  APP_NAME: "IT-Tools"
   CI: True
   DOTNET_SDK_VERSION: 9.0.303
   DOTNET_VERSION: 9.0.7
@@ -287,11 +286,10 @@ jobs:
         id: find-exe
         run: |
           Get-ChildItem -Path "${{ github.workspace }}/build/build" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
-        shell: powershell
+          
+          echo "APP_NAME=$(cat app_exe_name.txt)" >> $GITHUB_ENV
 
-      - name: Read application executable name
-        id: app-name
-        run: echo "APP_NAME=$(cat app_exe_name.txt)" >> $GITHUB_ENV
+        shell: powershell
 
       - name: Generate installer with Inno Setup
         if: runner.os == 'Windows'  && success()
@@ -299,7 +297,7 @@ jobs:
           APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
           APP_BINARY: ${{ github.workspace }}/build/build
-          SETUP_FILE_NAME: "setup-${{ runner.os }}-${{ matrix.build_type }}-${{ env.APP_VERSION }}"
+          EXE_FILE_NAME: "${{ runner.os }}-${{ matrix.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }} "
         run: |
             $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
             $innoScriptPath = "${{ github.workspace }}/it-tools.iss"
@@ -310,7 +308,7 @@ jobs:
             $outputDirForInno = "${{ env.OUTPUT_DIR }}"
             $appBinaryDir = "${{ env.APP_BINARY }}"
             $appArchSupport = "${{ matrix.arch }}compatible"
-            $appOutputBaseFilename = "${{ env.SETUP_FILE_NAME }}"
+            $appOutputBaseFilename = "setup-${{ env.EXE_FILE_NAME }}"
           
             & "$innoSetupExe" "$innoScriptPath" `
               "/DAppName=$appName" `
@@ -330,7 +328,7 @@ jobs:
       - name: Create release archive
         uses: thedoctor0/zip-release@master
         with:
-          filename: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+          filename: ${{ env.EXE_FILE_NAME }}.zip
           directory: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}
 
       - name: Upload to GitHub Release

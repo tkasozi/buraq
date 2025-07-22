@@ -1,7 +1,6 @@
 name: Matrix Build and Deploy
 
-on: [ "delete" ]
-#on: [ push, pull_request ]
+on: [ push, pull_request ]
 
 env:
   APP_NAME: "IT-Tools"
@@ -281,3 +280,51 @@ jobs:
       - name: Show Created files
         run: ls -al .; echo "*****************************\n\n"; ${{ github.workspace }}/build
         shell: bash
+
+      - name: Download Inno Setup
+        if: runner.os == 'Windows'  && success()
+        run: |
+              Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
+              Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
+        shell: powershell
+
+      - name: Find application executable
+        if: runner.os == 'Windows'  && success()
+        id: find-exe
+        run: |
+          Get-ChildItem -Path "${{ github.workspace }}/build/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+        shell: powershell
+
+      - name: Read application executable name
+        id: app-name
+        run: echo "APP_NAME=$(cat app_exe_name.txt)" >> $GITHUB_ENV
+
+      - name: Generate installer with Inno Setup
+        if: runner.os == 'Windows'  && success()
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ${{ github.workspace }}/it-tools.iss
+        env:
+          APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
+          OUTPUT_DIR: ${{ github.workspace }}/Output
+          APP_BINARY: ${{ github.workspace }}/build/Release/${{ secrets.APP_NAME }}
+        shell: powershell
+
+      - name: Create release archive
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+          directory: ${{ github.workspace }}/Output
+
+      - name: List Downloaded Artifacts
+        run: ls -R ./windows-release-build/
+        shell: bash
+
+      - name: Upload to GitHub Release
+        uses: actions/upload-release-asset@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use the default GITHUB_TOKEN for release uploads
+        with:
+            upload_url: ${{ github.event.release.upload_url }}
+            asset_path: ${{ github.workspace }}/OUTPUT/${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+            asset_name: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+            asset_content_type: application/zip

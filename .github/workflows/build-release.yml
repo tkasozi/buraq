@@ -287,7 +287,7 @@ jobs:
         run: |
             Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*editor.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
             
-            $exeName = $(cat app_exe_name.txt)
+            $exeName = "$(cat app_exe_name.txt)"
             $appName = exeName.Replace(".exe", "")
           
             Write-Host "APP_NAME set to $appName"

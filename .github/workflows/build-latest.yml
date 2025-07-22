@@ -25,9 +25,6 @@ jobs:
       build_type: ${{ matrix.build_type }}
       vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
       gh_packages_token: ${{ secrets.GH_PACKAGES_TOKEN }}
-    secrets:
-      # Pass the secret from the caller workflow to the reusable workflow
-      gh_packages_token: ${{ secrets.GH_PACKAGES_TOKEN }}
 
   # A separate job that runs only for Release builds on Windows and publishes
   publish_release:

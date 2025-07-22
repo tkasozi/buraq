@@ -274,11 +274,11 @@ jobs:
       - name: Build Project (Linux/macOS)
         if: runner.os != 'Windows'  && success()
         working-directory: ${{ github.workspace }}/build
-        run: cmake --build . --config ${{ matrix.build_type }}
+        run: cmake --build ${{ matrix.build_type }} --config ${{ matrix.build_type }}
         shell: bash
 
       - name: Show Created files
-        run: ls -al .; echo "*****************************\n\n"; ls -al ./build; ls -al ./build/build
+        run: ls -al .; echo "*****************************\n\n"; ls -al ./build; ls -al ./build/${{ matrix.build_type }}
         shell: bash
 
       - name: Download Inno Setup
@@ -292,7 +292,7 @@ jobs:
         if: runner.os == 'Windows'  && success()
         id: find-exe
         run: |
-          Get-ChildItem -Path "${{ github.workspace }}/build/Release" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+          Get-ChildItem -Path "${{ github.workspace }}/build/${{ matrix.build_type }}" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
         shell: powershell
 
       - name: Read application executable name
@@ -306,7 +306,7 @@ jobs:
         env:
           APP_VERSION: ${{ github.event.release.tag_name }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
-          APP_BINARY: ${{ github.workspace }}/build/Release/${{ secrets.APP_NAME }}
+          APP_BINARY: ${{ github.workspace }}/build/${{ matrix.build_type }}/${{ secrets.APP_NAME }}
         shell: powershell
 
       - name: Create release archive
@@ -325,6 +325,6 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use the default GITHUB_TOKEN for release uploads
         with:
             upload_url: ${{ github.event.release.upload_url }}
-            asset_path: ${{ github.workspace }}/OUTPUT/${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
+            asset_path: ${{ github.workspace }}/OUTPUT/${{ env.APP_NAME }}-${{ matrix.build_type }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
             asset_name: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
             asset_content_type: application/zip

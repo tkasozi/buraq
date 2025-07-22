@@ -316,7 +316,7 @@ jobs:
             
             & "$innoSetupExe" "$innoScriptPath" `
               /DAppVersion="${{ env.APP_VERSION }}" `
-              /DOutputDir="$outputDirForInno" ` # Passing OUTPUT_DIR
+              /DOutputDir="$outputDirForInno" `
               /DAppBinaryDir="${{ env.APP_BINARY }}" `
               /DAppName="${{ env.APP_NAME }}" `
               /DAppExeName="${{ env.APP_NAME }}.exe" `

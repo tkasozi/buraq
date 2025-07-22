@@ -308,7 +308,7 @@ jobs:
         env:
           APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
-          APP_BINARY: ${{ github.workspace }}/build/build/${{ secrets.APP_NAME }}
+          APP_BINARY: ${{ github.workspace }}/build/build
         run: |
             $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
             $innoScriptPath = "${{ github.workspace }}/it-tools.iss"
@@ -320,6 +320,7 @@ jobs:
               /DAppBinaryDir="${{ env.APP_BINARY }}" `
               /DAppName="${{ env.APP_NAME }}" `
               /DAppExeName="${{ env.APP_NAME }}.exe" `
+              /DAppOutputBaseFilename="setup-${{ runner.os }}-${{ matrix.build_type }}" `
               /F"setup-${{ runner.os }}-${{ matrix.build_type }}"
         shell: powershell
 

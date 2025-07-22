@@ -281,16 +281,6 @@ jobs:
               Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
         shell: powershell
 
-      - name: Find application executable
-        if: runner.os == 'Windows'  && success()
-        id: find-exe
-        run: |
-          Get-ChildItem -Path "${{ github.workspace }}/build/build" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
-          
-          echo "APP_NAME=$(cat app_exe_name.txt)" >> $GITHUB_ENV
-
-        shell: powershell
-
       - name: Generate installer with Inno Setup
         if: runner.os == 'Windows'  && success()
         env:
@@ -300,14 +290,18 @@ jobs:
           EXE_FILE_NAME: "${{ runner.os }}-${{ matrix.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }} "
         run: |
             Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*editor.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
-            echo "APP_NAME=$(cat app_exe_name.txt)" >> $GITHUB_ENV
-            cat app_exe_name.txt
+            
+            $exeName = $(cat app_exe_name.txt)
+            $appName = exeName.Replace(".exe", "")
+          
+            Write-Host "APP_NAME set to $appName"
+          
+            "APP_NAME=$appName" | Set-Content -Path $GITHUB_ENV -Force
           
             $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
             $innoScriptPath = "${{ github.workspace }}/it-tools.iss"
           
-            $appName = "${{ env.APP_NAME }}"
-            $appExeName = "${{ env.APP_NAME }}.exe"
+            $appExeName = "$(cat app_exe_name.txt)"
             $appVersion = "${{ env.APP_VERSION }}"
             $outputDirForInno = "${{ env.OUTPUT_DIR }}"
             $appBinaryDir = "${{ env.APP_BINARY }}"

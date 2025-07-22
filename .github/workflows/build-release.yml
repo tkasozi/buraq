@@ -295,16 +295,6 @@ jobs:
 
       - name: Generate installer with Inno Setup
         if: runner.os == 'Windows'  && success()
-        run: |
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ${{ github.workspace }}/it-tools.iss
-        env:
-          APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
-          OUTPUT_DIR: ${{ github.workspace }}/Output
-          APP_BINARY: ${{ github.workspace }}/build/build/${{ secrets.APP_NAME }}
-        shell: powershell
-
-      - name: Generate installer with Inno Setup
-        if: runner.os == 'Windows'  && success()
         env:
           APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
@@ -313,17 +303,24 @@ jobs:
         run: |
             $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
             $innoScriptPath = "${{ github.workspace }}/it-tools.iss"
-            $outputDirForInno = "${{ github.workspace }}\InstallerOutput"
-            
+          
+            $appName = "${{ env.APP_NAME }}"
+            $appExeName = "${{ env.APP_NAME }}.exe"
+            $appVersion = "${{ env.APP_VERSION }}"
+            $outputDirForInno = "${{ env.OUTPUT_DIR }}"
+            $appBinaryDir = "${{ env.APP_BINARY }}"
+            $appArchSupport = "${{ matrix.arch }}compatible"
+            $appOutputBaseFilename = "${{ env.SETUP_FILE_NAME }}"
+          
             & "$innoSetupExe" "$innoScriptPath" `
-              /DAppVersion="${{ env.APP_VERSION }}" `
-              /DOutputDir="$outputDirForInno" `
-              /DAppBinaryDir="${{ env.APP_BINARY }}" `
-              /DAppArchSupport="${{ matrix.arch }}compatible" `
-              /DAppName="${{ env.APP_NAME }}" `
-              /DAppExeName="${{ env.APP_NAME }}.exe" `
-              /DAppOutputBaseFilename="${{ env.SETUP_FILE_NAME }}" `
-              /F"${{ env.SETUP_FILE_NAME }}"
+              "/DAppName=$appName" `
+              "/DAppExeName=$appExeName" `
+              "/DAppVersion=$appVersion" `
+              "/DOutputDir=$outputDirForInno" `
+              "/DAppBinaryDir=$appBinaryDir" `
+              "/DAppArchSupport=$appArchSupport" `
+              "/DAppOutputBaseFilename=$appOutputBaseFilename"
+
         shell: powershell
 
       - name: Show Created files after Inno Setup
@@ -334,7 +331,7 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           filename: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}.zip
-          directory: ${{ github.workspace }}/Output
+          directory: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}
 
       - name: Upload to GitHub Release
         uses: actions/upload-release-asset@v1

@@ -14,11 +14,11 @@
 #endif 
 
 #ifndef AppBinaryDir
-#define AppBinaryDir "./cmake-build-release/build"
+#define AppBinaryDir "./cmake-build-debug/build"
 #endif
 
 #ifndef AppOutputBaseFilename
-#define AppOutputBaseFilename "setup-{#AppName}-{#AppVersion}"
+#define AppOutputBaseFilename setup-"{#AppName}"-"{#AppVersion}"
 #endif
 
 #ifndef AppArchSupport

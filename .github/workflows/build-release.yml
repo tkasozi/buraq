@@ -309,6 +309,7 @@ jobs:
           APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
           APP_BINARY: ${{ github.workspace }}/build/build
+          SETUP_FILE_NAME: "setup-${{ runner.os }}-${{ matrix.build_type }}-${{ env.APP_VERSION }}"
         run: |
             $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
             $innoScriptPath = "${{ github.workspace }}/it-tools.iss"
@@ -321,8 +322,8 @@ jobs:
               /DAppArchSupport="${{ matrix.arch }}compatible" `
               /DAppName="${{ env.APP_NAME }}" `
               /DAppExeName="${{ env.APP_NAME }}.exe" `
-              /DAppOutputBaseFilename="setup-${{ runner.os }}-${{ matrix.build_type }}-${{ env.APP_VERSION }}" `
-              /F"setup-${{ runner.os }}-${{ matrix.build_type }}"
+              /DAppOutputBaseFilename="${{ env.SETUP_FILE_NAME }}" `
+              /F"${{ env.SETUP_FILE_NAME }}"
         shell: powershell
 
       - name: Show Created files after Inno Setup

@@ -286,10 +286,10 @@ jobs:
           EXE_FILE_NAME: "${{ runner.os }}-${{ matrix.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }} "
         run: |
             Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*editor.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
-            
-            $exeName = "$(cat app_exe_name.txt)"
-            $appName = exeName.Replace(".exe", "")
           
+          
+            $exeName = Get-Content -Path "app_exe_name.txt"
+            $appName = $exeName.Replace(".exe", "")
             Write-Host "APP_NAME set to $appName"
           
             "APP_NAME=$appName" | Set-Content -Path $GITHUB_ENV -Force

@@ -278,7 +278,7 @@ jobs:
         shell: bash
 
       - name: Show Created files
-        run: ls -al .; echo "*****************************\n\n"; ls -al ${{ github.workspace }}/build
+        run: ls -al .; echo "*****************************\n\n"; ls -al build
         shell: bash
 
       - name: Download Inno Setup

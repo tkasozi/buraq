@@ -2,13 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define AppName "ITools"
-#define AppVersion "{cm:APP_VERSION}"
+;#define AppVersion "{cm:APP_VERSION}"
 #define AppPublisher "ITools Projectxx, Inc."
 #define AppURL "https://tkasozi.github.io/it-tools-editor/"
-#define AppExeName "{cm:APP_NAME}.exe"
-#define AppAssocName AppName + " File"
-#define AppAssocExt ".myp"
-#define AppAssocKey StringChange(AppAssocName, " ", "") + AppAssocExt
+#define AppExeName "{#AppName}.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -35,7 +32,7 @@ ChangesAssociations=yes
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
-OutputBaseFilename=setup-{#AppName}-{#AppVersion}
+OutputBaseFilename=setup-{#AppName}-{cm:APP_VERSION}
 SetupIconFile="app\icons\workflow.ico"
 SolidCompression=yes
 WizardStyle=modern

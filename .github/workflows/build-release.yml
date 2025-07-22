@@ -1,4 +1,4 @@
-name: Matrix Build and Deploy
+name: Build and Deploy
 
 on: [ push, pull_request ]
 
@@ -299,6 +299,10 @@ jobs:
           APP_BINARY: ${{ github.workspace }}/build/build
           EXE_FILE_NAME: "${{ runner.os }}-${{ matrix.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }} "
         run: |
+            Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*editor.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+            echo "APP_NAME=$(cat app_exe_name.txt)" >> $GITHUB_ENV
+            cat app_exe_name.txt
+          
             $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
             $innoScriptPath = "${{ github.workspace }}/it-tools.iss"
           
@@ -335,7 +339,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use the default GITHUB_TOKEN for release uploads
-            ASSET_NAME: ${{ env.APP_NAME }}-${{ github.event.release.tag_name }}-${{ runner.os }}
+            ASSET_NAME: ${{ env.EXE_FILE_NAME }}
         with:
             upload_url: ${{ github.event.release.upload_url }}
             asset_path: ${{ github.workspace }}/OUTPUT/${{ env.ASSET_NAME }}.zip

@@ -1,0 +1,71 @@
+# .github/workflows/main-workflow.yml
+name: Main CI Workflow
+
+on: [push, pull_request]
+
+jobs:
+  # This job triggers the reusable workflow for each matrix combination
+  build_and_package:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        build_type: [Release]
+        include:
+          - os: windows-latest
+            vcpkg_triplet: x64-windows
+          - os: ubuntu-latest
+            vcpkg_triplet: x64-linux
+          - os: macos-latest
+            vcpkg_triplet: x64-osx
+
+    uses: ./.github/workflows/reusable-build.yml # Calls the reusable workflow
+    with:
+      os: ${{ matrix.os }}
+      build_type: ${{ matrix.build_type }}
+      vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
+      gh_packages_token: ${{ secrets.GH_PACKAGES_TOKEN }}
+    secrets:
+      # Pass the secret from the caller workflow to the reusable workflow
+      gh_packages_token: ${{ secrets.GH_PACKAGES_TOKEN }}
+
+  # A separate job that runs only for Release builds on Windows and publishes
+  publish_release:
+    needs: build_and_package # This job depends on the build completing
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main' # Publish only on push to main
+    runs-on: ubuntu-latest # Can be a single runner, as it only downloads and uploads
+    permissions:
+      contents: write # To upload release assets
+      packages: read # If it needs to read from GitHub Packages again
+
+    steps:
+      - name: Get Release Information (from trigger, if this is a release workflow)
+        run: |
+          echo "Release Tag: ${{ github.ref }}"
+          echo "Release Upload URL: ${{ github.event.release.upload_url }}"
+          # For 'release' event, the upload_url is direct.
+          # For 'push' to main (as configured here), you might need to find/create a release.
+
+      - name: Download Windows Release Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-latest-Release-build-artifacts # Specific artifact name for Windows Release build
+          path: ./windows-release-build/
+
+      - name: Download Inno Setup
+        run: |
+          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
+          Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
+        shell: powershell
+
+      - name: List Downloaded Artifacts
+        run: ls -R ./windows-release-build/
+        shell: bash
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./${{ github.workspace }}/build/ITools.exe # Adjust path to your built executable/installer
+          # upload_url: ${{ github.event.release.upload_url }} # Use this if triggered by `release` event
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use the default GITHUB_TOKEN for release uploads

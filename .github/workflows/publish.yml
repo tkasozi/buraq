@@ -1,10 +1,10 @@
 name: Build and Package
 on:
-  release:
-   types: [published]
-#  push:
-#    branches:
-#     - 19-prepare-a-pre-release-v0012
+#  release:
+#   types: [published]
+  push:
+    branches:
+     - 19-prepare-a-pre-release-v0012
 
 env:
   APP_NAME: "IT-Tools"

@@ -1,56 +1,47 @@
-name: Matrix Build and Deploy
+# .github/workflows/callable-build-logic.yml
+name: Reusable Build Logic
 
-on: [ "delete" ]
-#on: [ push, pull_request ]
+# This workflow can be called by other workflows
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+        description: 'Runner operating system'
+      build_type:
+        required: true
+        type: string
+        description: 'Build configuration (Debug/Release)'
+      vcpkg_triplet:
+        required: true
+        type: string
+        description: 'Vcpkg triplet for the target platform'
+      # You might also pass secrets and other complex inputs
+      gh_packages_token:
+        required: true
+        type: secret
+        description: 'GitHub Packages PAT'
 
-env:
-  APP_NAME: "IT-Tools"
-  CI: True
-  DOTNET_SDK_VERSION: 9.0.303
-  DOTNET_VERSION: 9.0.7
-  CMAKE_EXE: "cmake"
-
-permissions:
-  contents: write
+    outputs:
+      # If your build logic produces outputs needed by the caller
+      build_success:
+        description: "Whether the build was successful"
+        value: ${{ jobs.build_component.outputs.build_successful }}
+      artifact_name:
+        description: "Name of the uploaded artifact"
+        value: ${{ jobs.build_component.outputs.artifact_name }}
 
 jobs:
-  init:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-          path: it-tools-editor
-          fetch-depth: 0
-
-      - name: Archive and Upload it-tools-editor as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: it-tools-editor
-          path: ${{ github.workspace }}/it-tools-editor/
-
-
-  build:
-    needs: init
-    runs-on: ${{ matrix.os }}
+  build_component:
+    runs-on: ${{ inputs.os }}
     permissions:
       contents: read
-      packages: write
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ windows-latest, ubuntu-latest, macos-latest ]
-        build_type: [ Release ]
-        include:
-          - os: windows-latest
-            vcpkg_triplet: x64-windows
-            generator: "Visual Studio 17 2022"
-            arch: x64
-          - os: ubuntu-latest
-            vcpkg_triplet: x64-linux
-          - os: macos-latest
-            vcpkg_triplet: x64-osx
+      packages: write # Necessary if this reusable workflow interacts with GitHub Packages
+    outputs:
+      build_successful: ${{ steps.build_project_step.outcome == 'success' }}
+      artifact_name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts # Example, match your upload name
+
     steps:
       - name: Restore job artifact
         uses: actions/download-artifact@v4
@@ -95,9 +86,9 @@ jobs:
         id: dotnet-project
         run: |
           ls -alh
-          
+
           cd ManagedLibrary
-          
+
           ./build.sh
 
         shell: bash
@@ -172,7 +163,7 @@ jobs:
           $nuget_path = & "${{ env.VCPKG_EXE }}" fetch nuget | Select-String -Pattern '\S+\.exe$' | ForEach-Object { $_.Matches[0].Value }
           if (-not $nuget_path) { Write-Error "Failed to get nuget.exe path."; exit 1 }
           & "$nuget_path" setapikey "${{ env.GH_PACKAGES_TOKEN }}" -Source "GitHubPackages" -NonInteractive 2>&1 | Write-Host
-          
+
           Write-Host "API Key for GitHubPackages set successfully."
 
       - name: Set NuGet API Key for GitHub Packages  (Linux/macOS)
@@ -207,19 +198,19 @@ jobs:
         run: |
           echo "******Dotnet at ${{ env.DOTNET_ROOT }}/packs: **********"
           ls -al "${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64"
-          
+
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
           ls -al "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
-          
-          
+
+
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
             # For MinGW (x64-mingw-dynamic), find it from msys2 setup
-          
+
             # Initialize variables for the Windows case
             cmake_make_program_arg=""
             host_triplet_arg="-DVCPKG_DEFAULT_HOST_TRIPLET=x64-windows" # Default for Windows host
-          
+
             if [[ "${{ matrix.vcpkg_triplet }}" == "x64-windows" ]]; then
             # If using x64-windows triplet, CMake usually finds Ninja automatically
             # so cmake_make_program_arg remains empty.
@@ -235,7 +226,7 @@ jobs:
             cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
           fi
           else # For Linux/macOS
-          
+
           # Use 'command -v' for a more robust way to find executables in PATH
           ninja_path=$(command -v ninja)
           if [[ -z "$ninja_path" ]]; then
@@ -280,4 +271,13 @@ jobs:
 
       - name: Show Created files
         run: ls -al .; echo "*****************************\n\n"; ${{ github.workspace }}/build
-        shell: bash
+        shell:
+          bash
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
+          path: ${{ github.workspace }}/it-tools-editor/build/ # Adjust to your actual build output path
+          retention-days: 5
+        if: success()

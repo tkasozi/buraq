@@ -58,10 +58,14 @@ jobs:
   build_component:
     needs: init
     runs-on: ${{ inputs.os }}
+
+    env:
+      APP_EXE_NAME: "it-tools-editor-${{ runner.os }}-${{ inputs.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
+
     outputs:
       build_successful: ${{ steps.build_project_step.outcome == 'success' }}
       artifact_name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
-      executable_name: "it-tools-editor-${{ runner.os }}-${{ inputs.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
+      executable_name: ${{ env.APP_EXE_NAME }}
 
     permissions:
       contents: read
@@ -316,7 +320,7 @@ jobs:
           $outputDirForInno = "${{ env.OUTPUT_DIR }}"
           $appBinaryDir = "${{ env.APP_BINARY }}"
           $appArchSupport = "${{ inputs.arch }}compatible"
-          $appOutputBaseFilename = "setup-${{ jobs.build_component.outputs.artifact_name }}"
+          $appOutputBaseFilename = "setup-${{ env.APP_EXE_NAME }}"
           
           & "$innoSetupExe" "$innoScriptPath" `
             "/DAppName=$appName" `
@@ -344,5 +348,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
-          path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/${{ jobs.build_component.outputs.artifact_name }}.exe
+          path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/${{ env.APP_EXE_NAME }}.exe
           retention-days: 1

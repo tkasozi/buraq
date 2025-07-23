@@ -1,9 +1,11 @@
 # .github/workflows/release.yml
 name: release.yml
 
-on:
-  release:
-    types: [published]
+#on:
+#  release:
+#    types: [published]
+
+on: ["push"]
 
 jobs:
   # This job triggers the reusable workflow for each matrix combination
@@ -29,7 +31,6 @@ jobs:
 #            vcpkg_triplet: x64-osx
 
     uses: ./.github/workflows/reusable-build.yml # Calls the reusable workflow
-
 
     with:
       os: ${{ matrix.os }}
@@ -61,11 +62,11 @@ jobs:
       - name: Download Windows Release Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ inputs.build_type }}-build-artifacts # Specific artifact name for Windows Release build
+          name: ${{ matrix.os }}-${{ matrix.build_type }}-build-artifacts # Specific artifact name for Windows Release build
           path: ./windows-release-build/
 
       - name: List Downloaded Artifacts
-        run: ls -R ./windows-release-build/
+        run: ls -R ./windows-release-build/; echo
         shell: bash
 
       - name: Upload release asset
@@ -74,6 +75,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/windows-release-build/setup-it-tools-editor-${{ runner.os }}-${{ matrix.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe
+          asset_path: ${{ github.workspace }}/windows-release-build/setup-it-tools-editor-${{ matrix.os }}-${{ matrix.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe
           asset_content_type: application/zip
-          asset_name: setup-it-tools-editor-${{ runner.os }}-${{ matrix.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}
+          asset_name: setup-it-tools-editor-${{ matrix.os }}-${{ matrix.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}

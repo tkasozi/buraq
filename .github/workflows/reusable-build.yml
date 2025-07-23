@@ -90,6 +90,7 @@ jobs:
 
       - name: Build Managed project
         id: dotnet-project
+        working-directory: ${{ github.workspace }}/it-tools-editor
         run: |
           ls -alh
 

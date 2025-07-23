@@ -5,6 +5,9 @@ on: [ push, pull_request ]
 jobs:
   # This job triggers the reusable workflow for each matrix combination
   build_and_package:
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:

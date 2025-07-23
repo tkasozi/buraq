@@ -106,8 +106,8 @@ jobs:
         shell: pwsh
 
       - name: Bootstrap Vcpkg (Linux/macOS)
-        run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
         if: inputs.os != 'Windows'
+        run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
         shell: bash
 
       - name: Configure NuGet for GitHub Packages (Windows)
@@ -137,6 +137,7 @@ jobs:
           $nugetConfigContent | Out-File $nugetConfigPath
           Write-Host "Created NuGet.Config at $nugetConfigPath"
 
+
       - name: Configure NuGet for GitHub Packages (Linux/macOS)
         env:
           USERNAME: ${{ github.repository_owner }}
@@ -160,6 +161,7 @@ jobs:
           echo '</configuration>' >> ~/.nuget/NuGet/NuGet.Config
           echo "Created NuGet.Config at ~/.nuget/NuGet/NuGet.Config"
 
+
       - name: Set NuGet API Key for GitHub Packages (Windows)
         if: inputs.os == 'Windows'
         shell: pwsh
@@ -173,6 +175,7 @@ jobs:
 
           Write-Host "API Key for GitHubPackages set successfully."
 
+
       - name: Set NuGet API Key for GitHub Packages  (Linux/macOS)
         if: inputs.os != 'Windows'
         shell: bash
@@ -183,6 +186,8 @@ jobs:
           NUGET_PATH=$(mono "${{ env.VCPKG_EXE }}" fetch nuget | tail -n 1)
           if [ -z "$NUGET_PATH" ]; then echo "Failed to get nuget.exe path." && exit 1; fi
           mono "$NUGET_PATH" setapikey "${{ env.GH_PACKAGES_TOKEN }}" -Source "GitHubPackages" -NonInteractive 2>&1 | cat
+
+
 
       - name: Cache Vcpkg Asset Downloads
         uses: actions/cache@v4
@@ -195,7 +200,7 @@ jobs:
             ${{ inputs.os }}-vcpkg-assets-
 
       - name: Configure CMake and Install Vcpkg Dependencies
-        working-directory: ${{ github.workspace }}
+        working-directory: ${{ github.workspace }}/it-tools-editor
         env:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
           VCPKG_INSTALL_OPTIONS: "--debug"
@@ -203,6 +208,8 @@ jobs:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
         shell: bash
         run: |
+          ls -alh
+          
           echo "******Dotnet at ${{ env.DOTNET_ROOT }}/packs: **********"
           ls -al "${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64"
 
@@ -259,20 +266,20 @@ jobs:
 
       - name: Build Project (Windows - MSVC)
         if: inputs.os == 'Windows' && inputs.vcpkg_triplet == 'x64-windows'  && success()
-        working-directory: ${{ github.workspace }}/build
+        working-directory: ${{ github.workspace }}/it-tools-editor/build
         run: cmake --build . --config ${{ inputs.build_type }}
         # Use cmd to ensure vcvars64.bat context persists from the configure step
         shell: cmd
 
       - name: Build Project (Windows - MinGW)
         if: inputs.os == 'Windows' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
-        working-directory: ${{ github.workspace }}/build
+        working-directory: ${{ github.workspace }}/it-tools-editor/build
         run: cmake --build . --config ${{ inputs.build_type }}
         shell: pwsh # Use pwsh to continue the MinGW context
 
       - name: Build Project (Linux/macOS)
         if: inputs.os != 'Windows'  && success()
-        working-directory: ${{ github.workspace }}/build
+        working-directory: ${{ github.workspace }}/it-tools-editor/build
         run: cmake --build . --config ${{ inputs.build_type }}
         shell: bash
 

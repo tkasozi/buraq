@@ -28,7 +28,6 @@ jobs:
           name: it-tools-editor
           path: ${{ github.workspace }}/it-tools-editor/
 
-
   build:
     needs: init
     runs-on: ${{ matrix.os }}
@@ -323,13 +322,10 @@ jobs:
           filename: ${{ env.EXE_FILE_NAME }}.zip
           directory: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}
 
-      - name: Upload to GitHub Release
-        uses: actions/upload-release-asset@v1
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use the default GITHUB_TOKEN for release uploads
-            ASSET_NAME: ${{ env.EXE_FILE_NAME }}
+      - name: Upload Build Artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
         with:
-            upload_url: ${{ github.event.release.upload_url }}
-            asset_path: ${{ github.workspace }}/OUTPUT/${{ env.ASSET_NAME }}.zip
-            asset_name: ${{ env.ASSET_NAME }}.zip
-            asset_content_type: application/zip
+          name: ${{ env.EXE_FILE_NAME }}.zip
+          path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}
+          retention-days: 1

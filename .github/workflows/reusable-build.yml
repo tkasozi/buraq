@@ -333,7 +333,7 @@ jobs:
         shell: powershell
 
       - name: Show Created files after build
-        run: ls -al .; echo "*****************************\n\n"; ls -al "${{ github.workspace }}\it-tools-editor"; echo "**** APP_NAME:${{ env.APP_NAME }}***"
+        run: ls -al .; echo "*****************************\n\n"; ls -al "${{ github.workspace }}\it-tools-editor"; ls -al "${{ github.workspace }}\it-tools-editor\Output"; echo "**** OUTPUT_DIR:${{ env.OUTPUT_DIR }}***"
         shell: bash
 
       - name: Create release archive

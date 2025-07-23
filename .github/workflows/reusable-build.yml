@@ -303,7 +303,7 @@ jobs:
         env:
           APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
-          APP_BINARY: ${{ github.workspace }}/build/build
+          APP_BINARY: ${{ github.workspace }}/it-tools-editor/build
         run: |
           Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*editor.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
           
@@ -341,12 +341,12 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           filename: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts.zip
-          directory: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}
+          directory: ${{ github.workspace }}/it-tools-editor/${{ env.OUTPUT_DIR }}
 
       - name: Upload Build Artifacts
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
-          path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/${{ env.APP_EXE_NAME }}.exe
+          path: ${{ github.workspace }}/it-tools-editor/${{ env.OUTPUT_DIR }}/${{ env.APP_EXE_NAME }}.exe
           retention-days: 1

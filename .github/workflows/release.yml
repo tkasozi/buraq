@@ -36,12 +36,10 @@ jobs:
       generator: ${{ matrix.generator }}
       arch: ${{ matrix.arch }}
 
-
-
   # A separate job that runs only for Release builds on Windows and publishes
   publish_release:
     needs: build_and_package # This job depends on the build completing
-    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main' # Publish only on push to main
+    if: needs.build_and_package.outputs.build_successful == 'true'
     runs-on: ubuntu-latest # Can be a single runner, as it only downloads and uploads
     permissions:
       contents: write # To upload release assets

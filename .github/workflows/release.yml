@@ -8,9 +8,15 @@ on:
 jobs:
   # This job triggers the reusable workflow for each matrix combination
   build_and_package:
+    outputs:
+      # Capture the output from the reusable workflow's job
+      # The key 'build_artifact_name' will hold the value of `uploaded_artifact_name` from the reusable workflow.
+      build_artifact_name: ${{ uses.build_and_package.outputs.artifact_name }} # <--- Access it here!
     permissions:
-      contents: read
+      contents: write
       packages: write
+      actions: read
+
     strategy:
       fail-fast: false
       matrix:
@@ -28,10 +34,6 @@ jobs:
 
     uses: ./.github/workflows/reusable-build.yml # Calls the reusable workflow
 
-    outputs:
-      # Capture the output from the reusable workflow's job
-      # The key 'build_artifact_name' will hold the value of `uploaded_artifact_name` from the reusable workflow.
-      build_artifact_name: ${{ uses.build_and_package.outputs.artifact_name }} # <--- Access it here!
 
     with:
       os: ${{ matrix.os }}

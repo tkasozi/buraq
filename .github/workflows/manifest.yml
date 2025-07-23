@@ -101,7 +101,7 @@ jobs:
                 name: .name,
                 download_url: .browser_download_url,
                 size: .size,
-                content_type: .content_type // "application/octet-stream"
+                content_type: .content_type '//' "application/octet-stream"
               }]
             else
               [] # Default to an empty array if no assets or .assets is null/empty

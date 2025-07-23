@@ -5,7 +5,7 @@ on:
       repository:
         description: 'GitHub repository (OWNER/REPO) to fetch the latest release from'
         required: true
-        default: 'tkasozi/updater-exe' # Example default
+        default: 'tkasozi/it-tools-editor'
       output_filename:
         description: 'Name of the output manifest file'
         required: false

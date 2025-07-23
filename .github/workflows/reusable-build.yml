@@ -26,7 +26,7 @@ on:
       # You might also pass secrets and other complex inputs
       gh_packages_token:
         required: true
-        type: boolean
+        type: string
         description: 'GitHub Packages PAT'
 
     outputs:

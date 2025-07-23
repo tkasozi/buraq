@@ -45,9 +45,22 @@ jobs:
     needs: build_and_package # This job depends on the build completing
     if: success()
     runs-on: ubuntu-latest # Can be a single runner, as it only downloads and uploads
+
     permissions:
-      contents: write # To upload release assets
-      packages: read # If it needs to read from GitHub Packages again
+      contents: write
+      packages: write
+      actions: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest ]
+        build_type: [ Release ]
+        include:
+          - os: windows-latest
+            vcpkg_triplet: x64-windows
+            generator: "Visual Studio 17 2022"
+            arch: x64
 
     steps:
       - name: Get Release Information (from trigger, if this is a release workflow)
@@ -75,4 +88,4 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ${{ github.workspace }}/windows-release-build/setup-it-tools-editor-${{ matrix.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe
           asset_content_type: application/zip
-          asset_name: setup-it-tools-editor-${{ matrix.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}
+          asset_name: "setup-it-tools-editor-${{ inputs.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"

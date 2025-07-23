@@ -52,7 +52,10 @@ jobs:
     
     env: 
       APP_EXE_NAME: "it-tools-editor-${{ inputs.os }}-${{ inputs.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
-      
+      APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
+      OUTPUT_DIR: ${{ github.workspace }}/it-tools-editor/Output
+      APP_BINARY: ${{ github.workspace }}/it-tools-editor/build/build
+
     outputs:
       build_successful: ${{ steps.build_project_step.outcome == 'success' }}
       artifact_name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
@@ -300,10 +303,6 @@ jobs:
 
       - name: Generate installer with Inno Setup
         if: inputs.os == 'windows-latest'  && success()
-        env:
-          APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
-          OUTPUT_DIR: ${{ github.workspace }}/it-tools-editor/Output
-          APP_BINARY: ${{ github.workspace }}/it-tools-editor/build/build
         run: |
           Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*editor.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
           

@@ -23,11 +23,6 @@ on:
         required: true
         type: string
         description: 'Vcpkg triplet for the target platform'
-      # You might also pass secrets and other complex inputs
-      gh_packages_token:
-        required: false
-        type: string
-        description: 'GitHub Packages PAT'
       generator:
         required: true
         type: string
@@ -36,6 +31,11 @@ on:
         required: true
         type: string
         description: 'Supported Arch'
+
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: true
+        description: 'GitHub Packages PAT'
 
     outputs:
       # If your build logic produces outputs needed by the caller

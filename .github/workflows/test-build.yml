@@ -24,11 +24,12 @@ jobs:
             vcpkg_triplet: x64-osx
 
     uses: ./.github/workflows/reusable-build.yml # Calls the reusable workflow
+    secrets:
+      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
     with:
       os: ${{ matrix.os }}
       build_type: ${{ matrix.build_type }}
       vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
       generator: ${{ matrix.generator }}
       arch: ${{ matrix.arch }}
-      gh_packages_token: ''
 

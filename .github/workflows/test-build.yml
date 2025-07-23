@@ -33,6 +33,7 @@ jobs:
             vcpkg_triplet: x64-osx
 
     uses: ./.github/workflows/reusable-build.yml # Calls the reusable workflow
+
     secrets:
       GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
     with:

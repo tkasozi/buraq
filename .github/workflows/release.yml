@@ -27,14 +27,21 @@ jobs:
 #            vcpkg_triplet: x64-osx
 
     uses: ./.github/workflows/reusable-build.yml # Calls the reusable workflow
-    secrets:
-      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+
+    outputs:
+      # Capture the output from the reusable workflow's job
+      # The key 'build_artifact_name' will hold the value of `uploaded_artifact_name` from the reusable workflow.
+      build_artifact_name: ${{ uses.build_and_package.outputs.artifact_name }} # <--- Access it here!
+
     with:
       os: ${{ matrix.os }}
       build_type: ${{ matrix.build_type }}
       vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
       generator: ${{ matrix.generator }}
       arch: ${{ matrix.arch }}
+
+    secrets:
+      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
   # A separate job that runs only for Release builds on Windows and publishes
   publish_release:

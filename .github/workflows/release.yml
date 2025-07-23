@@ -39,7 +39,7 @@ jobs:
   # A separate job that runs only for Release builds on Windows and publishes
   publish_release:
     needs: build_and_package # This job depends on the build completing
-    if: needs.build_and_package.outputs.build_successful == 'true'
+    if: success()
     runs-on: ubuntu-latest # Can be a single runner, as it only downloads and uploads
     permissions:
       contents: write # To upload release assets

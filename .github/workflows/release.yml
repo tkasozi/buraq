@@ -8,6 +8,9 @@ on:
 jobs:
   # This job triggers the reusable workflow for each matrix combination
   build_and_package:
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -24,15 +27,16 @@ jobs:
             vcpkg_triplet: x64-osx
 
     uses: ./.github/workflows/reusable-build.yml # Calls the reusable workflow
-
+    secrets:
+      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
     with:
       os: ${{ matrix.os }}
       build_type: ${{ matrix.build_type }}
       vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
-      gh_packages_token: ${{ secrets.GH_PACKAGES_TOKEN }}
-    secrets:
-      # Pass the secret from the caller workflow to the reusable workflow
-      gh_packages_token: ${{ secrets.GH_PACKAGES_TOKEN }}
+      generator: ${{ matrix.generator }}
+      arch: ${{ matrix.arch }}
+
+
 
   # A separate job that runs only for Release builds on Windows and publishes
   publish_release:
@@ -54,11 +58,11 @@ jobs:
       - name: Download Windows Release Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ matrix.build_type }}-build-artifacts # Specific artifact name for Windows Release build
-          path: ${{ github.workspace }}/windows-release-build/
+          name: ${{ needs.build_and_package.outputs }} # Specific artifact name for Windows Release build
+          path: ./windows-release-build/
 
       - name: List Downloaded Artifacts
-        run: ls -R ${{ github.workspace }}/windows-release-build/
+        run: ls -R ./windows-release-build/
         shell: bash
 
       - name: Upload release asset

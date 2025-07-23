@@ -73,11 +73,11 @@ jobs:
       - name: Download Windows Release Artifact
         uses: actions/download-artifact@v4
         with:
-          name: window-latest-Release-build-artifacts # Specific artifact name for Windows Release build
+          name: ${{ matrix.os }}-${{ matrix.build_type }}-build-artifacts # Specific artifact name for Windows Release build
           path: ./windows-release-build/
 
       - name: List Downloaded Artifacts
-        run: ls -R ./windows-release-build/; echo
+        run: ls -R ./windows-release-build/; echo ${{ needs.build_and_package.outputs.executable_name || 'Failed to find var' }}
         shell: bash
 
       - name: Upload release asset
@@ -88,4 +88,4 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ${{ github.workspace }}/windows-release-build/setup-it-tools-editor-${{ matrix.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe
           asset_content_type: application/zip
-          asset_name: "setup-it-tools-editor-${{ inputs.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
+          asset_name: "setup-it-tools-editor-${{ matrix.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe"

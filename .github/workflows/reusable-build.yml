@@ -346,7 +346,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: window-latest-Release-build-artifacts
+          name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
           path: ${{ env.OUTPUT_DIR }}\setup-${{ env.APP_EXE_NAME }}.exe
           retention-days: 1
 

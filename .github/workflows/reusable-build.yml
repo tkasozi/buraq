@@ -79,7 +79,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up MSYS2 with Build Tools (Windows Only, if needed)
-        if: inputs.os == 'Windows' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
+        if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
         uses: msys2/setup-msys2@v2
         with:
           msys2-architecture: x86_64
@@ -110,12 +110,12 @@ jobs:
         shell: bash
 
       - name: Bootstrap Vcpkg (Windows)
-        if: inputs.os == 'Windows'
+        if: inputs.os == 'windows-latest'
         run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
         shell: pwsh
 
       - name: Bootstrap Vcpkg (Linux/macOS)
-        if: inputs.os != 'Windows'
+        if: inputs.os != 'windows-latest'
         run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
         shell: bash
 
@@ -151,7 +151,7 @@ jobs:
         env:
           USERNAME: ${{ github.repository_owner }}
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        if: inputs.os != 'Windows'
+        if: inputs.os != 'windows-latest'
         shell: bash
         run: |
           mkdir -p ~/.nuget/NuGet
@@ -172,7 +172,7 @@ jobs:
 
 
       - name: Set NuGet API Key for GitHub Packages (Windows)
-        if: inputs.os == 'Windows'
+        if: inputs.os == 'windows-latest'
         shell: pwsh
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
@@ -186,7 +186,7 @@ jobs:
 
 
       - name: Set NuGet API Key for GitHub Packages  (Linux/macOS)
-        if: inputs.os != 'Windows'
+        if: inputs.os != 'windows-latest'
         shell: bash
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
@@ -226,7 +226,7 @@ jobs:
           ls -al "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 
 
-          if [[ "${{ inputs.os }}" == "Windows" ]]; then
+          if [[ "${{ inputs.os }}" == "windows-latest" ]]; then
             # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
             # For MinGW (x64-mingw-dynamic), find it from msys2 setup
 
@@ -274,33 +274,33 @@ jobs:
                "${host_triplet_arg}"
 
       - name: Build Project (Windows - MSVC)
-        if: inputs.os == 'Windows' && inputs.vcpkg_triplet == 'x64-windows'  && success()
+        if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-windows'  && success()
         working-directory: ${{ github.workspace }}/it-tools-editor/build
         run: cmake --build . --config ${{ inputs.build_type }}
         # Use cmd to ensure vcvars64.bat context persists from the configure step
         shell: cmd
 
       - name: Build Project (Windows - MinGW)
-        if: inputs.os == 'Windows' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
+        if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
         working-directory: ${{ github.workspace }}/it-tools-editor/build
         run: cmake --build . --config ${{ inputs.build_type }}
         shell: pwsh # Use pwsh to continue the MinGW context
 
       - name: Build Project (Linux/macOS)
-        if: inputs.os != 'Windows'  && success()
+        if: inputs.os != 'windows-latest'  && success()
         working-directory: ${{ github.workspace }}/it-tools-editor/build
         run: cmake --build . --config ${{ inputs.build_type }}
         shell: bash
 
       - name: Download Inno Setup
-        if: inputs.os == 'Windows'  && success()
+        if: inputs.os == 'windows-latest'  && success()
         run: |
           Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
           Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
         shell: powershell
 
       - name: Generate installer with Inno Setup
-        if: inputs.os == 'Windows'  && success()
+        if: inputs.os == 'windows-latest'  && success()
         env:
           APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output

@@ -96,12 +96,13 @@ jobs:
           echo "Latest version found: ${VERSION}"
 
           ASSETS_JSON=$(echo "$LATEST_RELEASE_DATA" | jq '
-            if .assets and (.assets | length > 0) then # Check if .assets exists and is not empty
+            if .assets and (.assets | length > 0) then
               [.assets[]? | select(.name and .browser_download_url and .size) | {
                 name: .name,
                 download_url: .browser_download_url,
                 size: .size,
-                content_type: .content_type '//' "application/octet-stream"
+                # CRITICAL CHANGE: Replace '//' with 'if . then . else ... end'
+                content_type: (if .content_type then .content_type else "application/octet-stream" end)
               }]
             else
               [] # Default to an empty array if no assets or .assets is null/empty

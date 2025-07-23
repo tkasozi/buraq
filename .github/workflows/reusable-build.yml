@@ -1,6 +1,12 @@
 # .github/workflows/callable-build-logic.yml
 name: Reusable Build Logic
 
+env:
+  CI: True
+  DOTNET_SDK_VERSION: 9.0.303
+  DOTNET_VERSION: 9.0.7
+  CMAKE_EXE: "cmake"
+
 # This workflow can be called by other workflows
 on:
   workflow_call:
@@ -20,7 +26,7 @@ on:
       # You might also pass secrets and other complex inputs
       gh_packages_token:
         required: true
-        type: secret
+        type: boolean
         description: 'GitHub Packages PAT'
 
     outputs:
@@ -33,15 +39,33 @@ on:
         value: ${{ jobs.build_component.outputs.artifact_name }}
 
 jobs:
+  init:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          path: it-tools-editor
+          fetch-depth: 0
+
+      - name: Archive and Upload it-tools-editor as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: it-tools-editor
+          path: ${{ github.workspace }}/it-tools-editor/
+
   build_component:
+    needs: init
     runs-on: ${{ inputs.os }}
-    permissions:
-      contents: read
-      packages: write # Necessary if this reusable workflow interacts with GitHub Packages
     outputs:
       build_successful: ${{ steps.build_project_step.outcome == 'success' }}
-      artifact_name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts # Example, match your upload name
+      artifact_name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
+      executable_name: "it-tools-editor-${{ runner.os }}-${{ inputs.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
 
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Restore job artifact
         uses: actions/download-artifact@v4
@@ -59,7 +83,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up MSYS2 with Build Tools (Windows Only, if needed)
-        if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
+        if: runner.os == 'Windows' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
         uses: msys2/setup-msys2@v2
         with:
           msys2-architecture: x86_64
@@ -70,12 +94,6 @@ jobs:
             ninja
           path-type: minimal
           msystem: MINGW64
-
-      - name: Download Inno Setup
-        run: |
-          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
-          Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
-        shell: powershell
 
       - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}
         uses: actions/setup-dotnet@v4
@@ -183,7 +201,7 @@ jobs:
           path: |
             ${{ github.workspace }}/vcpkg/downloads
             ${{ github.workspace }}/vcpkg/toolsrc
-          key: ${{ runner.os }}-${{ matrix.build_type }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
+          key: ${{ runner.os }}-${{ inputs.build_type }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-vcpkg-assets-
 
@@ -211,7 +229,7 @@ jobs:
             cmake_make_program_arg=""
             host_triplet_arg="-DVCPKG_DEFAULT_HOST_TRIPLET=x64-windows" # Default for Windows host
 
-            if [[ "${{ matrix.vcpkg_triplet }}" == "x64-windows" ]]; then
+            if [[ "${{ inputs.vcpkg_triplet }}" == "x64-windows" ]]; then
             # If using x64-windows triplet, CMake usually finds Ninja automatically
             # so cmake_make_program_arg remains empty.
             true # No-op
@@ -241,43 +259,90 @@ jobs:
           # Example of how you'd use them (assuming you have a line_continuation variable defined):
           cmake -B build \
                -S . \
-               -G "${{ matrix.generator }}" \
-               -A ${{ matrix.arch }} \
+               -G "${{ inputs.generator }}" \
+               -A ${{ inputs.arch }} \
                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-               -DVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} \
-               -DVCPKG_DEFAULT_HOST_TRIPLET=${{ matrix.vcpkg_triplet }} \
-               -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+               -DVCPKG_TARGET_TRIPLET=${{ inputs.vcpkg_triplet }} \
+               -DVCPKG_DEFAULT_HOST_TRIPLET=${{ inputs.vcpkg_triplet }} \
+               -DCMAKE_BUILD_TYPE=${{ inputs.build_type }} \
                -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
                "${host_triplet_arg}"
 
       - name: Build Project (Windows - MSVC)
-        if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-windows'  && success()
+        if: runner.os == 'Windows' && inputs.vcpkg_triplet == 'x64-windows'  && success()
         working-directory: ${{ github.workspace }}/build
-        run: cmake --build . --config ${{ matrix.build_type }}
+        run: cmake --build . --config ${{ inputs.build_type }}
         # Use cmd to ensure vcvars64.bat context persists from the configure step
         shell: cmd
 
       - name: Build Project (Windows - MinGW)
-        if: runner.os == 'Windows' && matrix.vcpkg_triplet == 'x64-mingw-dynamic' && success()
+        if: runner.os == 'Windows' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
         working-directory: ${{ github.workspace }}/build
-        run: cmake --build . --config ${{ matrix.build_type }}
+        run: cmake --build . --config ${{ inputs.build_type }}
         shell: pwsh # Use pwsh to continue the MinGW context
 
       - name: Build Project (Linux/macOS)
         if: runner.os != 'Windows'  && success()
         working-directory: ${{ github.workspace }}/build
-        run: cmake --build . --config ${{ matrix.build_type }}
+        run: cmake --build . --config ${{ inputs.build_type }}
         shell: bash
 
-      - name: Show Created files
-        run: ls -al .; echo "*****************************\n\n"; ${{ github.workspace }}/build
-        shell:
-          bash
+      - name: Download Inno Setup
+        if: runner.os == 'Windows'  && success()
+        run: |
+          Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
+          Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
+        shell: powershell
+
+      - name: Generate installer with Inno Setup
+        if: runner.os == 'Windows'  && success()
+        env:
+          APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
+          OUTPUT_DIR: ${{ github.workspace }}/Output
+          APP_BINARY: ${{ github.workspace }}/build/build
+        run: |
+          Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*editor.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+          
+          $exeName = Get-Content -Path "app_exe_name.txt"
+          $appName = $exeName.Replace(".exe", "")
+          
+          Write-Host "APP_NAME set to $appName"
+          
+          $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          $innoScriptPath = "${{ github.workspace }}/it-tools.iss"
+          
+          $appExeName = "$(cat app_exe_name.txt)"
+          $appVersion = "${{ env.APP_VERSION }}"
+          $outputDirForInno = "${{ env.OUTPUT_DIR }}"
+          $appBinaryDir = "${{ env.APP_BINARY }}"
+          $appArchSupport = "${{ inputs.arch }}compatible"
+          $appOutputBaseFilename = "setup-${{ jobs.build_component.outputs.artifact_name }}"
+          
+          & "$innoSetupExe" "$innoScriptPath" `
+            "/DAppName=$appName" `
+            "/DAppExeName=$appExeName" `
+            "/DAppVersion=$appVersion" `
+            "/DOutputDir=$outputDirForInno" `
+            "/DAppBinaryDir=$appBinaryDir" `
+            "/DAppArchSupport=$appArchSupport" `
+            "/DAppOutputBaseFilename=$appOutputBaseFilename"
+
+        shell: powershell
+
+      - name: Show Created files after build
+        run: ls -al .; echo "*****************************\n\n"; ls -al ./build; ls -al ./build/build; echo "**** APP_NAME:${{ env.APP_NAME }}***"
+        shell: bash
+
+      - name: Create release archive
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts.zip
+          directory: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}
 
       - name: Upload Build Artifacts
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
-          path: ${{ github.workspace }}/it-tools-editor/build/ # Adjust to your actual build output path
-          retention-days: 5
-        if: success()
+          path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/${{ jobs.build_component.outputs.artifact_name }}.exe
+          retention-days: 1

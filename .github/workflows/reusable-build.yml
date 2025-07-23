@@ -58,10 +58,10 @@ jobs:
   build_component:
     needs: init
     runs-on: ${{ inputs.os }}
-
-    env:
-      APP_EXE_NAME: "it-tools-editor-${{ runner.os }}-${{ inputs.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
-
+    
+    env: 
+      APP_EXE_NAME: "it-tools-editor-${{ inputs.os }}-${{ inputs.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
+      
     outputs:
       build_successful: ${{ steps.build_project_step.outcome == 'success' }}
       artifact_name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
@@ -87,7 +87,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up MSYS2 with Build Tools (Windows Only, if needed)
-        if: runner.os == 'Windows' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
+        if: inputs.os == 'Windows' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
         uses: msys2/setup-msys2@v2
         with:
           msys2-architecture: x86_64
@@ -116,17 +116,17 @@ jobs:
         shell: bash
 
       - name: Bootstrap Vcpkg (Windows)
-        if: runner.os == 'Windows'
+        if: inputs.os == 'Windows'
         run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat
         shell: pwsh
 
       - name: Bootstrap Vcpkg (Linux/macOS)
         run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh
-        if: runner.os != 'Windows'
+        if: inputs.os != 'Windows'
         shell: bash
 
       - name: Configure NuGet for GitHub Packages (Windows)
-        if: runner.os == 'Windows'
+        if: inputs.os == 'Windows'
         shell: pwsh
         env:
           USERNAME: ${{ github.repository_owner }}
@@ -156,7 +156,7 @@ jobs:
         env:
           USERNAME: ${{ github.repository_owner }}
           GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        if: runner.os != 'Windows'
+        if: inputs.os != 'Windows'
         shell: bash
         run: |
           mkdir -p ~/.nuget/NuGet
@@ -176,7 +176,7 @@ jobs:
           echo "Created NuGet.Config at ~/.nuget/NuGet/NuGet.Config"
 
       - name: Set NuGet API Key for GitHub Packages (Windows)
-        if: runner.os == 'Windows'
+        if: inputs.os == 'Windows'
         shell: pwsh
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
@@ -189,7 +189,7 @@ jobs:
           Write-Host "API Key for GitHubPackages set successfully."
 
       - name: Set NuGet API Key for GitHub Packages  (Linux/macOS)
-        if: runner.os != 'Windows'
+        if: inputs.os != 'Windows'
         shell: bash
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
@@ -205,9 +205,9 @@ jobs:
           path: |
             ${{ github.workspace }}/vcpkg/downloads
             ${{ github.workspace }}/vcpkg/toolsrc
-          key: ${{ runner.os }}-${{ inputs.build_type }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
+          key: ${{ inputs.os }}-${{ inputs.build_type }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
           restore-keys: |
-            ${{ runner.os }}-vcpkg-assets-
+            ${{ inputs.os }}-vcpkg-assets-
 
       - name: Configure CMake and Install Vcpkg Dependencies
         working-directory: ${{ github.workspace }}
@@ -225,7 +225,7 @@ jobs:
           ls -al "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 
 
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
+          if [[ "${{ inputs.os }}" == "Windows" ]]; then
             # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
             # For MinGW (x64-mingw-dynamic), find it from msys2 setup
 
@@ -273,33 +273,33 @@ jobs:
                "${host_triplet_arg}"
 
       - name: Build Project (Windows - MSVC)
-        if: runner.os == 'Windows' && inputs.vcpkg_triplet == 'x64-windows'  && success()
+        if: inputs.os == 'Windows' && inputs.vcpkg_triplet == 'x64-windows'  && success()
         working-directory: ${{ github.workspace }}/build
         run: cmake --build . --config ${{ inputs.build_type }}
         # Use cmd to ensure vcvars64.bat context persists from the configure step
         shell: cmd
 
       - name: Build Project (Windows - MinGW)
-        if: runner.os == 'Windows' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
+        if: inputs.os == 'Windows' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
         working-directory: ${{ github.workspace }}/build
         run: cmake --build . --config ${{ inputs.build_type }}
         shell: pwsh # Use pwsh to continue the MinGW context
 
       - name: Build Project (Linux/macOS)
-        if: runner.os != 'Windows'  && success()
+        if: inputs.os != 'Windows'  && success()
         working-directory: ${{ github.workspace }}/build
         run: cmake --build . --config ${{ inputs.build_type }}
         shell: bash
 
       - name: Download Inno Setup
-        if: runner.os == 'Windows'  && success()
+        if: inputs.os == 'Windows'  && success()
         run: |
           Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe?site=1" -OutFile "inno_setup.exe"
           Start-Process -Wait -FilePath "inno_setup.exe" -ArgumentList "/SILENT"
         shell: powershell
 
       - name: Generate installer with Inno Setup
-        if: runner.os == 'Windows'  && success()
+        if: inputs.os == 'Windows'  && success()
         env:
           APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output

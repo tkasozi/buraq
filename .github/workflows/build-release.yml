@@ -283,16 +283,14 @@ jobs:
           APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
           OUTPUT_DIR: ${{ github.workspace }}/Output
           APP_BINARY: ${{ github.workspace }}/build/build
-          EXE_FILE_NAME: "${{ runner.os }}-${{ matrix.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }} "
+          EXE_FILE_NAME: "it-tools-editor-${{ runner.os }}-${{ matrix.build_type }}-${{ github.event.release.tag_name || 'x.x.x-dev' }} "
         run: |
             Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*editor.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
           
-          
             $exeName = Get-Content -Path "app_exe_name.txt"
             $appName = $exeName.Replace(".exe", "")
+            
             Write-Host "APP_NAME set to $appName"
-          
-            "APP_NAME=$appName" | Set-Content -Path $GITHUB_ENV -Force
           
             $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
             $innoScriptPath = "${{ github.workspace }}/it-tools.iss"

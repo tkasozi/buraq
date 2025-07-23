@@ -87,5 +87,5 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ${{ github.workspace }}/windows-release-build/setup-it-tools-editor-${{ matrix.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe
-          asset_content_type: application/zip
+          asset_content_type: application/octet-stream
           asset_name: "setup-it-tools-editor-${{ matrix.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe"

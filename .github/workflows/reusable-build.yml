@@ -302,8 +302,8 @@ jobs:
         if: inputs.os == 'windows-latest'  && success()
         env:
           APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
-          OUTPUT_DIR: ${{ github.workspace }}/Output
-          APP_BINARY: ${{ github.workspace }}/it-tools-editor/build
+          OUTPUT_DIR: ${{ github.workspace }}/it-tools-editor/Output
+          APP_BINARY: ${{ github.workspace }}/it-tools-editor/build/build
         run: |
           Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*editor.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
           
@@ -313,7 +313,7 @@ jobs:
           Write-Host "APP_NAME set to $appName"
           
           $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          $innoScriptPath = "${{ github.workspace }}/it-tools.iss"
+          $innoScriptPath = "${{ github.workspace }}/it-tools-editor/it-tools.iss"
           
           $appExeName = "$(cat app_exe_name.txt)"
           $appVersion = "${{ env.APP_VERSION }}"
@@ -334,7 +334,7 @@ jobs:
         shell: powershell
 
       - name: Show Created files after build
-        run: ls -al .; echo "*****************************\n\n"; ls -al ./build; ls -al ./build/build; echo "**** APP_NAME:${{ env.APP_NAME }}***"
+        run: ls -al .; echo "*****************************\n\n"; ls -al "${{ github.workspace }}/it-tools-editor/build; ls -al "${{ github.workspace }}/it-tools-editor/build/build; echo "**** APP_NAME:${{ env.APP_NAME }}***"
         shell: bash
 
       - name: Create release archive

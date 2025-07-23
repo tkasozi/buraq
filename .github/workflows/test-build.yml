@@ -28,5 +28,7 @@ jobs:
       os: ${{ matrix.os }}
       build_type: ${{ matrix.build_type }}
       vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
+      generator: ${{ matrix.generator }}
+      arch: ${{ matrix.arch }}
       gh_packages_token: ''
 

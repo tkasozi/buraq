@@ -28,6 +28,14 @@ on:
         required: false
         type: string
         description: 'GitHub Packages PAT'
+      generator:
+        required: true
+        type: string
+        description: 'Build generator'
+      arch:
+        required: true
+        type: string
+        description: 'Supported Arch'
 
     outputs:
       # If your build logic produces outputs needed by the caller

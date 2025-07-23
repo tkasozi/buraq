@@ -39,24 +39,7 @@ on:
         value: ${{ jobs.build_component.outputs.artifact_name }}
 
 jobs:
-  init:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-          path: it-tools-editor
-          fetch-depth: 0
-
-      - name: Archive and Upload it-tools-editor as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: it-tools-editor
-          path: ${{ github.workspace }}/it-tools-editor/
-
   build_component:
-    needs: init
     runs-on: ${{ inputs.os }}
     
     env: 
@@ -71,11 +54,12 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Restore job artifact
-        uses: actions/download-artifact@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
         with:
-          name: it-tools-editor
-          path: ${{ github.workspace }}
+          submodules: true
+          path: it-tools-editor
+          fetch-depth: 0
 
       - name: Clone Vcpkg Repository
         if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')

@@ -1,11 +1,9 @@
 # .github/workflows/release.yml
 name: release.yml
 
-#on:
-#  release:
-#    types: [published]
-
-on: ["push"]
+on:
+  release:
+    types: [published]
 
 jobs:
   # This job triggers the reusable workflow for each matrix combination

@@ -100,7 +100,6 @@ jobs:
         id: dotnet-project
         working-directory: ${{ github.workspace }}/it-tools-editor
         run: |
-          echo "*****${{ inputs.os }}*****"
           ls -alh
 
           cd ManagedLibrary
@@ -120,7 +119,7 @@ jobs:
         shell: bash
 
       - name: Configure NuGet for GitHub Packages (Windows)
-        if: inputs.os == 'Windows'
+        if: inputs.os == 'windows-latest'
         shell: pwsh
         env:
           USERNAME: ${{ github.repository_owner }}

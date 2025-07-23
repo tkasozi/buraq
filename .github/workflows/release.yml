@@ -8,10 +8,6 @@ on:
 jobs:
   # This job triggers the reusable workflow for each matrix combination
   build_and_package:
-    outputs:
-      # Capture the output from the reusable workflow's job
-      # The key 'build_artifact_name' will hold the value of `uploaded_artifact_name` from the reusable workflow.
-      build_artifact_name: ${{ uses.build_and_package.outputs.artifact_name }} # <--- Access it here!
     permissions:
       contents: write
       packages: write
@@ -53,6 +49,10 @@ jobs:
     permissions:
       contents: write # To upload release assets
       packages: read # If it needs to read from GitHub Packages again
+    outputs:
+      # Capture the output from the reusable workflow's job
+      # The key 'build_artifact_name' will hold the value of `uploaded_artifact_name` from the reusable workflow.
+      build_artifact_name: ${{ uses.build_and_package.outputs.artifact_name }} # <--- Access it here!
 
     steps:
       - name: Get Release Information (from trigger, if this is a release workflow)
@@ -65,7 +65,7 @@ jobs:
       - name: Download Windows Release Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.build_and_package.outputs }} # Specific artifact name for Windows Release build
+          name: ${{ build_artifact_name }} # Specific artifact name for Windows Release build
           path: ./windows-release-build/
 
       - name: List Downloaded Artifacts

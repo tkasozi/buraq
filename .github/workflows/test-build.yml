@@ -1,15 +1,16 @@
 name: test-build.yml
 
-on:
-  push:
-    branches:
-      - '**'        # Matches all branches
-      - '!main'     # Excludes the 'main' branch
-
-  pull_request:
-    branches:
-      - '**'
-      - '!main'
+#on:
+#  push:
+#    branches:
+#      - '**'        # Matches all branches
+#      - '!main'     # Excludes the 'main' branch
+#
+#  pull_request:
+#    branches:
+#      - '**'
+#      - '!main'
+on: ["delete"]
 
 jobs:
   # This job triggers the reusable workflow for each matrix combination

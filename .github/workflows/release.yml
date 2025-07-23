@@ -62,7 +62,7 @@ jobs:
       - name: Download Windows Release Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ matrix.build_type }}-build-artifacts # Specific artifact name for Windows Release build
+          name: window-latest-Release-build-artifacts # Specific artifact name for Windows Release build
           path: ./windows-release-build/
 
       - name: List Downloaded Artifacts

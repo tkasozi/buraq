@@ -35,52 +35,42 @@
 
 #include "../utils/Utils.h"
 
-
-class ToolButton : public QToolButton {
-Q_OBJECT
+class ToolButton : public QToolButton
+{
+    Q_OBJECT
 
 private:
-	QString customHoverColor;
+    QString customHoverColor;
 
-	void applyIconStyles(const QIcon &icon) {
-		if (!icon.isNull()) {
-			ToolButton::setIcon(icon);
-		}
-		setFixedWidth(48);
-		setFixedHeight(32);
-		setMouseTracking(true);
-	}
+    void applyIconStyles(const QIcon &icon)
+    {
+        if (!icon.isNull())
+        {
+            ToolButton::setIcon(icon);
+        }
+        setFixedWidth(32);
+        setFixedHeight(32);
+        setIconSize(QSize(24, 24));
+        setMouseTracking(true);
+    }
 
 private slots:
 
 public:
-	explicit ToolButton(QWidget *ptr = nullptr) :  QToolButton(ptr) {};
-	explicit ToolButton(const QString &fileName, QString customHoverColor = nullptr)
-			: customHoverColor(std::move(customHoverColor)) {
-		applyIconStyles(QIcon::fromTheme(fileName));
-	};
+    explicit ToolButton(QWidget *ptr = nullptr) : QToolButton(ptr) {};
+    explicit ToolButton(const QString &fileName, QString customHoverColor = nullptr)
+        : customHoverColor(std::move(customHoverColor))
+    {
+        applyIconStyles(QIcon::fromTheme(fileName));
+    };
 
-	explicit ToolButton(const QIcon &icon, QString customHoverColor = nullptr)
-			: customHoverColor(std::move(customHoverColor)) {
-		applyIconStyles(icon);
-	};
+    explicit ToolButton(const QIcon &icon, QString customHoverColor = nullptr)
+        : customHoverColor(std::move(customHoverColor))
+    {
+        applyIconStyles(icon);
+    };
 
-	void leaveEvent(QEvent *p) override {
-		setStyleSheet(ItoolsNS::main_config.getMainStyles()->toolBar.styleSheet);
-	}
-
-	void enterEvent(QEnterEvent *event) override {
-		if (customHoverColor != nullptr) {
-			setStyleSheet(
-					ItoolsNS::main_config.getMainStyles()->toolBar.styleSheet +
-					"background-color: " + customHoverColor
-			);
-		} else {
-			setStyleSheet(ItoolsNS::main_config.getMainStyles()->toolBarHover.styleSheet);
-		}
-	}
-
-	~ToolButton() override = default;
+    ~ToolButton() override = default;
 };
 
-#endif //IT_TOOLS_TOOL_BUTTON_H
+#endif // IT_TOOLS_TOOL_BUTTON_H

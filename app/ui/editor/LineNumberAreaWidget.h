@@ -10,7 +10,7 @@
 #include <QFontMetrics> // For calculating text sizes
 #include "IToolsAPI.h"
 
-class LineNumberAreaWidget : public QWidget {
+class LineNumberAreaWidget final : public QWidget {
 Q_OBJECT
 
 public:

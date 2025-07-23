@@ -29,8 +29,8 @@
 
 
 #include <QWidget>
+#include <QToolButton>
 #include <QGridLayout>
-#include "IconButton.h"
 #include "editor/Editor.h"
 #include "FilePathLabel.h"
 
@@ -61,11 +61,11 @@ public:
 	// smart pointer will be cleaned up.
 	~CustomDrawer() override = default;
 
-	void showPreviouslyOpenedFiles();
+	void showPreviouslyOpenedFiles() const;
 
 private:
 	Editor *editor;
-	std::unique_ptr<IconButton> addFile;
+	std::unique_ptr<QToolButton> addFile;
 	std::unique_ptr<QVBoxLayout> pLayout;
 
 	struct drawerState state = {.activeFileLabel = nullptr};

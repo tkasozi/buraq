@@ -31,32 +31,33 @@
 
 #include "Config.h"
 
-namespace ItoolsNS {
-	[[maybe_unused]] extern Config main_config;
+namespace ItoolsNS
+{
+    // Helper function to get the user's home directory
 
-// Helper function to get the user's home directory
-
-	static std::filesystem::path get_user_home_directory() {
-		const char *home_dir_env = nullptr;
+    static std::filesystem::path get_user_home_directory()
+    {
+        const char *home_dir_env = nullptr;
 
 #ifdef _WIN32 // Check if compiling on Windows
-		home_dir_env = std::getenv("USERPROFILE");
+        home_dir_env = std::getenv("USERPROFILE");
 #else // For POSIX systems (Linux, macOS, etc.)
-		home_dir_env = std::getenv("HOME");
+        home_dir_env = std::getenv("HOME");
 #endif
 
-		if (home_dir_env == nullptr) {
-			// Environment variable not found, handle error or return a default/empty path
+        if (home_dir_env == nullptr)
+        {
+            // Environment variable not found, handle error or return a default/empty path
 #ifdef _WIN32
 //		std:: << "Warning: USERPROFILE environment variable not set." << std::endl;
 #else
-			std::cerr << "Warning: HOME environment variable not set." << std::endl;
+            std::cerr << "Warning: HOME environment variable not set." << std::endl;
 #endif
-			return {}; // Return an empty path
-		}
+            return {}; // Return an empty path
+        }
 
-		return std::filesystem::path(home_dir_env);
-	}
+        return std::filesystem::path(home_dir_env);
+    }
 }
 
-#endif //ITOOLS_UTILS_H
+#endif // ITOOLS_UTILS_H

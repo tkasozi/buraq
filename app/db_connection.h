@@ -53,6 +53,8 @@ const auto SELECT_FILES_SQL = QLatin1String(R"(
 
 const auto SELECT_FILE_BY_FILE_PATH_SQL = QLatin1String(R"(SELECT * FROM files WHERE file_path = ?;)");
 
+const auto DELETE_BY_FILE_PATH_SQL = QLatin1String(R"(DELETE FROM files WHERE file_path = ?;)");
+
 static QVariant insertFile(const QString &filePath, const QString &title) {
 	QSqlQuery query;
 	if (!query.prepare(INSERT_FILE_SQL)) {
@@ -61,6 +63,18 @@ static QVariant insertFile(const QString &filePath, const QString &title) {
 
 	query.addBindValue(filePath);
 	query.addBindValue(title);
+	query.exec();
+
+	return query.lastInsertId();
+}
+
+static QVariant deleteRow(const QString &filePath) {
+	QSqlQuery query;
+	if (!query.prepare(DELETE_BY_FILE_PATH_SQL)) {
+		// "Error executing query:" << query.lastError().text();
+	}
+
+	query.addBindValue(filePath);
 	query.exec();
 
 	return query.lastInsertId();
@@ -81,9 +95,14 @@ static QList<FileObject *> findPreviouslyOpenedFiles() {
 		QString filePath = query.value(1).toString(); // column file_path
 		QString title = query.value(2).toString();      // column title
 
-		file->setFilePath(filePath);
-		file->setFileName(title);
-		files.append(file);
+		if (std::filesystem::exists(filePath.toStdString())) {
+			file->setFilePath(filePath);
+			file->setFileName(title);
+			files.append(file);
+		} else {
+			// delete row with this file
+			deleteRow(filePath);
+		}
 	}
 
 	return files;

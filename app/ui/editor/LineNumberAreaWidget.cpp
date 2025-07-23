@@ -6,15 +6,9 @@
 #include <QPainter>
 #include <QPalette> // For theme colors
 
-#define LINE_NUMBER_STYLES R"(
-	border-right: 1px;
-	border-left: 1px;
-)"
-
 LineNumberAreaWidget::LineNumberAreaWidget(QWidget *parent) : QWidget(parent) {
 	// It's good to set an initial size policy or minimum width
 	setMinimumWidth(5);
-	setStyleSheet(LINE_NUMBER_STYLES);
 }
 
 void LineNumberAreaWidget::updateEditorState(const EditorState &state) {
@@ -32,7 +26,7 @@ void LineNumberAreaWidget::paintEvent(QPaintEvent *event) {
 	QPainter painter(this);
 
 	// Use this widget's fontMetrics
-	int lineHeight =  std::max(19, m_editorState.lineHeight);
+	const int lineHeight =  std::max(19, m_editorState.lineHeight);
 	if (lineHeight <= 0) {
 		qWarning() << "LineNumberAreaWidget::paintEvent: fontMetrics().height() is zero or negative.";
 		return;
@@ -72,7 +66,7 @@ void LineNumberAreaWidget::paintEvent(QPaintEvent *event) {
 		QRect textDrawingRect = lineAreaRect;
 		textDrawingRect.setLeft(lineAreaRect.left() + textPaddingLeft);
 
-		painter.setPen(palette().color(QPalette::Text)); // Use a color from the widget's palette
+		painter.setPen(palette().color(QPalette::Light)); // Use a color from the widget's palette
 		painter.drawText(textDrawingRect, Qt::AlignLeft | Qt::AlignVCenter, numberText);
 
 		currentY += lineHeight;

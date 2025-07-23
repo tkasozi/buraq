@@ -8,6 +8,7 @@
 
 #include <QDialog>
 #include <QVBoxLayout>
+#include <QPushButton>
 
 class QLabel;
 class QPushButton;

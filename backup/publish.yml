@@ -1,37 +1,63 @@
 name: Build and Package
 on:
-  release:
-   types: [published]
-#  push:
-#    branches:
-#     - 19-prepare-a-pre-release-v0012
+#  release:
+#   types: [published]
+  push:
+    branches:
+     - 19-prepare-a-pre-release-v0012
 
 env:
-  APP_NAME: "ITools"
+  APP_NAME: "IT-Tools"
   CI: True
   DOTNET_VERSION: 9.0
   CMAKE_EXE: "cmake"
-  
+
 permissions:
   contents: write
 
 jobs:
   build-and-package:
     runs-on: windows-latest # Or a specific Windows version
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    env:
+      VCPKG_DEFAULT_TRIPLET: x64-windows # Ensure triplet is consistently set
+      VCPKG_INSTALL_OPTIONS: "--debug"
 
-      - name: Setup MSYS2 (for MinGW) and Install Qt
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      # --- Step 1: Setup MSYS2 for build environment ---
+      # This provides the MinGW-w64 toolchain (GCC, make) that Vcpkg will use.
+      - name: Setup MSYS2 for build environment (Provides MinGW toolchain)
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64 # Or MINGW32
+          msystem: MINGW64
           update: true
-          install: >- # Install specific MinGW packages if needed
-            mingw-w64-x86_64-gcc
+          install: |
+            coreutils
+            bash
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-make
-            mingw-w64-x86_64-qt6-base
+            mingw-w64-x86_64-ninja
+
+      - name: Check Ninja Installation
+        shell: cmd # Use cmd shell for Windows commands
+        run: echo "CMAKE_MAKE_PROGRAM=$(where ninja)" >> $GITHUB_ENV
+
+      # --- Step 2: Setup Vcpkg and Install Dependencies with Cache ---
+      # This step depends on the MinGW toolchain being available from the previous step.
+      - name: Setup Vcpkg and Install Dependencies with Cache
+        uses: lukka/run-vcpkg@v11
+        id: vcpkg # Give this step an ID to access its outputs
+        with:
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          vcpkgJsonGlob: '**/vcpkg.json'
+          runVcpkgInstall: true
+          vcpkgTriplet: '${{ env.VCPKG_DEFAULT_TRIPLET }}'
+          vcpkgCacheKeySuffix: |
+            ${{ runner.os }}-${{ env.VCPKG_DEFAULT_TRIPLET }}-
 
       - name: Download Inno Setup
         run: |
@@ -47,6 +73,8 @@ jobs:
       - name: Build Managed project
         id: dotnet-project
         run: |
+          ls -alh
+          
          cd ManagedLibrary
           
          ./build.sh
@@ -63,30 +91,40 @@ jobs:
           
           echo "CMAKE_PREFIX_PATH is set to: $CMAKE_PREFIX_PATH"
           
+          echo "VCPKG_ROOT is: $VCPKG_ROOT"
+          echo "CMAKE_TOOLCHAIN_FILE is: $CMAKE_TOOLCHAIN_FILE"
+          
+          # build.sh script's CMake configure command should now implicitly
+          # use the Vcpkg toolchain via the CMAKE_TOOLCHAIN_FILE env var.
+          # Ensure it does NOT manually set compiler or toolchain paths.
           ./build.sh --clean
           
           echo "PATH: $PATH"
           
-          # ls -Al "D:/a/_temp/msys64/mingw64/bin/"
+          #          # ls -Al "D:/a/_temp/msys64/mingw64/bin/"
+          #          
+          #          mkdir ./build/Release
+          #          mkdir ./build/Release/plugins
+          #
+          #          cp ./build/bin/ITools.exe ./build/Release
+          #          
+          #          cp ./build/bin/*.dll ./build/Release
+          #          cp ./build/bin/qt.conf ./build/Release
+          #          cp ./build/bin/workflow.ico ./build/Release
+          #          
+          #          mkdir ./build/Release/plugins/managed
+          #          cp -r ./build/bin/plugins/managed/* ./build/Release/plugins/managed
+          #          
+          #          mkdir ./build/Release/plugins/ext
+          #          cp ./build/bin/plugins/ext/* ./build/Release/plugins/ext
+          #          
+          #          D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/Release/ITools.exe"
+          #          
+          #          echo "--- Listing deployment directory contents ---"
+          echo "*******Build Dir**************"
+          ls -alh ./build
           
-          mkdir ./build/Release
-          mkdir ./build/Release/plugins
-
-          cp ./build/bin/ITools.exe ./build/Release
-          
-          cp ./build/bin/*.dll ./build/Release
-          cp ./build/bin/qt.conf ./build/Release
-          cp ./build/bin/workflow.ico ./build/Release
-          
-          mkdir ./build/Release/plugins/managed
-          cp -r ./build/bin/plugins/managed/* ./build/Release/plugins/managed
-          
-          mkdir ./build/Release/plugins/ext
-          cp ./build/bin/plugins/ext/* ./build/Release/plugins/ext
-          
-          D:/a/_temp/msys64/mingw64/bin/windeployqt-qt6.exe --verbose 2 --dir "./build/Release" --plugindir "./build/Release/plugins" "./build/Release/ITools.exe"
-          
-          echo "--- Listing deployment directory contents ---"
+          echo "*******Build/Release Dir**************"
           ls -alh ./build/Release
         env:
           MINGW_COMPILER_BIN_DIR: /mingw64/bin

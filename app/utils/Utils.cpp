@@ -24,9 +24,4 @@
 // Created by talik on 5/12/2025.
 //
 
-#include "Utils.h"
-#include "Config.h"
-
-namespace ItoolsNS {
-	[[maybe_unused]] Config main_config;
-}
+namespace ItoolsNS {}

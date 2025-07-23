@@ -10,20 +10,26 @@
 
 class Network {
 public:
-	static Network& singleton(); // Return a reference
+	static Network &singleton(); // Return a reference
 	std::string http_get(const std::string &url);
-	static size_t write_callback(void* contents, size_t size, size_t nmemb, std::string* userp);
 
-	[[maybe_unused]] [[maybe_unused]] void http_post(const std::string& url);
+	static size_t write_callback(void *contents, size_t size, size_t nmemb, std::string *userp);
 
-	[[maybe_unused]] [[maybe_unused]] void http_put(const std::string& url);
+	int downloadFile(const std::string &url, const char *filename);
 
-	[[maybe_unused]] [[maybe_unused]] void http_delete(const std::string& url);
+	[[maybe_unused]] [[maybe_unused]] void http_post(const std::string &url);
+
+	[[maybe_unused]] [[maybe_unused]] void http_put(const std::string &url);
+
+	[[maybe_unused]] [[maybe_unused]] void http_delete(const std::string &url);
+
 private:
 	Network();
+
 	~Network();
-	Network(const Network&) = delete; // No copy constructor
-	Network& operator=(const Network&) = delete; // No copy assignment
+
+	Network(const Network &) = delete; // No copy constructor
+	Network &operator=(const Network &) = delete; // No copy assignment
 
 	CURL *curl;
 };

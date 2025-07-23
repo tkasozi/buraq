@@ -2,8 +2,8 @@
 // Created by talik on 4/19/2024.
 //
 
-#ifndef IT_TOOLS_CUSTOMLABEL_H
-#define IT_TOOLS_CUSTOMLABEL_H
+#ifndef CUSTOM_LABEL_H
+#define CUSTOM_LABEL_H
 
 #include <QMouseEvent>
 #include <QLabel>
@@ -25,4 +25,4 @@ signals:
 
 };
 
-#endif //IT_TOOLS_CUSTOMLABEL_H
+#endif //CUSTOM_LABEL_H

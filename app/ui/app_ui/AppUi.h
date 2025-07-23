@@ -4,39 +4,28 @@
 #ifndef APP_UI_H
 #define APP_UI_H
 
-#include <QMainWindow>
-#include <QPushButton>
-#include <QLabel>
-#include <QObject>
-#include <QGridLayout>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QStatusBar>
-#include <QTextEdit>
-#include <QFile>
 
 #include "ToolBarEventFilter.h"
-#include "ToolButton.h"
 #include "CustomDrawer.h"
 #include "IconButton.h"
 #include "output_display/OutputDisplay.h"
 #include "ToolBar.h"
-#include "../PluginManager.h"
+#include "PluginManager.h"
 #include "EditorMargin.h"
 
-
-class AppUi : public QMainWindow {
+class AppUi final : public QMainWindow {
 Q_OBJECT
 
 public slots:
-	void processStatusSlot(const QString &, int timeout = 5000);
-	void processResultSlot(int exitCode, const QString &output, const QString &error);
+	void processStatusSlot(const QString &, int timeout = 5000) const;
+	void processResultSlot(int exitCode, const QString &output, const QString &error) const;
 
 private slots:
 
-	void onClicked();
+	void onClicked() const;
 
-	void onShowOutputButtonClicked();
+	void onShowOutputButtonClicked() const;
 
 	void onWindowFullyLoaded();
 
@@ -48,11 +37,12 @@ public:
 	// No manual delete, no manual nullptr.
 	~AppUi() override = default;
 
-	Editor *getEditor();
-	EditorMargin *getEditorMargin();
+Editor *getEditor() const;
+	EditorMargin *getEditorMargin() const;
 
-	PluginManager *getLangPluginManager();
+	PluginManager *getLangPluginManager() const;
 
+	IToolsApi *get_api_context() const { return api_context.get(); };
 private:
 	std::unique_ptr<PluginManager> pluginManager;
 	std::unique_ptr<CustomDrawer> drawer;
@@ -64,8 +54,11 @@ private:
 	std::unique_ptr<EditorMargin> editorMargin;
 	std::unique_ptr<ToolBar> toolBar;
 	std::unique_ptr<QStatusBar> statusBar;
+	std::unique_ptr<IToolsApi> api_context;
 
 	void configureAppContext();
+	static void launchUpdaterAndExit(const  std::filesystem::path &updaterPath, const  std::filesystem::path &packagePath,
+								 const  std::filesystem::path &installPath);
 };
 
 

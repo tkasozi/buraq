@@ -39,8 +39,6 @@ if [[ ! -n "${CI}" ]]; then
   popd
 fi
 
-CMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"
-
 # --- Configuration ---
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -78,10 +76,12 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
     --debug)
         BUILD_TYPE="Debug"
+        BUILD_DIR="${BUILD_DIR}-debug"
         shift
         ;;
     --release)
         BUILD_TYPE="Release"
+        BUILD_DIR="${BUILD_DIR}-release"
         shift
         ;; # Default, but explicit option
     --clean)
@@ -152,10 +152,15 @@ echo ""
 echo "--- Configuring CMake project (Build Type: ${BUILD_TYPE}) ---"
 # The -S option specifies the source directory.
 # The -B option specifies the build directory (created if it doesn't exist).
-#-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake
-"$CMAKE_EXE" -S "${SOURCE_DIR}" -B "${BUILD_DIR}" -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
- -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" -DMINGW_COMPILER_BIN_DIR="${MINGW_COMPILER_BIN_DIR}" \
- -G "MinGW Makefiles"
+"${CMAKE_EXE}" -S "${SOURCE_DIR}"  -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
+ -G "Ninja" \
+ -B "${BUILD_DIR}" \
+ -DCMAKE_MAKE_PROGRAM="${CMAKE_MAKE_PROGRAM}" \
+ -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+ -DVCPKG_TARGET_TRIPLET="${VCPKG_DEFAULT_TRIPLET}" \
+ -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
+ -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe \
+ -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe
 
 echo "CMake configuration complete."
 
@@ -166,7 +171,7 @@ echo "--- Building project using CMake (Jobs: ${NUM_JOBS}) ---"
 # --config is mostly for multi-configuration generators (like Visual Studio).
 # For single-config (Makefiles, Ninja), CMAKE_BUILD_TYPE is used at configure time.
 # The -- -j${NUM_JOBS} part passes the parallel job count to the underlying build tool (make/ninja).
-"$CMAKE_EXE"  --build "${BUILD_DIR}" --config "${BUILD_TYPE}" -- -j"${NUM_JOBS}"
+"$CMAKE_EXE" --build "${BUILD_DIR}" --config "${BUILD_TYPE}" -- -j"${NUM_JOBS}"
 echo "Build complete."
 
 echo ""

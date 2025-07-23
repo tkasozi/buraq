@@ -340,12 +340,12 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           filename: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts.zip
-          directory: ${{ github.workspace }}/it-tools-editor/${{ env.OUTPUT_DIR }}
+          directory: ${{ env.OUTPUT_DIR }}
 
       - name: Upload Build Artifacts
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
-          path: ${{ github.workspace }}/it-tools-editor/${{ env.OUTPUT_DIR }}/${{ env.APP_EXE_NAME }}.exe
+          path: ${{ env.OUTPUT_DIR }}/${{ env.APP_EXE_NAME }}.exe
           retention-days: 1

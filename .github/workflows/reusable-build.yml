@@ -25,7 +25,7 @@ on:
         description: 'Vcpkg triplet for the target platform'
       # You might also pass secrets and other complex inputs
       gh_packages_token:
-        required: true
+        required: false
         type: string
         description: 'GitHub Packages PAT'
 

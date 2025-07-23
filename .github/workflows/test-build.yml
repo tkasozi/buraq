@@ -28,5 +28,5 @@ jobs:
       os: ${{ matrix.os }}
       build_type: ${{ matrix.build_type }}
       vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
-      gh_packages_token: ${{ secrets.GH_PACKAGES_TOKEN }}
+      gh_packages_token: ''
 

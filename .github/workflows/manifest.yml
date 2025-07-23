@@ -101,7 +101,6 @@ jobs:
                 name: .name,
                 download_url: .browser_download_url,
                 size: .size,
-                # CRITICAL CHANGE: Replace '//' with 'if . then . else ... end'
                 content_type: (if .content_type then .content_type else "application/octet-stream" end)
               }]
             else

@@ -5,7 +5,11 @@ name: release.yml
 #  release:
 #    types: [ published ]
 
-on: [push]
+on:
+  push:
+    branches:
+      - '**'        # Matches all branches
+      - '!main'     # Excludes the 'main' branch
 
 jobs:
   # This job triggers the reusable workflow for each matrix combination

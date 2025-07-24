@@ -294,7 +294,7 @@ jobs:
         with:
             # Use the default GITHUB_TOKEN for authentication.
             # This will make the approval come from "github-actions[bot]".
-            github-token: ${{ steps.app-token.outputs.token }}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
             # Optional: Add a review message
             review-message: "Automated approval for generated manifest.json"
             pull-request-number: "${{ env.PULL_REQUEST_NUMBER }}"

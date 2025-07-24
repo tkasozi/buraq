@@ -288,16 +288,16 @@ jobs:
           labels: |
             automated
             chore
-      - name: Auto approve PR from bot
-        uses: hmarr/auto-approve-action@v4
-        if: github.actor == 'github-actions[bot]' || github.actor == 'tkasozi'
-        with:
-            # Use the default GITHUB_TOKEN for authentication.
-            # This will make the approval come from "github-actions[bot]".
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            # Optional: Add a review message
+#      - name: Auto approve PR from bot
+#        uses: hmarr/auto-approve-action@v4
+#        if: github.actor == 'github-actions[bot]' || github.actor == 'tkasozi'
+#        with:
+#            # Use the default GITHUB_TOKEN for authentication.
+#            # This will make the approval come from "github-actions[bot]".
+#            github-token: ${{ secrets.GITHUB_TOKEN }}
+#            # Optional: Add a review message
 #            review-message: "Automated approval for generated manifest.json"
-            pull-request-number: "${{ env.PULL_REQUEST_NUMBER }}"
+#            pull-request-number: "${{ env.PULL_REQUEST_NUMBER }}"
 
       - name: Enable Auto-Merge for Bot PR
         if: success() && github.actor == 'buraq-bot' # Replace with YOUR actual App's bot name

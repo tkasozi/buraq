@@ -1,9 +1,60 @@
 {
-    "files.associations": {
-        "*.dbclient-js": "javascript",
-        ".fantomasignore": "ignore",
-        "memory": "cpp",
-        "charconv": "cpp",
-        "xmemory": "cpp"
-    }
+    "cmake.enableAutomaticKitScan": false,
+    "cmake.cmakePath": "C:/Program Files/CMake/bin/cmake.exe",
+    "cmake.additionalKits": [
+        "${workspaceFolder}/.vscode/cmake-tools-kits.json"
+    ],
+    "cmake.defaultVariants": {
+        "buildType": {
+            "default": "debug",
+            "description": "The build type.",
+            "choices": {
+                "debug": {
+                    "short": "Debug",
+                    "long": "Disable optimizations - include debug information.",
+                    "buildType": "Debug"
+                },
+                "release": {
+                    "short": "Release",
+                    "long": "Optimize for speed - exclude debug information.",
+                    "buildType": "Release"
+                },
+                "minsize": {
+                    "short": "MinSizeRel",
+                    "long": "Optimize for smallest binary size - exclude debug information.",
+                    "buildType": "MinSizeRel"
+                },
+                "reldeb": {
+                    "short": "RelWithDebInfo",
+                    "long": "Optimize for speed - include debug information.",
+                    "buildType": "RelWithDebInfo"
+                },
+                "unspecified": {
+                    "short": "Unspecified",
+                    "long": "Let CMake pick the default build type.",
+                    "buildType": "Unspecified"
+                }
+            }
+        }
+    },
+    "cmake.automaticReconfigure": false,
+    // "cmake.clearOutputBeforeBuild": true,
+    "cmake.showSystemKits": true,
+    "cmake.buildDirectory": "${workspaceFolder}/cmake-build-${buildType}",
+    // "cmake.configureArgs": [
+    //     "-DCMAKE_DOTNET_TARGET_FRAMEWORK=C:/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.6/runtimes/win-x64/native",
+    //     "-DCMAKE_TOOLCHAIN_FILE=E:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+    //     "-DCMAKE_BUILD_TYPE=${buildType}",
+    // ],
+    "cmake.configureSettings": {
+        "CMAKE_DOTNET_TARGET_FRAMEWORK": "C:/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.6/runtimes/win-x64/native",
+        "CMAKE_TOOLCHAIN_FILE": "E:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_BUILD_TYPE": "${buildType}",
+        "CMAKE_C_COMPILER_LAUNCHER": "sccache",
+        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache",
+        "QT_DEBUG_PLUGINS": "1"
+    },
+    "csharp.debug.logging.exceptions": true,
+    "clang-format.language.c.enable": true,
+    "C_Cpp.codeAnalysis.clangTidy.codeAction.formatFixes": true
 }

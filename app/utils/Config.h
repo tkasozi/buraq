@@ -31,7 +31,8 @@
 #include <QIcon>
 #include <QDomElement>
 
-struct WindowConfig {
+struct WindowConfig
+{
 	int minWidth;
 	int minHeight;
 	int normalSize;
@@ -40,7 +41,8 @@ struct WindowConfig {
 	QIcon restoreIcon;
 	QIcon closeIcon;
 };
-struct AppIcons {
+struct AppIcons
+{
 	QIcon settingsIcon;
 	QIcon folderIcon;
 	QIcon terminalIcon;
@@ -49,8 +51,8 @@ struct AppIcons {
 	QIcon executeSelectedIcon;
 	QIcon addFileIcon;
 };
-
-struct StyleSheetStruct {
+struct StyleSheetStruct
+{
 	QString color = QString("");
 	QString backgroundColor = QString("");
 	QString padding = QString("");
@@ -64,8 +66,8 @@ struct StyleSheetStruct {
 	 */
 	QString styleSheet;
 };
-
-struct MainStyles {
+struct MainStyles
+{
 	StyleSheetStruct commonStyle;
 	StyleSheetStruct controlToolBar;
 	StyleSheetStruct toolBar;
@@ -73,43 +75,62 @@ struct MainStyles {
 	StyleSheetStruct toolBarHover;
 };
 
-class Config {
+class Config
+{
 
 public:
-	explicit Config();
+	/**
+	 * @brief Returns the singleton instance of the Config class.
+	 *
+	 * This static method provides access to the single, shared instance of the Config class,
+	 * ensuring that only one instance exists throughout the application's lifetime.
+	 *
+	 * @return Config The singleton instance of the Config class.
+	 */
+	static Config &singleton();
 
-	// smart pointer tobe cleaned up
-	virtual ~Config() = default;
-
-	[[nodiscard]] const QString &getTitle() const {
+	[[nodiscard]] const QString &getTitle() const
+	{
 		return title;
 	}
 
-	[[nodiscard]] QString getVersion() const {
+	[[nodiscard]] QString getVersion() const
+	{
 		return version;
 	}
 
-	[[nodiscard]] const QString &getPowershellPath() const {
+	[[nodiscard]] const QString &getPowershellPath() const
+	{
 		return powershellPath;
 	}
 
-	[[nodiscard]] const QIcon &getAppLogo() const {
+	[[nodiscard]] const QIcon &getAppLogo() const
+	{
 		return appLogo;
 	}
 
-	[[nodiscard]] const WindowConfig *getWindow() const {
+	[[nodiscard]] const WindowConfig *getWindow() const
+	{
 		return windowConfig.get();
 	}
 
-	[[nodiscard]] const AppIcons *getAppIcons() const {
+	[[nodiscard]] const AppIcons *getAppIcons() const
+	{
 		return appIcons.get();
 	}
 
-	[[nodiscard]] const MainStyles *getMainStyles() const {
+	[[nodiscard]] const MainStyles *getMainStyles() const
+	{
 		return mainStyles.get();
 	}
-
 private:
+	Config();
+	// smart pointer tobe cleaned up
+	~Config() = default;
+	Config(const Config &) = delete;			// No copy constructor
+	Config &operator=(const Config &) = delete; // No copy assignment
+
+	bool isSetup = false;
 	QString title;
 	QString version;
 	QString powershellPath;
@@ -118,13 +139,15 @@ private:
 	std::unique_ptr<AppIcons> appIcons;
 	std::unique_ptr<MainStyles> mainStyles;
 
-	void processWindowAttr(const QDomElement &);
+	void processWindowAttr(const QDomElement &) const;
 
-	void processAppIconsAttr(const QDomElement &element);
+	void processAppIconsAttr(const QDomElement &element) const;
 
-	void processStyles(const QDomElement &element);
+	void processStyles(const QDomElement &element) const;
 
-	void processStyleBlock(QDomElement &element, StyleSheetStruct &aStruct);
+	void processStyleBlock(const QDomElement &element, StyleSheetStruct &aStruct) const;
+
+	static void loadConfig(Config *_thi);
 };
 
-#endif //ITOOLS_CONFIG_H
+#endif // ITOOLS_CONFIG_H

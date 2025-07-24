@@ -5,7 +5,7 @@ on:
       repository:
         description: 'GitHub repository (OWNER/REPO) to fetch the latest release from'
         required: true
-        default: 'tkasozi/updater-exe' # Example default
+        default: 'tkasozi/it-tools-editor'
       output_filename:
         description: 'Name of the output manifest file'
         required: false
@@ -14,14 +14,12 @@ on:
     # Example: Run every Sunday at 00:00 UTC
     - cron: '0 0 * * 0'
 
+permissions:
+  contents: write
+
 jobs:
   generate-manifest:
     runs-on: ubuntu-latest
-
-    # Optional: Define permissions if you plan to commit the file back to this repository
-    # permissions:
-    // contents: write # To allow committing changes to the repository
-    #   actions: read   # Default, to read GITHUB_TOKEN
 
     steps:
       - name: Checkout repository (needed if committing manifest back)
@@ -98,12 +96,12 @@ jobs:
           echo "Latest version found: ${VERSION}"
 
           ASSETS_JSON=$(echo "$LATEST_RELEASE_DATA" | jq '
-            if .assets and (.assets | length > 0) then # Check if .assets exists and is not empty
+            if .assets and (.assets | length > 0) then
               [.assets[]? | select(.name and .browser_download_url and .size) | {
                 name: .name,
                 download_url: .browser_download_url,
                 size: .size,
-                content_type: .content_type // "application/octet-stream"
+                content_type: (if .content_type then .content_type else "application/octet-stream" end)
               }]
             else
               [] # Default to an empty array if no assets or .assets is null/empty

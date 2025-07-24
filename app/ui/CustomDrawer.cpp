@@ -28,158 +28,220 @@
 #include <QLabel>
 #include <QFileDialog>
 #include "CustomDrawer.h"
+
+#include <QPushButton>
+
 #include "IconButton.h"
 #include "../db_connection.h"
 
-namespace {
+namespace
+{
 
-	//TODO clean up for best practices
-	QString getFilename(const QString &filePath) {
-		if (!filePath.isEmpty()) {
-			long long int i = filePath.lastIndexOf("/") + 1;
-			return filePath.mid(i);
-		}
+    // TODO clean up for best practices
+    QString getFilename(const QString &filePath)
+    {
+        if (!filePath.isEmpty())
+        {
+            long long int i = filePath.lastIndexOf("/") + 1;
+            return filePath.mid(i);
+        }
 
-		return nullptr;
-	}
+        return nullptr;
+    }
 }
 
-CustomDrawer::CustomDrawer(Editor *ptr) : editor(ptr), QWidget(ptr) {
-	setStyleSheet("background-color: #252525;");
+CustomDrawer::CustomDrawer(Editor *editor) : QWidget(editor), editor(editor)
+{
+    setFixedWidth(DrawerMeasurements::width);
+    // Consider if setMaximumHeight(500) is truly desired, or if content should dictate height.
+    // If content can grow beyond 500, remove this line or make it a maximum.
+    setMaximumHeight(500);
 
-	setFixedWidth(DrawerMeasurements::width);
-	setMaximumHeight(500);
+    // 1. Set up the main vertical layout for the CustomDrawer.
+    // The QWidget (this) takes ownership of the layout when setLayout() is called.
+    // Therefore, we release the unique_ptr to transfer ownership.
+    pLayout = std::make_unique<QVBoxLayout>();
+    setLayout(pLayout.release()); // Transfer ownership to 'this' QWidget
 
-	pLayout = std::make_unique<QVBoxLayout>();
-	setLayout(pLayout.get());
-	pLayout->setSpacing(8);
-	pLayout->setContentsMargins(2, 4, 2, 4);
+    // Access the layout via layout() member function after transfer.
+    QVBoxLayout *mainVLayout = qobject_cast<QVBoxLayout*>(layout());
+    mainVLayout->setSpacing(8);          // Spacing between widgets in the main layout
+    mainVLayout->setContentsMargins(2, 4, 2, 4); // Margins around the main layout's content
 
-	auto *panel = new QWidget;
-	panel->setStyleSheet(
-			"color: #C2C2C2;"
-			"background-color: #252525;"
-	);
+    // 2. Create a container widget for the header section (label and add button).
+    // This widget will be parented to CustomDrawer, so no unique_ptr needed here.
+    QWidget *headerPanel = new QWidget(this);
 
-	auto *layout = new QGridLayout;
-	panel->setLayout(layout);
+    // 3. Create a horizontal layout for the header section.
+    // headerPanel takes ownership of this layout.
+    QHBoxLayout *headerLayout = new QHBoxLayout(headerPanel);
+    headerLayout->setContentsMargins(0, 0, 0, 0); // No extra margins within the header
+    headerLayout->setSpacing(5);                  // Small spacing between label and button
 
-	addFile = std::make_unique<IconButton>(QIcon(ItoolsNS::main_config.getAppIcons()->addFileIcon));
-	connect(addFile.get(), &IconButton::clicked, this, &CustomDrawer::onAddButtonClicked);
+    // 4. Create the "Workspace" label.
+    // Parented to headerPanel, so no unique_ptr needed.
+    const auto workspaceLabel = new QLabel("Workspace", headerPanel);
+    workspaceLabel->setObjectName("HeaderLabel");
+    // Apply a bold font to make it stand out.
+    workspaceLabel->setFont(QFont("Segoe UI", 10, QFont::Bold));
 
-	auto label = new QLabel();
-	label->setText("Workspace");
+    // 5. Create the "addFile" button.
+    // addFile is a unique_ptr member variable, so we initialize it.
+    addFile = std::make_unique<IconButton>(QIcon(Config::singleton().getAppIcons()->addFileIcon));
+    // Connect its clicked signal to your slot.
+    connect(addFile.get(), &IconButton::clicked, this, &CustomDrawer::onAddButtonClicked);
 
-	layout->addWidget(addFile.get(), 0, 1, 12, 12, Qt::AlignmentFlag::AlignRight);
-	layout->addWidget(label, 0, 0, 12, 1);
+    // 6. Add widgets to the header layout.
+    // The workspaceLabel will take up available space, pushing addFile to the right.
+    headerLayout->addWidget(workspaceLabel);
+    headerLayout->addStretch(1); // This stretch pushes the button to the far right.
+    // Transfer ownership of the IconButton to the layout.
+    headerLayout->addWidget(addFile.release());
 
-	pLayout->addWidget(panel, Qt::AlignmentFlag::AlignRight);
+    // 7. Add the header panel to the main vertical layout of CustomDrawer.
+    mainVLayout->addWidget(headerPanel);
 
-	// Read from the database and load all the files that were
-	// previously opened.
-	showPreviouslyOpenedFiles();
+    // 8. Add a separator line for visual distinction below the header.
+    QFrame *separator = new QFrame(this);
+    separator->setFrameShape(QFrame::HLine); // Horizontal line
+    separator->setFrameShadow(QFrame::Sunken); // Gives a sunken 3D effect
+    mainVLayout->addWidget(separator);
 
-	// drawer is collapsed by default.
-	// show();
+    // 9. Add a stretch to the main layout to push content to the top.
+    // This ensures that if there's not enough content to fill the drawer,
+    // the existing widgets stay at the top.
+    mainVLayout->addStretch(1);
+
+    // Read from the database and load all the files that were
+    // previously opened. This function should add widgets to `mainVLayout`.
+    showPreviouslyOpenedFiles();
+
+    // drawer is collapsed by default.
+    // show(); // Uncomment if you want it visible by default
 }
 
-void CustomDrawer::toggle() {
-	if (isVisible()) {
-		hide();
-	} else {
-		show();
-	}
+
+void CustomDrawer::toggle()
+{
+    if (isVisible())
+    {
+        hide();
+    }
+    else
+    {
+        show();
+    }
 }
 
-void CustomDrawer::onAddButtonClicked() {
-	QFileDialog dialog(this);
-	// Removes name filter to allow future support for other languages
-	dialog.setViewMode(QFileDialog::Detail);
+void CustomDrawer::onAddButtonClicked()
+{
+    QFileDialog dialog(this);
+    // Removes name filter to allow future support for other languages
+    dialog.setViewMode(QFileDialog::Detail);
 
-	QStringList fileNames;
+    if (dialog.exec())
+    {
+        if (const QStringList fileNames = dialog.selectedFiles(); !fileNames.empty())
+        {
+            const QString &filePath = fileNames.at(0);
+            const QString &fileName = getFilename(filePath);
 
-	if (dialog.exec()) {
-		fileNames = dialog.selectedFiles();
-		if (!fileNames.empty()) {
-			const QString &filePath = fileNames.at(0);
-			const QString &fileName = getFilename(filePath);
-
-			QVariant result = insertFile(filePath, fileName);
-			if (result.isValid()) {
-				createFileLabel(filePath, fileName, true);
-			}
-		}
-	}
+            if (const QVariant result = insertFile(filePath, fileName); result.isValid())
+            {
+                createFileLabel(filePath, fileName, true);
+            }
+        }
+    }
 }
 
 void CustomDrawer::createFileLabel(
-		const QString &filePath, const QString &fileName, bool shouldAutoOpenFile) const {
+    const QString &filePath, const QString &fileName, bool shouldAutoOpenFile) const
+{
 
-	auto label = new FilePathLabel(filePath, (QWidget *) this);
+    const auto label = new FilePathLabel(filePath, nullptr);
 
-	QObject::connect(label, &FilePathLabel::clicked, this, &CustomDrawer::onFileLabelClick);
+    connect(label, &FilePathLabel::clicked, this, &CustomDrawer::onFileLabelClick);
 
-	pLayout->addWidget(label);
+    const auto mainVLayout = qobject_cast<QVBoxLayout*>(layout());
+    mainVLayout->addWidget(label);
 
-	if (!filePath.isEmpty()) {
-		openFilePath(label, filePath, fileName);
+    if (!filePath.isEmpty())
+    {
+        openFilePath(label, filePath, fileName);
 
-		if (shouldAutoOpenFile) {
-			// updated the side panel to show this as the newly active file
-			emit label->clicked();
-		}
-	}
+        if (shouldAutoOpenFile)
+        {
+            // updated the side panel to show this as the newly active file
+            emit label->clicked();
+        }
+    }
 }
 
-void CustomDrawer::openFilePath(FilePathLabel *label, const QString &filePath, const QString &fileName) {
-	if (!filePath.isEmpty()) {
-		label->setText(fileName);
+void CustomDrawer::openFilePath(FilePathLabel *label, const QString &filePath, const QString &fileName)
+{
+    if (!filePath.isEmpty())
+    {
+        label->setText(fileName);
 
-		QFile file(filePath);
-		file.close();
-	}
+        QFile file(filePath);
+        file.close();
+    }
 }
 
-void CustomDrawer::onFileLabelClick() {
-	QObject *senderObj = sender();
-	QObject *activeItem = state.activeFileLabel;
-	if (activeItem == senderObj) {
-		// do nothing.
-		return;
-	}
+void CustomDrawer::onFileLabelClick()
+{
+    QObject *senderObj = sender();
+    const QObject *activeItem = state.activeFileLabel;
+    if (activeItem == senderObj)
+    {
+        // do nothing.
+        return;
+    }
 
-	if (activeItem != nullptr) {
-		auto prevActiveLabel = dynamic_cast<FilePathLabel *>(state.activeFileLabel);
-		prevActiveLabel->reset();
-	}
+    if (activeItem != nullptr)
+    {
+        const auto prevActiveLabel = dynamic_cast<FilePathLabel *>(state.activeFileLabel);
+        prevActiveLabel->reset();
+    }
 
-	// update active label
-	auto label = dynamic_cast<FilePathLabel *>(senderObj);
-	// sets active label css
-	label->activeLabel();
+    // update active label
+    const auto label = dynamic_cast<FilePathLabel *>(senderObj);
+    // sets active label css
+    label->activeLabel();
 
-	setActive(label);
+    setActive(label);
 
-	// Update the editor
-	if (!editor) {
-		return;
-	}
-	editor->openAndParseFile(label->getFilePath(), QFile::OpenModeFlag::ReadWrite);
+    // Update the editor
+    if (editor)
+    {
+        editor->openAndParseFile(label->getFilePath(), QFile::OpenModeFlag::ReadWrite);
+    }
 }
 
-void CustomDrawer::setActive(QWidget *pLabel) {
-	state.activeFileLabel = pLabel;
+void CustomDrawer::setActive(QWidget *pLabel)
+{
+    state.activeFileLabel = pLabel;
 }
 
-void CustomDrawer::showPreviouslyOpenedFiles() {
-	auto previousOpenedFiles = findPreviouslyOpenedFiles();
+void CustomDrawer::showPreviouslyOpenedFiles() const
+{
+    auto previousOpenedFiles = findPreviouslyOpenedFiles();
 
-	bool isFirstTime = true;
-	for (auto file: previousOpenedFiles) {
-		createFileLabel(file->getFilePath(), file->getFileName(), isFirstTime);
+    bool isFirstTime = true;
+    for (const auto file : previousOpenedFiles)
+    {
+        try
+        {
+            createFileLabel(file->getFilePath(), file->getFileName(), isFirstTime);
 
-		if (isFirstTime) {
-			isFirstTime = false;
-		}
-	}
+            if (isFirstTime)
+            {
+                isFirstTime = false;
+            }
+        }
+        catch (...)
+        {
+            deleteRow(file->getFilePath());
+        }
+    }
 }

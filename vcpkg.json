@@ -1,0 +1,34 @@
+{
+  "builtin-baseline": "4fc5d0252289d5dc22a422beff86344a6cb52414",
+  "name": "it-tools-editor",
+  "version-string": "1.0.1",
+  "dependencies": [
+    {
+      "name": "qtbase",
+      "default-features": false,
+      "features": [
+        "gui",
+        "widgets",
+        "sql",
+        "sql-sqlite",
+        "png"
+      ]
+    },
+    {
+      "name": "curl"
+    },
+    {
+      "name": "boost-property-tree"
+    },
+    {
+      "name": "minizip"
+    },
+    {
+      "name": "qtsvg",
+      "version>=": "6.5.0"
+    },
+    {
+      "name": "sqlite3"
+    }
+  ]
+}

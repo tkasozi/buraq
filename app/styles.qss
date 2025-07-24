@@ -1,8 +1,6 @@
 
 /* General styles */
 QWidget {
-  color: #FFFFFF;
-  background-color: #101010;
   font-family: "Open Sans", Arial, sans-serif, serif, monospace;
   font-size: 14px;
   line-height: 1.5; /* One and a half times the font size */
@@ -12,10 +10,8 @@ QPlainTextEdit {
     font-size: 16px;
     /* Add padding so text doesn't touch the scrollbar directly if scrollbar is inside */
 	font-family: Consolas, Courier New, monospace;
-	color: #ffffff;
 	height: 100vh;
 	width: 100%;
-	background-color: #232323;
 	padding: 0px;
 }
 
@@ -26,26 +22,21 @@ QWidget br {
 
  /* Style for vertical scrollbars */
         QScrollBar:vertical {
-            background: #232323; /* Scrollbar track color */
-            width: 15px;         /* Width of the vertical scr  ollbar */
+            width: 15px;         /* Width of the vertical scrollbar */
             margin: 0px 0px 0px 0px; /* Top, Right, Bottom, Left margins */
         }
         QScrollBar::handle:vertical {
-            background: #606060; /* Handle color */
             min-height: 20px;    /* Minimum height of the handle */
             border-radius: 7px;  /* Rounded corners for the handle */
         }
         QScrollBar::handle:vertical:hover {
-            background: #707070; /* Handle color on hover */
         }
         QScrollBar::add-line:vertical { /* Up arrow button */
-            background: #232323;
             height: 14px;
             subcontrol-position: bottom;
             subcontrol-origin: margin;
         }
         QScrollBar::sub-line:vertical { /* Down arrow button */
-            background: #232323;
             height: 14px;
             subcontrol-position: top;
             subcontrol-origin: margin;
@@ -65,25 +56,21 @@ QWidget br {
 
 /* Style for horizontal scrollbars */
 QScrollBar:horizontal {
-    background: #232323;     /* Scrollbar track color */
     height: 15px;            /* Thickness of the horizontal scrollbar */
     margin: 0px 0px 0px 0px; /* No margins around the scrollbar itself */
     border: none;            /* Optional: remove any default border on the scrollbar track */
 }
 
 QScrollBar::handle:horizontal {
-    background: #606060;     /* Handle color */
     min-width: 20px;         /* Minimum length of the handle */
     border-radius: 5px;      /* Rounded corners (radius <= height/2) */
 }
 
 QScrollBar::handle:horizontal:hover {
-    background: #707070;     /* Handle color on hover */
 }
 
 /* Left arrow button */
 QScrollBar::sub-line:horizontal {
-    background: #232323;     /* Button background, same as track */
     width: 15px;             /* Width of the button area */
     height: 15px;            /* Height of the button area, matching scrollbar thickness */
     subcontrol-position: left;
@@ -93,7 +80,6 @@ QScrollBar::sub-line:horizontal {
 
 /* Right arrow button */
 QScrollBar::add-line:horizontal {
-    background: #232323;     /* Button background */
     width: 15px;             /* Width of the button area */
     height: 15px;            /* Height of the button area */
     subcontrol-position: right;
@@ -112,8 +98,6 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
 
 /* Primary Action Button: "Update" */
 QPushButton#updateButton {
-    background-color: #4A90E2; /* A welcoming blue - primary action color */
-    color: white;
     border: 1px solid #4A90E2; /* Same as background or slightly darker for depth */
     padding: 8px 16px; /* Adjust padding as needed for your text */
     border-radius: 4px; /* Rounded corners */
@@ -122,13 +106,9 @@ QPushButton#updateButton {
 }
 
 QPushButton#updateButton:hover {
-    background-color: #5AA0F2; /* Lighter blue on hover */
-    border-color: #5AA0F2;
 }
 
 QPushButton#updateButton:pressed {
-    background-color: #3A80D2; /* Darker blue when pressed */
-    border-color: #3A80D2;
 }
 
 QPushButton#updateButton:disabled {
@@ -140,8 +120,6 @@ QPushButton#updateButton:disabled {
 
 /* Secondary Action Button: "Later" */
 QPushButton#laterButton {
-    background-color: #555555; /* A neutral dark gray, less prominent */
-    color: #DDDDDD; /* Light gray text */
     border: 1px solid #656565; /* Subtle border */
     padding: 8px 16px; /* Consistent padding */
     border-radius: 4px; /* Consistent rounded corners */
@@ -150,14 +128,9 @@ QPushButton#laterButton {
 }
 
 QPushButton#laterButton:hover {
-    background-color: #606060; /* Slightly lighter gray on hover */
-    border-color: #707070;
-    color: #FFFFFF; /* Brighter text on hover */
 }
 
 QPushButton#laterButton:pressed {
-    background-color: #454545; /* Darker gray when pressed */
-    border-color: #555555;
 }
 
 QPushButton#laterButton:disabled {
@@ -171,8 +144,6 @@ QPushButton#laterButton:disabled {
 
 /* Primary Action Button: "Update" */
 QPushButton#updateButton {
-    background-color: #4A90E2; /* A welcoming blue - primary action color */
-    color: white;
     border: 1px solid #4A90E2; /* Same as background or slightly darker for depth */
     padding: 8px 16px; /* Adjust padding as needed for your text */
     border-radius: 4px; /* Rounded corners */
@@ -181,46 +152,13 @@ QPushButton#updateButton {
 }
 
 QPushButton#updateButton:hover {
-    background-color: #5AA0F2; /* Lighter blue on hover */
-    border-color: #5AA0F2;
 }
 
 QPushButton#updateButton:pressed {
-    background-color: #3A80D2; /* Darker blue when pressed */
-    border-color: #3A80D2;
 }
 
 QPushButton#updateButton:disabled {
     background-color: #787878;
     color: #A0A0A0;
     border-color: #787878;
-}
-
-
-/* Secondary Action Button: "Later" */
-QPushButton#laterButton {
-    background-color: #555555; /* A neutral dark gray, less prominent */
-    color: #DDDDDD; /* Light gray text */
-    border: 1px solid #656565; /* Subtle border */
-    padding: 8px 16px; /* Consistent padding */
-    border-radius: 4px; /* Consistent rounded corners */
-    font-size: 14px; /* Consistent font size */
-    font-weight: normal; /* Normal weight to be less emphasized than Update */
-}
-
-QPushButton#laterButton:hover {
-    background-color: #606060; /* Slightly lighter gray on hover */
-    border-color: #707070;
-    color: #FFFFFF; /* Brighter text on hover */
-}
-
-QPushButton#laterButton:pressed {
-    background-color: #454545; /* Darker gray when pressed */
-    border-color: #555555;
-}
-
-QPushButton#laterButton:disabled {
-    background-color: #404040;
-    color: #808080;
-    border-color: #404040;
 }

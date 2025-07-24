@@ -51,10 +51,10 @@ jobs:
     runs-on: ${{ inputs.os }}
     
     env: 
-      APP_EXE_NAME: "it-tools-editor-${{ inputs.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
+      APP_EXE_NAME: "buraq-${{ inputs.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
       APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
-      OUTPUT_DIR: ${{ github.workspace }}\it-tools-editor\Output
-      APP_BINARY: ${{ github.workspace }}\it-tools-editor\build\build
+      OUTPUT_DIR: ${{ github.workspace }}\buraq\Output
+      APP_BINARY: ${{ github.workspace }}\buraq\build\build
 
     outputs:
       build_successful: ${{ steps.build_project_step.outcome == 'success' }}
@@ -69,11 +69,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-          path: it-tools-editor
+          path: buraq
           fetch-depth: 0
 
       - name: Clone Vcpkg Repository
-        if: ${{ github.workspace }}/it-tools-editor/vcpkg == '' || !contains(github.workspace, 'it-tools-editor/vcpkg')
+        if: ${{ github.workspace }}/buraq/vcpkg == '' || !contains(github.workspace, 'buraq/vcpkg')
         uses: actions/checkout@v4
         with:
           repository: microsoft/vcpkg
@@ -101,7 +101,7 @@ jobs:
 
       - name: Build Managed project
         id: dotnet-project
-        working-directory: ${{ github.workspace }}/it-tools-editor
+        working-directory: ${{ github.workspace }}/buraq
         run: |
           ls -alh
 
@@ -206,12 +206,12 @@ jobs:
           path: |
             ${{ github.workspace }}/vcpkg/downloads
             ${{ github.workspace }}/vcpkg/toolsrc
-          key: ${{ inputs.os }}-${{ inputs.build_type }}-vcpkg-assets-${{ hashFiles('it-tools-editor/vcpkg.json') }}
+          key: ${{ inputs.os }}-${{ inputs.build_type }}-vcpkg-assets-${{ hashFiles('buraq/vcpkg.json') }}
           restore-keys: |
             ${{ inputs.os }}-vcpkg-assets-
 
       - name: Configure CMake and Install Vcpkg Dependencies
-        working-directory: ${{ github.workspace }}/it-tools-editor
+        working-directory: ${{ github.workspace }}/buraq
         env:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
           VCPKG_INSTALL_OPTIONS: "--debug"
@@ -277,20 +277,20 @@ jobs:
 
       - name: Build Project (Windows - MSVC)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-windows'  && success()
-        working-directory: ${{ github.workspace }}/it-tools-editor/build
+        working-directory: ${{ github.workspace }}/buraq/build
         run: cmake --build . --config ${{ inputs.build_type }}
         # Use cmd to ensure vcvars64.bat context persists from the configure step
         shell: cmd
 
       - name: Build Project (Windows - MinGW)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
-        working-directory: ${{ github.workspace }}/it-tools-editor/build
+        working-directory: ${{ github.workspace }}/buraq/build
         run: cmake --build . --config ${{ inputs.build_type }}
         shell: pwsh # Use pwsh to continue the MinGW context
 
       - name: Build Project (Linux/macOS)
         if: inputs.os != 'windows-latest'  && success()
-        working-directory: ${{ github.workspace }}/it-tools-editor/build
+        working-directory: ${{ github.workspace }}/buraq/build
         run: cmake --build . --config ${{ inputs.build_type }}
         shell: bash
 
@@ -312,7 +312,7 @@ jobs:
           Write-Host "APP_NAME set to $appName"
           
           $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          $innoScriptPath = "${{ github.workspace }}/it-tools-editor/it-tools.iss"
+          $innoScriptPath = "${{ github.workspace }}/buraq/it-tools.iss"
           
           $appExeName = "$(cat app_exe_name.txt)"
           $appVersion = "${{ env.APP_VERSION }}"
@@ -333,7 +333,7 @@ jobs:
         shell: powershell
 
       - name: Show Created files after build
-        run: ls -al .; echo "*****************************\n\n"; ls -al "${{ github.workspace }}\it-tools-editor"; ls -al "${{ github.workspace }}\it-tools-editor\Output"; echo "**** OUTPUT_DIR:${{ env.OUTPUT_DIR }}***"
+        run: ls -al .; echo "*****************************\n\n"; ls -al "${{ github.workspace }}\buraq"; ls -al "${{ github.workspace }}\buraq\Output"; echo "**** OUTPUT_DIR:${{ env.OUTPUT_DIR }}***"
         shell: bash
 
       - name: Create release archive

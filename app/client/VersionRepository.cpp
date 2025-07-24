@@ -13,7 +13,7 @@ std::mutex network_mutex;
 
 
 VersionRepository::VersionRepository(IToolsApi* api_context) :
-    endpoint("file:///C:/Users/talik/workspace/it-tools-editor/app/version.json"),
+    endpoint("file:///C:/Users/talik/workspace/buraq/app/version.json"),
     network(Network::singleton()),
     api_context(api_context)
 {

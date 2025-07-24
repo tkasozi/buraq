@@ -10,8 +10,7 @@ on:
     types: [ opened, synchronize, reopened ]
   push:
     branches:
-      - '**'        # Matches all branches
-      - '!main'     # Excludes the 'main' branch
+      - 'main'
     paths-ignore: # IMPORTANT: Prevent infinite loop if this workflow's PR is merged
       - 'manifest.json'
 

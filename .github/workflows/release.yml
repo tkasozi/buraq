@@ -10,6 +10,8 @@ on:
     branches:
       - '**'        # Matches all branches
       - '!main'     # Excludes the 'main' branch
+    paths-ignore: # IMPORTANT: Prevent infinite loop if this workflow's PR is merged
+      - 'manifest.json'
 
 jobs:
   # This job triggers the reusable workflow for each matrix combination

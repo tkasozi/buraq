@@ -6,6 +6,7 @@ env:
   DOTNET_SDK_VERSION: 9.0.303
   DOTNET_VERSION: 9.0.7
   CMAKE_EXE: "cmake"
+  PROJECT_NAME: buraq
 
 # This workflow can be called by other workflows
 on:
@@ -51,10 +52,10 @@ jobs:
     runs-on: ${{ inputs.os }}
     
     env: 
-      APP_EXE_NAME: "buraq-${{ inputs.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
+      APP_EXE_NAME: "${{ env.PROJECT_NAME }}-${{ inputs.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
       APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
-      OUTPUT_DIR: ${{ github.workspace }}\buraq\Output
-      APP_BINARY: ${{ github.workspace }}\buraq\build\build
+      OUTPUT_DIR: ${{ github.workspace }}\${{ env.PROJECT_NAME }}\Output
+      APP_BINARY: ${{ github.workspace }}\${{ env.PROJECT_NAME }}\build\build
 
     outputs:
       build_successful: ${{ steps.build_project_step.outcome == 'success' }}
@@ -69,11 +70,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-          path: buraq
+          path: ${{ env.PROJECT_NAME }}
           fetch-depth: 0
 
       - name: Clone Vcpkg Repository
-        if: ${{ github.workspace }}/buraq/vcpkg == '' || !contains(github.workspace, 'buraq/vcpkg')
+        if: ${{ github.workspace }}/${{ env.PROJECT_NAME }}/vcpkg == '' || !contains(github.workspace, "${{ env.PROJECT_NAME }}/vcpkg")
         uses: actions/checkout@v4
         with:
           repository: microsoft/vcpkg
@@ -101,7 +102,7 @@ jobs:
 
       - name: Build Managed project
         id: dotnet-project
-        working-directory: ${{ github.workspace }}/buraq
+        working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
         run: |
           ls -alh
 
@@ -211,7 +212,7 @@ jobs:
             ${{ inputs.os }}-vcpkg-assets-
 
       - name: Configure CMake and Install Vcpkg Dependencies
-        working-directory: ${{ github.workspace }}/buraq
+        working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
         env:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
           VCPKG_INSTALL_OPTIONS: "--debug"
@@ -277,20 +278,20 @@ jobs:
 
       - name: Build Project (Windows - MSVC)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-windows'  && success()
-        working-directory: ${{ github.workspace }}/buraq/build
+        working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}/build
         run: cmake --build . --config ${{ inputs.build_type }}
         # Use cmd to ensure vcvars64.bat context persists from the configure step
         shell: cmd
 
       - name: Build Project (Windows - MinGW)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
-        working-directory: ${{ github.workspace }}/buraq/build
+        working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}/build
         run: cmake --build . --config ${{ inputs.build_type }}
         shell: pwsh # Use pwsh to continue the MinGW context
 
       - name: Build Project (Linux/macOS)
         if: inputs.os != 'windows-latest'  && success()
-        working-directory: ${{ github.workspace }}/buraq/build
+        working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}/build
         run: cmake --build . --config ${{ inputs.build_type }}
         shell: bash
 
@@ -304,7 +305,7 @@ jobs:
       - name: Generate installer with Inno Setup
         if: inputs.os == 'windows-latest'  && success()
         run: |
-          Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*editor.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
+          Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "${{ env.PROJECT_NAME }}.exe" | Select-Object -First 1 -ExpandProperty Name | Out-File -FilePath app_exe_name.txt
           
           $exeName = Get-Content -Path "app_exe_name.txt"
           $appName = $exeName.Replace(".exe", "")
@@ -312,7 +313,7 @@ jobs:
           Write-Host "APP_NAME set to $appName"
           
           $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          $innoScriptPath = "${{ github.workspace }}/buraq/it-tools.iss"
+          $innoScriptPath = "${{ github.workspace }}/${{ env.PROJECT_NAME }}/it-tools.iss"
           
           $appExeName = "$(cat app_exe_name.txt)"
           $appVersion = "${{ env.APP_VERSION }}"
@@ -333,7 +334,7 @@ jobs:
         shell: powershell
 
       - name: Show Created files after build
-        run: ls -al .; echo "*****************************\n\n"; ls -al "${{ github.workspace }}\buraq"; ls -al "${{ github.workspace }}\buraq\Output"; echo "**** OUTPUT_DIR:${{ env.OUTPUT_DIR }}***"
+        run: ls -al .; echo "*****************************\n\n"; ls -al "${{ github.workspace }}\${{ env.PROJECT_NAME }}"; ls -al "${{ github.workspace }}\${{ env.PROJECT_NAME }}\Output"; echo "**** OUTPUT_DIR:${{ env.OUTPUT_DIR }}***"
         shell: bash
 
       - name: Create release archive

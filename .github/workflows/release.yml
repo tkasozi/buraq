@@ -6,7 +6,7 @@ name: release.yml
 #    types: [ published ]
 
 on:
-  pull_request_target: # <-- THIS IS THE KEY CHANGE
+  pull_request: # <-- THIS IS THE KEY CHANGE
     types: [ opened, synchronize, reopened ]
   push:
     branches:
@@ -268,6 +268,7 @@ jobs:
           fi
 
       - name: Create Pull Request for manifest.json
+        id: create_pr
         # Only run this step if actual changes were detected in manifest.json
         if: steps.git_status_check.outputs.no_changes == 'false'
         uses: peter-evans/create-pull-request@v6
@@ -296,6 +297,7 @@ jobs:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             # Optional: Add a review message
             review-message: "Automated approval for generated manifest.json"
+            pull-request-number: "${{ github.event.pull_request.number }}"
 
       - name: Create Release and Upload Manifest
         uses: softprops/action-gh-release@v1

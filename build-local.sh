@@ -1,18 +1,18 @@
 #!/bin/bash
 
-configs=("powershell_plugin" "updater" "it-tools-editor" "deploy_main")
+configs=("powershell_plugin" "updater" "buraq" "deploy_main")
 
 CMAKE_EXE="C:\\Users\\talik\\AppData\\Local\\JetBrains\\CLion 2023.3.2\\bin\\cmake\\win\\x64\\bin\\cmake.exe"
 
 # Ensure this BUILD_DIR matches the one you just configured in Step 1
-BUILD_DIR="C:\\Users\\talik\\projects\\it-tools-editor\\cmake-build-debug" # Or -release-visual-studio
+BUILD_DIR="C:\\Users\\talik\\projects\\buraq\\cmake-build-debug" # Or -release-visual-studio
 
 "C:\Users\talik\AppData\Local\JetBrains\CLion 2023.3.2\bin\cmake\win\x64\bin\cmake.exe" \
  -DCMAKE_BUILD_TYPE=Debug \
  -DCMAKE_MAKE_PROGRAM="C:/Users/talik/AppData/Local/JetBrains/CLion 2023.3.2/bin/ninja/win/x64/ninja.exe" \
  -DCMAKE_TOOLCHAIN_FILE="C:\Users\talik\.vcpkg-clion\vcpkg\scripts\buildsystems\vcpkg.cmake" \
  -DCMAKE_DOTNET_TARGET_FRAMEWORK="C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64\9.0.6\runtimes\win-x64\native" \
--G Ninja -S "C:\Users\talik\projects\it-tools-editor" -B "${BUILD_DIR}"
+-G Ninja -S "C:\Users\talik\projects\buraq" -B "${BUILD_DIR}"
 
 for config in "${configs[@]}"; do
     echo "====================================================="

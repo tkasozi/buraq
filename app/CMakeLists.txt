@@ -1,4 +1,4 @@
-project(it-tools-editor LANGUAGES CXX)
+project(buraq LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

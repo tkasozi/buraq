@@ -1,16 +1,15 @@
 name: test-build.yml
 
-#on:
-#  push:
-#    branches:
-#      - '**'        # Matches all branches
-#      - '!main'     # Excludes the 'main' branch
-#
-#  pull_request:
-#    branches:
-#      - '**'
-#      - '!main'
-on: ["delete"]
+on:
+  push:
+    branches:
+      - '**'        # Matches all branches
+      - '!main'     # Excludes the 'main' branch
+
+  pull_request:
+    branches:
+      - '**'
+      - '!main'
 
 jobs:
   # This job triggers the reusable workflow for each matrix combination
@@ -21,17 +20,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        os: [ windows-latest ]
+        #        os: [ windows-latest, ubuntu-latest, macos-latest ]
         build_type: [ Release ]
         include:
           - os: windows-latest
             vcpkg_triplet: x64-windows
             generator: "Visual Studio 17 2022"
             arch: x64
-          - os: ubuntu-latest
-            vcpkg_triplet: x64-linux
-          - os: macos-latest
-            vcpkg_triplet: x64-osx
+    #          - os: ubuntu-latest
+    #            vcpkg_triplet: x64-linux
+    #          - os: macos-latest
+    #            vcpkg_triplet: x64-osx
 
     uses: ./.github/workflows/reusable-build.yml # Calls the reusable workflow
 

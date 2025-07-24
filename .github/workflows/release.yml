@@ -272,7 +272,7 @@ jobs:
         if: steps.git_status_check.outputs.no_changes == 'false'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GH_BOT_TOKEN }} # Use the default GITHUB_TOKEN
+          token: ${{ steps.app-token.outputs.token }} # app-token "is the id of the step"
           commit-message: "chore: Update generated manifest.json for v${{ steps.generate_manifest.outputs.manifest_version }} [skip ci]"
           title: "Chore: Auto-update manifest.json"
           body: |

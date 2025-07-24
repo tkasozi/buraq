@@ -103,6 +103,7 @@ jobs:
     permissions:
       contents: write # Grants write access to repository contents, including releases.
       packages: write
+      pull-requests: write
       actions: read
     steps:
       - uses: actions/create-github-app-token@v1

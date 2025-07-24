@@ -100,7 +100,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}
+          # ref: ${{ github.ref }}
           # Important: If you're pushing to the same branch, you need to
           # fetch the full history. If you're pushing to a different branch
           # or a PR, you might not need this depth.
@@ -209,16 +209,15 @@ jobs:
             exit 1
           fi
 
-      - name: Commit generated manifest.json
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add manifest.json
-          git status # See what's staged
-          git commit -m "chore: Add/update generated manifest.json" || echo "No changes to commit"
-          git push
+      - name: Create Release and Upload Manifest
+        uses: softprops/action-gh-release@v1
+        with:
+            # If true, a new release will be created. If false, it tries to update an existing release for the tag.
+            # Usually, you want to create a new one when a new tag is pushed.
+            generate_release_notes: true # Auto-generate release notes based on commits
+            files: ./manifest.yml # Path to the manifest file you want to upload
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1

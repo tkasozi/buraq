@@ -6,7 +6,6 @@ env:
   DOTNET_SDK_VERSION: 9.0.303
   DOTNET_VERSION: 9.0.7
   CMAKE_EXE: "cmake"
-  PROJECT_NAME: buraq
 
 # This workflow can be called by other workflows
 on:
@@ -51,8 +50,9 @@ jobs:
   build_component:
     runs-on: ${{ inputs.os }}
     
-    env: 
-      APP_EXE_NAME: "${{ env.PROJECT_NAME }}-${{ inputs.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
+    env:
+      PROJECT_NAME: buraq
+      APP_EXE_NAME: "buraq-${{ inputs.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
       APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
       OUTPUT_DIR: ${{ github.workspace }}\${{ env.PROJECT_NAME }}\Output
       APP_BINARY: ${{ github.workspace }}\${{ env.PROJECT_NAME }}\build\build

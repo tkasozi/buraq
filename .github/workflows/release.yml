@@ -6,6 +6,8 @@ name: release.yml
 #    types: [ published ]
 
 on:
+  pull_request_target: # <-- THIS IS THE KEY CHANGE
+    types: [ opened, synchronize, reopened ]
   push:
     branches:
       - '**'        # Matches all branches

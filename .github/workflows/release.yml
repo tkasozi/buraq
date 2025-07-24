@@ -297,7 +297,7 @@ jobs:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             # Optional: Add a review message
             review-message: "Automated approval for generated manifest.json"
-            pull-request-number: "${{ github.event.pull_request.number }}"
+            pull-request-number: "${{ env.PULL_REQUEST_NUMBER }}"
 
       - name: Create Release and Upload Manifest
         uses: softprops/action-gh-release@v1

@@ -1,0 +1,5 @@
+{
+"version": "1.0.45",
+"buildDate": "$(date +%Y-%m-%d)",
+"commitSha": "465161cd19782b962ec3bae39670d3161c3a83d8"
+}

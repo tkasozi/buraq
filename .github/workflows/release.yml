@@ -93,14 +93,10 @@ jobs:
   generate-manifest:
     needs: publish_release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Grants write access to repository contents, including releases.
+      actions: read
     steps:
-      - name: Checkout repository (needed if committing manifest back)
-        # This step checks out the repository where the workflow is running.
-        # It's required if you want to commit the generated manifest.json back into this repo.
-        # If you only want to upload it as an artifact, this step can be optional,
-        # but it's generally good practice to include it.
-        uses: actions/checkout@v4
-
       - name: Install jq (if not pre-installed on runner)
         run: |
           if ! command -v jq &> /dev/null; then
@@ -217,4 +213,3 @@ jobs:
           asset_path: ./manifest.json
           asset_content_type: application/json
           asset_name: manifest.json
-

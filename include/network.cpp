@@ -139,7 +139,7 @@ int Network::downloadFile(const std::string &url, const char *output_filename) {
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
 
 	// Set a user agent (good practice)
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-c++-it-tools-editor/1.0");
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-c++-buraq/1.0");
 
 	// --- 5. Perform the file transfer ---
 	CURLcode res = curl_easy_perform(curl);

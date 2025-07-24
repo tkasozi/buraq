@@ -132,35 +132,22 @@ jobs:
             exit 1
           fi
 
-      - name: Upload Manifest Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: manifest-output # Name of the artifact bundle
-          path: ${{ github.event.inputs.output_filename || 'manifest.json' }} # Path to the file to upload
+      - name: List Downloaded Artifacts
+        run: ls -R ./windows-release-build/; echo ${{ needs.build_and_package.outputs.executable_name || 'Failed to find var' }}
+        shell: bash
 
-      # --- Optional: Commit and Push manifest.json ---
-      # Uncomment the following steps if you want to commit the generated file
-      # back to the repository where the workflow runs.
-      # Make sure you have set `permissions: contents: write` at the job or workflow level.
-      #
-      # - name: Configure Git
-      #   run: |
-      #     git config --global user.name "github-actions[bot]"
-      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      #
-      # - name: Commit and Push Manifest
-      #   env:
-      #     # Use the actual REPO_PATH and OUTPUT_FILE determined in the previous step
-      #     REPO_PATH_FOR_COMMIT_MSG: ${{ github.event.inputs.repository || 'jqlang/jq' }}
-      #     OUTPUT_FILE_TO_COMMIT: ${{ github.event.inputs.output_filename || 'manifest.json' }}
-      #   run: |
-      #     git add "$OUTPUT_FILE_TO_COMMIT"
-      #     # Check if there are changes to commit
-      #     if git diff --staged --quiet; then
-      #       echo "No changes to commit in $OUTPUT_FILE_TO_COMMIT."
-      #     else
-      #       git commit -m "Update $OUTPUT_FILE_TO_COMMIT from ${REPO_PATH_FOR_COMMIT_MSG} latest release"
-      #       echo "Pushing changes..."
-      #       git push
-      #       echo "$OUTPUT_FILE_TO_COMMIT committed and pushed."
-      #     fi
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: manifest.json
+          asset_content_type: application/json
+          asset_name: manifest.json
+
+#      - name: Upload Manifest Artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: manifest-output # Name of the artifact bundle
+#          path: ${{ github.event.inputs.output_filename || 'manifest.json' }} # Path to the file to upload

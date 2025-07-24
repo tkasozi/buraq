@@ -97,6 +97,14 @@ jobs:
       contents: write # Grants write access to repository contents, including releases.
       actions: read
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Important: If you're pushing to the same branch, you need to
+          # fetch the full history. If you're pushing to a different branch
+          # or a PR, you might not need this depth.
+          fetch-depth: 0
+
       - name: Install jq (if not pre-installed on runner)
         run: |
           if ! command -v jq &> /dev/null; then
@@ -200,16 +208,24 @@ jobs:
             exit 1
           fi
 
-      - name: List Downloaded Artifacts
-        run: ls -R .
-        shell: bash
+      - name: Commit generated manifest.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git status # See what's staged
+          git commit -m "chore: Add/update generated manifest.json" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./manifest.json
-          asset_content_type: application/json
-          asset_name: manifest.json
+              upload_url: ${{ github.event.release.upload_url }}
+              asset_path: ./manifest.json
+              asset_content_type: application/json
+              asset_name: manifest.json
+

@@ -10,7 +10,8 @@ on:
     types: [ opened, synchronize, reopened ]
   push:
     branches:
-      - 'main'
+      - '**'        # Matches all branches
+      - '!main'     # Excludes the 'main' branch
     paths-ignore: # IMPORTANT: Prevent infinite loop if this workflow's PR is merged
       - 'manifest.json'
 
@@ -271,7 +272,7 @@ jobs:
         if: steps.git_status_check.outputs.no_changes == 'false'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }} # Use the default GITHUB_TOKEN
+          token: ${{ secrets.GH_BOT_TOKEN }} # Use the default GITHUB_TOKEN
           commit-message: "chore: Update generated manifest.json for v${{ steps.generate_manifest.outputs.manifest_version }} [skip ci]"
           title: "Chore: Auto-update manifest.json"
           body: |

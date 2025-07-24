@@ -289,7 +289,7 @@ jobs:
             chore
       - name: Auto approve PR from bot
         uses: hmarr/auto-approve-action@v4
-        if: github.actor == 'github-actions[bot]'
+        if: github.actor == 'github-actions[bot]' || github.actor == 'tkasozi'
         with:
             # Use the default GITHUB_TOKEN for authentication.
             # This will make the approval come from "github-actions[bot]".

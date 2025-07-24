@@ -297,7 +297,15 @@ jobs:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             # Optional: Add a review message
             review-message: "Automated approval for generated manifest.json"
-            pull-request-number: "${{ env.PULL_REQUEST_NUMBER }}"
+            # pull-request-number: "${{ env.PULL_REQUEST_NUMBER }}"
+
+      - name: Enable Auto-Merge for Bot PR
+        if: success() && github.actor == 'buraq-bot' # Replace with YOUR actual App's bot name
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          gh pr merge --auto --merge "${{ env.PULL_REQUEST_NUMBER }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release and Upload Manifest
         uses: softprops/action-gh-release@v1

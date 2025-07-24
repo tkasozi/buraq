@@ -302,7 +302,6 @@ jobs:
       - name: Enable Auto-Merge for Bot PR
         if: github.actor == 'github-actions[bot]' || github.actor == 'tkasozi' # Replace with YOUR actual App's bot name
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           gh pr merge --auto --merge "${{ env.PULL_REQUEST_NUMBER }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

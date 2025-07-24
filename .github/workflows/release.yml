@@ -122,7 +122,7 @@ jobs:
         # For this example, let's assume a scheduled run targets a specific repo,
         # or you could use repository secrets if the target repo is sensitive/configurable.
         env:
-          REPO_PATH: ${{ github.event.inputs.repository || 'jqlang/jq' }} # For scheduled, defaults to 'jqlang/jq'
+          REPO_PATH: ${{ github.event.inputs.repository || 'tkasozi/buraq' }}
           OUTPUT_FILE: ${{ github.event.inputs.output_filename || 'manifest.json' }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use the built-in GitHub token
         run: |

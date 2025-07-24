@@ -113,7 +113,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-#          ref: main
+          ref: main
           fetch-depth: 0 # pulls all history and tags
           token: ${{ steps.app-token.outputs.token }}
 

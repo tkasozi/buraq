@@ -300,7 +300,7 @@ jobs:
 #            pull-request-number: "${{ env.PULL_REQUEST_NUMBER }}"
 
       - name: Enable Auto-Merge for Bot PR
-        if: success() && github.actor == 'buraq-bot' # Replace with YOUR actual App's bot name
+        if: github.actor == 'github-actions[bot]' || github.actor == 'tkasozi' # Replace with YOUR actual App's bot name
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           gh pr merge --auto --merge "${{ env.PULL_REQUEST_NUMBER }}

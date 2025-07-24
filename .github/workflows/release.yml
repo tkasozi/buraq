@@ -296,8 +296,8 @@ jobs:
             # This will make the approval come from "github-actions[bot]".
             github-token: ${{ secrets.GITHUB_TOKEN }}
             # Optional: Add a review message
-            review-message: "Automated approval for generated manifest.json"
-            # pull-request-number: "${{ env.PULL_REQUEST_NUMBER }}"
+#            review-message: "Automated approval for generated manifest.json"
+            pull-request-number: "${{ env.PULL_REQUEST_NUMBER }}"
 
       - name: Enable Auto-Merge for Bot PR
         if: success() && github.actor == 'buraq-bot' # Replace with YOUR actual App's bot name

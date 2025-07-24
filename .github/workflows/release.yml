@@ -1,13 +1,16 @@
 # .github/workflows/release.yml
 name: release.yml
 
-on:
-  release:
-    types: [ published ]
+#on:
+#  release:
+#    types: [ published ]
+
+on: [push]
 
 jobs:
   # This job triggers the reusable workflow for each matrix combination
   build_and_package:
+    if: false
     permissions:
       contents: write
       packages: write
@@ -91,20 +94,24 @@ jobs:
           asset_name: "setup-buraq-${{ matrix.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe"
 
   generate-manifest:
-    needs: publish_release
+    #needs: publish_release
     runs-on: ubuntu-latest
     permissions:
       contents: write # Grants write access to repository contents, including releases.
+      packages: write
       actions: read
     steps:
-      - name: Checkout repository
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+            app-id: ${{ vars.VERSION_BUMPER_APPID }}
+            private-key: ${{ secrets.VERSION_BUMPER_SECRET }}
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: main
-          # Important: If you're pushing to the same branch, you need to
-          # fetch the full history. If you're pushing to a different branch
-          # or a PR, you might not need this depth.
-          fetch-depth: 0
+          fetch-depth: 0 # pulls all history and tags
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Install jq (if not pre-installed on runner)
         run: |

@@ -215,17 +215,17 @@ jobs:
             # If true, a new release will be created. If false, it tries to update an existing release for the tag.
             # Usually, you want to create a new one when a new tag is pushed.
             generate_release_notes: true # Auto-generate release notes based on commits
-            files: ./manifest.yml # Path to the manifest file you want to upload
+            files: ./manifest.json # Path to the manifest file to upload
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload release asset
-        uses: actions/upload-release-asset@v1
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-              upload_url: ${{ github.event.release.upload_url }}
-              asset_path: ./manifest.json
-              asset_content_type: application/json
-              asset_name: manifest.json
+#      - name: Upload release asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#              upload_url: ${{ github.event.release.upload_url }}
+#              asset_path: ./manifest.json
+#              asset_content_type: application/json
+#              asset_name: manifest.json
 

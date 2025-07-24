@@ -220,6 +220,18 @@ jobs:
             exit 1
           fi
 
+      - name: Commit generated manifest.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git status # Good for debugging
+          git commit -m "chore: Add/update generated manifest.json [skip ci]" || echo "No changes to commit"
+          # Push to the current branch
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release and Upload Manifest
         uses: softprops/action-gh-release@v1
         with:
@@ -227,17 +239,5 @@ jobs:
             # Usually, you want to create a new one when a new tag is pushed.
             generate_release_notes: true # Auto-generate release notes based on commits
             files: ./manifest.json # Path to the manifest file to upload
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit generated manifest.json
-        run: |
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add manifest.json
-            git status # Good for debugging
-            git commit -m "chore: Add/update generated manifest.json [skip ci]" || echo "No changes to commit"
-            # Push to the current branch
-            git push
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

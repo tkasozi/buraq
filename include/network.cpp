@@ -9,8 +9,7 @@
 
 Network::Network() {
 	// Initialize libcurl globally. Do this once at the start of your program.
-	CURLcode global_init_res = curl_global_init(CURL_GLOBAL_DEFAULT);
-	if (global_init_res != CURLE_OK) {
+	if (const CURLcode global_init_res = curl_global_init(CURL_GLOBAL_DEFAULT); global_init_res != CURLE_OK) {
 		// This is a serious issue, often best to terminate or throw.
 		// Note: curl_global_init is not perfectly thread-safe if called concurrently
 		// by different parts of a very complex application before the singleton is first accessed.
@@ -24,6 +23,11 @@ Network::Network() {
 		throw std::runtime_error("curl_easy_init() failed. CURL easy handle could not be created.");
 		exit(-1);
 	}
+
+	// Set a user agent (good practice)
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-c++-buraq/1.0");
+
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 }
 
 Network::~Network() {
@@ -35,8 +39,8 @@ Network::~Network() {
 
 // Callback for std::ofstream
 size_t write_data_to_ofstream(void *ptr, size_t size, size_t nmemb, void *userdata) {
-	std::ofstream *out_stream = static_cast<std::ofstream *>(userdata);
-	std::ios_base::iostate original_exceptions = out_stream->exceptions();
+	auto *out_stream = static_cast<std::ofstream *>(userdata);
+	const std::ios_base::iostate original_exceptions = out_stream->exceptions();
 	out_stream->exceptions(std::ios::failbit | std::ios::badbit); // Enable for this scope
 
 	try {
@@ -80,9 +84,7 @@ std::string Network::http_get(const std::string &url) {
 	// You might want to reset other options if the handle is reused extensively
 	curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L); // Ensure it's a GET
 
-	CURLcode res = curl_easy_perform(curl);
-
-	if (res != CURLE_OK) {
+	if (const CURLcode res = curl_easy_perform(curl); res != CURLE_OK) {
 		std::cerr << "curl_easy_perform() failed for URL " << url << ": "
 				  << curl_easy_strerror(res) << std::endl;
 		throw std::runtime_error("Status not OK!");
@@ -107,16 +109,17 @@ Network &Network::singleton() {
 	return instance;
 }
 
-int Network::downloadFile(const std::string &url, const char *output_filename) {
+int Network::downloadFile(const std::string &url, const char *filename) const
+{
 	if (!curl) {
 		// ... cleanup curl ...
 		curl_global_cleanup();
 		return 1;
 	}
 
-	std::ofstream output_file_stream(output_filename, std::ios::binary);
+	std::ofstream output_file_stream(filename, std::ios::binary);
 	if (!output_file_stream.is_open()) {
-		std::cerr << "Error: Cannot open file for writing: " << output_filename << std::endl;
+		std::cerr << "Error: Cannot open file for writing: " << filename << std::endl;
 		// ... cleanup curl ...
 		curl_global_cleanup();
 		return 1;
@@ -138,11 +141,8 @@ int Network::downloadFile(const std::string &url, const char *output_filename) {
 	// Fail verbosely if the HTTP code is >= 400
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
 
-	// Set a user agent (good practice)
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-c++-buraq/1.0");
-
 	// --- 5. Perform the file transfer ---
-	CURLcode res = curl_easy_perform(curl);
+	const CURLcode res = curl_easy_perform(curl);
 
 	// --- 6. Check for errors ---
 	if (res != CURLE_OK) {
@@ -172,16 +172,4 @@ int Network::downloadFile(const std::string &url, const char *output_filename) {
 	curl_global_cleanup();
 
 	return (res == CURLE_OK) ? 0 : 1;
-}
-
-void Network::http_post(const std::string &url) {
-
-}
-
-void Network::http_put(const std::string &url) {
-
-}
-
-void Network::http_delete(const std::string &url) {
-
 }

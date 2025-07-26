@@ -9,10 +9,6 @@
 #include "network.h"
 #include "app_version.h"
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
-#include <boost/property_tree/json_parser.hpp>
-
-#include "../include/version.h"
-#include "../include/network.h"
 #include "client/VersionRepository.h"
 #include "IToolsAPI.h"
 
@@ -28,7 +24,7 @@ public:
 	 * @return Returns the new version object or an empty version object otherwise.
 	 */
 	[[nodiscard]] UpdateInfo main_version_logic();
-	std::filesystem::path downloadNewVersion() const;
+	[[nodiscard]] std::filesystem::path downloadNewVersion() const;
 
 
 private:
@@ -37,8 +33,8 @@ private:
 	UpdateInfo versionInfo;
 	Network &network;
 
-	std::string getCurrentAppVersion();
-	std::vector<std::string> split_version(const std::string &str);
+	static std::string getCurrentAppVersion();
+	static std::vector<std::string> split_version(const std::string &str);
 
 	/**
  * Fetches the application manifestJson file.

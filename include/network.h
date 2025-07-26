@@ -15,7 +15,7 @@ public:
 
 	static size_t write_callback(void *contents, size_t size, size_t nmemb, std::string *userp);
 
-	int downloadFile(const std::string &url, const char *filename);
+	int downloadFile(const std::string &url, const char *filename) const;
 
 	[[maybe_unused]] [[maybe_unused]] void http_post(const std::string &url);
 

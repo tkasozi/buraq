@@ -7,13 +7,21 @@
 #include <mutex>
 #include <vector>
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
+#include <qlogging.h>
+#include <QDebug>
+#include <list>
+#include <ranges>
+#include <boost/property_tree/json_parser.hpp>
+
+#include "../include/version.h"
+#include "../include/network.h"
 
 // Global mutex to protect access to the Network singleton's methods
 std::mutex network_mutex;
 
 
 VersionRepository::VersionRepository(IToolsApi* api_context) :
-    endpoint("file:///C:/Users/talik/workspace/buraq/app/version.json"),
+    endpoint("https://raw.githubusercontent.com/tkasozi/buraq/refs/heads/main/manifest.json"),
     network(Network::singleton()),
     api_context(api_context)
 {
@@ -21,10 +29,10 @@ VersionRepository::VersionRepository(IToolsApi* api_context) :
 
 void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInfo& info)
 {
-    std::string response;
     std::filesystem::path manifest_json = std::filesystem::temp_directory_path() / "ITools" / "manifest.json";
 
     {
+        std::string response;
         // Create a scope for the lock_guard
         std::lock_guard<std::mutex> lock(network_mutex); // Lock before accessing network methods
 
@@ -37,30 +45,46 @@ void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInf
     } // network_mutex is unlocked here
 
     namespace pt = boost::property_tree;
-    pt::ptree loadPtreeRoot;
-
-    pt::read_json(manifest_json.string(), loadPtreeRoot);
-    std::vector<std::tuple<std::string, std::string, std::string>> version;
-
-    if (loadPtreeRoot.empty())
+    try
     {
-        throw std::runtime_error("Failed to download update manifest.");
+        pt::ptree loadPtreeRoot;
+
+        pt::read_json(manifest_json.string(), loadPtreeRoot);
+        std::vector<std::tuple<std::string, std::string, std::string>> version;
+
+        if (loadPtreeRoot.empty())
+        {
+            throw std::runtime_error("Failed to download update manifest.");
+        }
+
+        auto latest_version_node = loadPtreeRoot.get_child("version");
+        info.latestVersion = latest_version_node.get_value<std::string>();
+
+        std::list<std::string> asset_names;
+
+        std::vector<std::string> item_list;
+        for (auto& asset : loadPtreeRoot.get_child("assets") | std::views::values)
+        {
+            info.asset = {
+                .name = asset.get<std::string>("name"),
+                .downloadUrl = asset.get<std::string>("download_url"),
+                .size = asset.get<std::string>("size")
+            };
+        }
+
+        auto release_notes_node = loadPtreeRoot.get_child("notes");
+        info.releaseNotes = release_notes_node.get_value<std::string>();
     }
-
-    auto latest_version_node = loadPtreeRoot.get_child("latestVersion");
-    info.latestVersion = latest_version_node.get_value<std::string>();
-
-    auto download_url_node = loadPtreeRoot.get_child("downloadUrl");
-    info.downloadUrl = download_url_node.get_value<std::string>();
-
-    auto release_notes_node = loadPtreeRoot.get_child("releaseNotes");
-    info.releaseNotes = release_notes_node.get_value<std::string>();
+    catch (const pt::ptree_error& e)
+    {
+        qDebug() << e.what();
+    }
 }
 
 UpdateInfo VersionRepository::main_version_logic()
 {
     std::vector<std::thread> threads;
-    const int num_threads = 1;
+    constexpr int num_threads = 1;
 
     // create a separate thread..
     for (int i = 0; i < num_threads; ++i)
@@ -78,7 +102,7 @@ UpdateInfo VersionRepository::main_version_logic()
 
     try
     {
-        std::string currentVersion = getCurrentAppVersion();
+        const std::string currentVersion = getCurrentAppVersion();
 
         if (versionInfo.latestVersion.empty())
         {
@@ -88,7 +112,7 @@ UpdateInfo VersionRepository::main_version_logic()
             return {};
         }
 
-        std::vector<std::string> ver = split_version(versionInfo.latestVersion);
+        const std::vector<std::string> ver = split_version(versionInfo.latestVersion);
 
         if (ver.size() != 3)
         {
@@ -127,16 +151,23 @@ std::string VersionRepository::getCurrentAppVersion()
 
 std::vector<std::string> VersionRepository::split_version(const std::string& str)
 {
+    if (str.empty()) return {};
+
+    std::string str_version = str;
+    if (str.starts_with('v'))
+    {
+        str_version = str.substr(1, str.length() - 1);
+    }
     std::vector<std::string> tokens;
     size_t start = 0;
-    size_t end = str.find(46); // 46 => '.'
+    size_t end = str_version.find(46); // 46 => '.'
     while (end != std::string::npos)
     {
-        tokens.push_back(str.substr(start, end - start));
+        tokens.push_back(str_version.substr(start, end - start));
         start = end + 1;
-        end = str.find(46, start);
+        end = str_version.find(46, start);
     }
-    tokens.push_back(str.substr(start));
+    tokens.push_back(str_version.substr(start));
     return tokens;
 }
 
@@ -147,17 +178,16 @@ std::filesystem::path VersionRepository::downloadNewVersion() const
         return {}; // No version available, exit the application
     };
 
-    std::filesystem::path latestRelease = std::filesystem::temp_directory_path() / "ITools" / ("it-tools-" + versionInfo
-        .latestVersion + ".zip");
+    std::filesystem::path latestRelease = std::filesystem::temp_directory_path() / "ITools" / versionInfo.asset.name;
 
     bool has_errors = false;
     {
         // Create a scope for the lock_guard
         std::lock_guard<std::mutex> lock(network_mutex); // Lock before accessing network methods
 
-        Network& net = Network::singleton(); // Get the singleton instance
-        auto response = net.downloadFile(versionInfo.downloadUrl, latestRelease.string().c_str()); // Call the method
-        if (response != 0)
+        const Network& net = Network::singleton(); // Get the singleton instance
+        if (const auto response = net.downloadFile(versionInfo.asset.downloadUrl, latestRelease.string().c_str());
+            response != 0)
         {
             has_errors = true;
             std::cout << "Failed to download" << std::endl;

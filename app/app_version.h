@@ -6,12 +6,20 @@
 #define APP_VERSION_H
 
 #include <string>
-#include <iostream>
+
+struct github_manifest_asset
+{
+	std::string name;
+	std::string downloadUrl;
+	std::string size;
+	std::string contentType;
+	std::string sha;
+};
 
 struct UpdateInfo {
 	std::string latestVersion;
-	std::string downloadUrl;
 	std::string releaseNotes;
+	github_manifest_asset asset;
 };
 
 std::string getCurrentAppVersion();

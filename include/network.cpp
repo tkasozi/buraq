@@ -21,7 +21,6 @@ Network::Network() {
 	if (!curl) {
 		// Handle error: libcurl easy handle could not be created
 		throw std::runtime_error("curl_easy_init() failed. CURL easy handle could not be created.");
-		exit(-1);
 	}
 
 	// Set a user agent (good practice)
@@ -66,7 +65,8 @@ size_t Network::write_callback(void *contents, size_t size, size_t nmemb, std::s
 	return size * nmemb;
 }
 
-std::string Network::http_get(const std::string &url) {
+std::string Network::http_get(const std::string &url) const
+{
 	if (!curl) {
 		// This shouldn't happen if constructor succeeded, and it's not cleaned up elsewhere
 		return "Error: CURL handle not initialized.";

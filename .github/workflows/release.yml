@@ -187,10 +187,11 @@ jobs:
 
                 ASSETS_JSON=$(echo "$LATEST_RELEASE_DATA" | jq '
                   if .assets and (.assets | length > 0) then
-                    [.assets[]? | select(.name and .browser_download_url and .size) | {
+                    [.assets[]? | select(.name and .browser_download_url and .size and .digest) | {
                       name: .name,
                       download_url: .browser_download_url,
                       size: .size,
+                      sha: .digest,
                       content_type: (if .content_type then .content_type else "application/octet-stream" end)
                     }]
                   else

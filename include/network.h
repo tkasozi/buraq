@@ -11,7 +11,7 @@
 class Network {
 public:
 	static Network &singleton(); // Return a reference
-	std::string http_get(const std::string &url);
+	std::string http_get(const std::string &url) const;
 
 	static size_t write_callback(void *contents, size_t size, size_t nmemb, std::string *userp);
 

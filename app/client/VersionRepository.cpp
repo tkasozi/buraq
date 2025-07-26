@@ -68,7 +68,8 @@ void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInf
             info.asset = {
                 .name = asset.get<std::string>("name"),
                 .downloadUrl = asset.get<std::string>("download_url"),
-                .size = asset.get<std::string>("size")
+                .size = asset.get<std::string>("size"),
+                .sha = asset.get<std::string>("sha"),
             };
         }
 

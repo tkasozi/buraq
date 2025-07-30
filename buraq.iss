@@ -14,7 +14,7 @@
 #endif 
 
 #ifndef AppBinaryDir
-#define AppBinaryDir "./cmake-build-debug/build"
+#define AppBinaryDir "./cmake-build-release/build"
 #endif
 
 #ifndef AppOutputBaseFilename

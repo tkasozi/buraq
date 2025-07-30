@@ -62,7 +62,7 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     setStatusBar(statusBar.get());
 
     // Setting window title and docking icon
-    setWindowTitle(Config::singleton().getVersion());
+    setWindowTitle(UpdateInfo().currentVersion.data());
     setWindowIcon(Config::singleton().getAppLogo());
 
     // Add CentralWidget
@@ -176,11 +176,11 @@ void AppUi::onWindowFullyLoaded()
 
         if (versionUpdater.exec() == QDialog::Accepted)
         {
-            const std::filesystem::path zipFile = repo.downloadNewVersion();
+            const std::filesystem::path installerExe = repo.downloadNewVersion();
 
             launchUpdaterAndExit(
                 api_context->searchPath / "updater.exe",
-                zipFile,
+                installerExe,
                 api_context->searchPath.parent_path());
         }
         else

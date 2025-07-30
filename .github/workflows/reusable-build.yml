@@ -312,7 +312,7 @@ jobs:
           Write-Host "APP_NAME set to $appName"
           
           $innoSetupExe = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          $innoScriptPath = "${{ github.workspace }}/${{ env.PROJECT_NAME }}/it-tools.iss"
+          $innoScriptPath = "${{ github.workspace }}/${{ env.PROJECT_NAME }}/buraq.iss"
           
           $appExeName = "$(cat app_exe_name.txt)"
           $appVersion = "${{ env.APP_VERSION }}"

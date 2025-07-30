@@ -18,7 +18,7 @@ public:
 
 public slots:
 	// The main function to run in the background thread
-	void doUpdate(const QString& packagePath, const QString& installPath, unsigned long parentPID);
+	void doUpdate(const QString& installerPath, const QString& installationPath, unsigned long parentPID);
 
 signals:
 	// Signals to update the GUI
@@ -30,8 +30,8 @@ signals:
 
 private:
 	void waitForMainAppToClose(unsigned long parentPID);
-	void relaunchMainApp(const std::string &installPath);
-	bool extractZip(const std::string &zipPath);
+	void launchApp(const std::filesystem::path &appPath, const QString& args = "");
+	bool installNewVersion(const std::string &installerPath);
 };
 
 #endif //UPDATE_WORKER_H

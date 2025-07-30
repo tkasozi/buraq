@@ -21,14 +21,8 @@
       "name": "boost-property-tree"
     },
     {
-      "name": "minizip"
-    },
-    {
       "name": "qtsvg",
       "version>=": "6.5.0"
-    },
-    {
-      "name": "sqlite3"
     }
   ]
 }

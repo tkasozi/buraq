@@ -2,7 +2,6 @@
 #include <windows.h>
 #include <string>
 #include <iostream>
-// #include <tlhelp32.h> // For process checking (optional, better to use Handle)
 #include <QApplication>
 #include "../../include/IToolsAPI.h"
 
@@ -26,14 +25,12 @@ int main(int argc, char *argv[])
 		qCritical() << "Usage: Updater.exe <packagePath> <installPath> <parentPID>";
 		return 1;
 	}
-	QString installer = QApplication::arguments().at(0);
-	QString packagePath = QApplication::arguments().at(1);
-	QString installPath = QApplication::arguments().at(2);
-	unsigned long parentPID = QApplication::arguments().at(3).toULong();
+	const QString installer = QApplication::arguments().at(1);
+	const QString installPath = QApplication::arguments().at(2);
+	const unsigned long parentPID = QApplication::arguments().at(3).toULong();
 
 	log("Updater started.");
 	log("Installer: " + installer.toStdString());
-	log("Package: " + packagePath.toStdString());
 	log("Install Dir: " + installPath.toStdString());
 	log("Parent PID: " + std::to_string(parentPID));
 
@@ -61,7 +58,7 @@ int main(int argc, char *argv[])
 
 	// When the thread starts, call the worker's doUpdate function
 	QObject::connect(workerThread, &QThread::started, worker, [=]()
-					 { worker->doUpdate(packagePath, installPath, parentPID); });
+					 { worker->doUpdate(installer, installPath, parentPID); });
 
 	// --- Start the Process ---
 	workerThread->start(); // Start the background thread

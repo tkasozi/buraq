@@ -47,7 +47,7 @@ set(ITOOLS_UTILS_SOURCES
 )
 
 set(ITOOLS_RESOURCES
-        res/ITools.rc
+        res/buraq.rc
         resources.qrc
 )
 

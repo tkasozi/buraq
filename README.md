@@ -1,6 +1,6 @@
 # README #
 
-See https://tkasozi.github.io/ITools/
+See https://tkasozi.github.io/Buraq/
 
 ### Deps management using vcpkg.
 

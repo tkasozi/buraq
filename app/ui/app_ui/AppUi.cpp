@@ -251,7 +251,7 @@ void AppUi::processResultSlot(int exitCode, const QString& output, const QString
 
 void AppUi::configureAppContext()
 {
-    const std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "ITools";
+    const std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "Buraq";
     // FIXME change the dirname
 
     // app search_path for plugins

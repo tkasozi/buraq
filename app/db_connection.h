@@ -122,7 +122,7 @@ static QSqlError init_db() {
 static bool db_conn() {
 	db_log("Initiating DB connection..");
 
-	std::filesystem::path dirName = std::filesystem::temp_directory_path() / "ITools" / ".data";
+	std::filesystem::path dirName = std::filesystem::temp_directory_path() / "Buraq" / ".data";
 	if (!std::filesystem::create_directories(dirName)) {
 		db_log("Dir " + dirName.string() + " already exists.");
 	}

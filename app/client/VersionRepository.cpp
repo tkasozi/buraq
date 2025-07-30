@@ -27,6 +27,19 @@ VersionRepository::VersionRepository(IToolsApi* api_context) :
 {
 }
 
+static std::string get(const boost::property_tree::basic_ptree<std::string, std::string>& a, const char* path)
+{
+    try
+    {
+        return a.get<std::string>(path);
+    }
+    catch (const std::exception& e)
+    {
+        qDebug() << "property_tree " << e.what();
+        return "";
+    }
+}
+
 void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInfo& info)
 {
     std::filesystem::path manifest_json = std::filesystem::temp_directory_path() / "ITools" / "manifest.json";
@@ -60,6 +73,9 @@ void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInf
         auto latest_version_node = loadPtreeRoot.get_child("version");
         info.latestVersion = latest_version_node.get_value<std::string>();
 
+        auto release_notes_node = loadPtreeRoot.get_child("notes");
+        info.releaseNotes = release_notes_node.get_value<std::string>();
+
         std::list<std::string> asset_names;
 
         std::vector<std::string> item_list;
@@ -69,12 +85,10 @@ void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInf
                 .name = asset.get<std::string>("name"),
                 .downloadUrl = asset.get<std::string>("download_url"),
                 .size = asset.get<std::string>("size"),
-                .sha = asset.get<std::string>("sha"),
+                // .sha = asset.get<std::string>("sha"),
+                .sha = get(asset, "sha"),
             };
         }
-
-        auto release_notes_node = loadPtreeRoot.get_child("notes");
-        info.releaseNotes = release_notes_node.get_value<std::string>();
     }
     catch (const pt::ptree_error& e)
     {

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #ifndef AppName
-#define AppName "it-tools"
+#define AppName "Buraq"
 #endif
 
 #ifndef AppVersion
@@ -10,7 +10,7 @@
 #endif
 
 #ifndef AppExeName
-#define AppExeName "ITools.exe"
+#define AppExeName "buraq.exe"
 #endif 
 
 #ifndef AppBinaryDir
@@ -18,7 +18,7 @@
 #endif
 
 #ifndef AppOutputBaseFilename
-#define AppOutputBaseFilename setup-"{#AppName}"-"{#AppVersion}"
+#define AppOutputBaseFilename "setup-x.x.x.dev"
 #endif
 
 #ifndef AppArchSupport
@@ -26,7 +26,7 @@
 #endif
 
 
-#define AppPublisher "ITools Projectxx, Inc."
+#define AppPublisher "Buraq Projectxx, Inc."
 #define AppURL "https://tkasozi.github.io/buraq/"
 
 [Setup]

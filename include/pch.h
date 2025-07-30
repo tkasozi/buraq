@@ -10,6 +10,5 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <boost/property_tree/ptree.hpp>
 
 #endif // PCH_H

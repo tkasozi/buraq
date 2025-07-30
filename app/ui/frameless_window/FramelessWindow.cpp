@@ -121,13 +121,3 @@ void FramelessWindow::mouseReleaseEvent(QMouseEvent *event) {
 	}
 	QWidget::mouseReleaseEvent(event);
 }
-
-// If you need to draw a custom border around the entire window:
-// void FramelessWindow::paintEvent(QPaintEvent *event) {
-//     Q_UNUSED(event);
-//     QPainter painter(this);
-//     QPen borderPen(QColor("#1A242F")); // Color of your border
-//     borderPen.setWidth(1); // Border width
-//     painter.setPen(borderPen);
-//     painter.drawRect(rect().adjusted(0, 0, -1, -1)); // Draw inside the widget rect
-// }

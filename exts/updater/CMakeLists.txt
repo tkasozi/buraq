@@ -9,9 +9,8 @@ find_package(Qt6 REQUIRED COMPONENTS
 		Gui
 		Widgets)
 
-find_package(unofficial-minizip CONFIG REQUIRED)
-
 qt_standard_project_setup()
+
 # Add your .qrc file as a resource
 qt_add_resources(${PROJECT_NAME} RESOURCES ${CMAKE_SOURCE_DIR}/app/resources.qrc)
 
@@ -35,7 +34,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 		Qt6::Core
 		Qt6::Gui
 		Qt6::Widgets
-		unofficial::minizip::minizip
 )
 
 if (WIN32)

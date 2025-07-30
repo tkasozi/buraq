@@ -7,17 +7,22 @@
 
 #include <string>
 
+#include <version.h>
+
 struct github_manifest_asset
 {
-	std::string name;
-	std::string downloadUrl;
-	std::string size;
-	std::string contentType;
-	std::string sha;
+    std::string name;
+    std::string downloadUrl;
+    std::string size;
+    std::string contentType;
+    std::string sha;
 };
 
 struct UpdateInfo {
 	std::string latestVersion;
+	std::string currentVersion = "v" + std::to_string(APP_VERSION_MAJOR) + "." +
+		std::to_string(APP_VERSION_MINOR) + "." +
+		std::to_string(APP_VERSION_PATCH);
 	std::string releaseNotes;
 	github_manifest_asset asset;
 };

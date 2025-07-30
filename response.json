@@ -1,9 +1,9 @@
 {
-  "url": "https://api.github.com/repos/tkasozi/buraq/releases/235281857",
-  "assets_url": "https://api.github.com/repos/tkasozi/buraq/releases/235281857/assets",
-  "upload_url": "https://uploads.github.com/repos/tkasozi/buraq/releases/235281857/assets{?name,label}",
-  "html_url": "https://github.com/tkasozi/buraq/releases/tag/v0.0.24",
-  "id": 235281857,
+  "url": "https://api.github.com/repos/tkasozi/buraq/releases/236147316",
+  "assets_url": "https://api.github.com/repos/tkasozi/buraq/releases/236147316/assets",
+  "upload_url": "https://uploads.github.com/repos/tkasozi/buraq/releases/236147316/assets{?name,label}",
+  "html_url": "https://github.com/tkasozi/buraq/releases/tag/v0.0.25",
+  "id": 236147316,
   "author": {
     "login": "tkasozi",
     "id": 12478423,
@@ -25,21 +25,21 @@
     "user_view_type": "public",
     "site_admin": false
   },
-  "node_id": "RE_kwDOOng-j84OBh3B",
-  "tag_name": "v0.0.24",
+  "node_id": "RE_kwDOOng-j84OE1J0",
+  "tag_name": "v0.0.25",
   "target_commitish": "main",
-  "name": "v0.0.24",
+  "name": "v0.0.25",
   "draft": false,
   "immutable": false,
   "prerelease": false,
-  "created_at": "2025-07-25T20:16:54Z",
-  "published_at": "2025-07-25T20:18:13Z",
+  "created_at": "2025-07-30T04:50:55Z",
+  "published_at": "2025-07-30T04:58:14Z",
   "assets": [
     {
-      "url": "https://api.github.com/repos/tkasozi/buraq/releases/assets/276395080",
-      "id": 276395080,
-      "node_id": "RA_kwDOOng-j84QeXRI",
-      "name": "setup-buraq-windows-latest-v0.0.24.exe",
+      "url": "https://api.github.com/repos/tkasozi/buraq/releases/assets/277655269",
+      "id": 277655269,
+      "node_id": "RA_kwDOOng-j84QjK7l",
+      "name": "setup-buraq-windows-latest-v0.0.25.exe",
       "label": "",
       "uploader": {
         "login": "github-actions[bot]",
@@ -64,16 +64,16 @@
       },
       "content_type": "application/octet-stream",
       "state": "uploaded",
-      "size": 24168190,
-      "digest": "sha256:19a2272b6d5441a542d2b82d1eb9c6d5ad95fbd3f6ee80a15abbf5741c737ee9",
+      "size": 24156816,
+      "digest": "sha256:25a358a876b196c8bec892932af73c6e5136f1b52c13691520cf421a56e193ea",
       "download_count": 0,
-      "created_at": "2025-07-25T20:23:25Z",
-      "updated_at": "2025-07-25T20:23:26Z",
-      "browser_download_url": "https://github.com/tkasozi/buraq/releases/download/v0.0.24/setup-buraq-windows-latest-v0.0.24.exe"
+      "created_at": "2025-07-30T05:03:23Z",
+      "updated_at": "2025-07-30T05:03:24Z",
+      "browser_download_url": "https://github.com/tkasozi/buraq/releases/download/v0.0.25/setup-buraq-windows-latest-v0.0.25.exe"
     }
   ],
-  "tarball_url": "https://api.github.com/repos/tkasozi/buraq/tarball/v0.0.24",
-  "zipball_url": "https://api.github.com/repos/tkasozi/buraq/zipball/v0.0.24",
-  "body": "## What's Changed\r\n* Chore: Auto-update manifest.json by @buraq-bot[bot] in https://github.com/tkasozi/buraq/pull/73\r\n* #54 fix manifest file by @tkasozi in https://github.com/tkasozi/buraq/pull/75\r\n* Fix the contents of the manifest.yml by @tkasozi in https://github.com/tkasozi/buraq/pull/76\r\n\r\n\r\n**Full Changelog**: https://github.com/tkasozi/buraq/compare/v0.0.23...v0.0.24",
+  "tarball_url": "https://api.github.com/repos/tkasozi/buraq/tarball/v0.0.25",
+  "zipball_url": "https://api.github.com/repos/tkasozi/buraq/zipball/v0.0.25",
+  "body": "## What's Changed\r\n* Chore: Auto-update manifest.json by @buraq-bot[bot] in https://github.com/tkasozi/buraq/pull/77\r\n* 55 read the generated manifestjson to determine new app versions by @tkasozi in https://github.com/tkasozi/buraq/pull/79\r\n* [#44] Updates application version; Updates installer by @tkasozi in https://github.com/tkasozi/buraq/pull/81\r\n* [v0.0.25] updating installer exe by @tkasozi in https://github.com/tkasozi/buraq/pull/82\r\n\r\n\r\n**Full Changelog**: https://github.com/tkasozi/buraq/compare/v0.0.24...v0.0.25",
   "mentions_count": 1
 }

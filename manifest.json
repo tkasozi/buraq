@@ -1,13 +1,14 @@
 {
-  "version": "v0.0.24",
-  "release_date": "2025-07-25T20:18:13Z",
-  "release_url": "https://github.com/tkasozi/buraq/releases/tag/v0.0.24",
-  "notes": "## What's Changed\r\n* Chore: Auto-update manifest.json by @buraq-bot[bot] in https://github.com/tkasozi/buraq/pull/73\r\n* #54 fix manifest file by @tkasozi in https://github.com/tkasozi/buraq/pull/75\r\n* Fix the contents of the manifest.yml by @tkasozi in https://github.com/tkasozi/buraq/pull/76\r\n\r\n\r\n**Full Changelog**: https://github.com/tkasozi/buraq/compare/v0.0.23...v0.0.24",
+  "version": "v0.0.25",
+  "release_date": "2025-07-30T04:58:14Z",
+  "release_url": "https://github.com/tkasozi/buraq/releases/tag/v0.0.25",
+  "notes": "## What's Changed\r\n* Chore: Auto-update manifest.json by @buraq-bot[bot] in https://github.com/tkasozi/buraq/pull/77\r\n* 55 read the generated manifestjson to determine new app versions by @tkasozi in https://github.com/tkasozi/buraq/pull/79\r\n* [#44] Updates application version; Updates installer by @tkasozi in https://github.com/tkasozi/buraq/pull/81\r\n* [v0.0.25] updating installer exe by @tkasozi in https://github.com/tkasozi/buraq/pull/82\r\n\r\n\r\n**Full Changelog**: https://github.com/tkasozi/buraq/compare/v0.0.24...v0.0.25",
   "assets": [
     {
-      "name": "setup-buraq-windows-latest-v0.0.24.exe",
-      "download_url": "https://github.com/tkasozi/buraq/releases/download/v0.0.24/setup-buraq-windows-latest-v0.0.24.exe",
-      "size": 24168190,
+      "name": "setup-buraq-windows-latest-v0.0.25.exe",
+      "download_url": "https://github.com/tkasozi/buraq/releases/download/v0.0.25/setup-buraq-windows-latest-v0.0.25.exe",
+      "size": 24156816,
+      "sha": "sha256:25a358a876b196c8bec892932af73c6e5136f1b52c13691520cf421a56e193ea",
       "content_type": "application/octet-stream"
     }
   ]

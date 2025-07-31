@@ -267,7 +267,6 @@ jobs:
           cmake -B build \
                -S . \
                -G "${{ inputs.generator }}" \
-               -A ${{ inputs.arch }} \
                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
                -DVCPKG_TARGET_TRIPLET=${{ inputs.vcpkg_triplet }} \
                -DVCPKG_DEFAULT_HOST_TRIPLET=${{ inputs.vcpkg_triplet }} \

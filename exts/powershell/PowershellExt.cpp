@@ -156,8 +156,8 @@ public:
 
 		// --- 2. Prepare paths and arguments ---
 		// Should be relative to your executable
-		fs::path managed_assembly_dir = app_api_->searchPath / "ext" / "managed";
-		fs::path config_path = managed_assembly_dir / "ManagedLibrary.runtimeconfig.json";
+		const fs::path managed_assembly_dir = app_api_->searchPath / "managed";
+		const fs::path config_path = managed_assembly_dir / "ManagedLibrary.runtimeconfig.json";
 		assembly_path = managed_assembly_dir / "ManagedLibrary.dll";
 
 		if (!fs::exists(config_path)) {

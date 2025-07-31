@@ -170,13 +170,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 if (WIN32)
     # --- DEPLOYMENT LOGIC ---
     # This command adds a new target to your project named "deploy"
-    string(TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E echo "Deploying for ${PROJECT_NAME} $<CONFIG>..."
             COMMAND Qt6::windeployqt
-#            "--dir=plugins"
+            #"--dir=plugins"
             # Use a generator expression to add the --release or --debug flag automatically
-#            "--${BUILD_TYPE}"
             # Use a generator expression to get the path to your .exe file at build time
             "$<TARGET_FILE:${PROJECT_NAME}>"
             # This ensures the deployment command runs from the directory where the .exe is located

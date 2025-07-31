@@ -261,7 +261,7 @@ void AppUi::configureAppContext()
         {"power_shell", searchPath.string() + "/libpowershell_plugin.dll"}
     };
 
-    api_context = std::make_unique<IToolsApi>();
+    api_context = std::make_unique<BuraqApi>();
     api_context->searchPath = searchPath;
     api_context->plugins = plugins_;
     api_context->userDataPath = userDataPath / ".data";

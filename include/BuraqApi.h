@@ -24,8 +24,8 @@
 // Created by talik on 5/16/2025.
 //
 
-#ifndef ITOOLS_API_H
-#define ITOOLS_API_H
+#ifndef BURAQ_API_H
+#define BURAQ_API_H
 
 #include <filesystem>
 #include <iostream>
@@ -38,7 +38,7 @@
 #include <ctime> // For std::localtime, std::time_t
 
     // Example of an application context you might pass to plugins
-    struct IToolsApi
+    struct BuraqApi
 {
     std::filesystem::path searchPath;
     std::filesystem::path userPath;
@@ -77,7 +77,7 @@ struct EditorState
 static void db_log(const std::string &message)
 {
     // Optionally, log to a file in a writable location:
-    std::filesystem::path logFilePath = std::filesystem::temp_directory_path() / "ITools" / ".data" / "log.txt";
+    std::filesystem::path logFilePath = std::filesystem::temp_directory_path() / "Buraq" / ".data" / "log.txt";
     try
     {
 		// Open the file in append mode.
@@ -125,4 +125,4 @@ static void db_log(const std::string &message)
     }
 }
 
-#endif // ITOOLS_API_H
+#endif // BURAQ_API_H

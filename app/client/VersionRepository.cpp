@@ -20,7 +20,7 @@
 std::mutex network_mutex;
 
 
-VersionRepository::VersionRepository(IToolsApi* api_context) :
+VersionRepository::VersionRepository(BuraqApi* api_context) :
     endpoint("https://raw.githubusercontent.com/tkasozi/buraq/refs/heads/main/manifest.json"),
     network(Network::singleton()),
     api_context(api_context)
@@ -193,7 +193,7 @@ std::filesystem::path VersionRepository::downloadNewVersion() const
         return {}; // No version available, exit the application
     };
 
-    std::filesystem::path latestRelease = std::filesystem::temp_directory_path() / "ITools" / versionInfo.asset.name;
+    std::filesystem::path latestRelease = std::filesystem::temp_directory_path() / "Buraq" / versionInfo.asset.name;
 
     bool has_errors = false;
     {

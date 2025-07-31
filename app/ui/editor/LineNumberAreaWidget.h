@@ -8,7 +8,7 @@
 
 #include <QWidget>
 #include <QFontMetrics> // For calculating text sizes
-#include "IToolsAPI.h"
+#include "BuraqApi.h"
 
 class LineNumberAreaWidget final : public QWidget {
 Q_OBJECT

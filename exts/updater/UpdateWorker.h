@@ -43,7 +43,7 @@ private:
     bool waitForAppWindow(HANDLE hProcess, DWORD timeout_ms);
 
 #endif
-    bool installNewVersion(const std::filesystem::path& installerPath);
+    bool installNewVersion(const std::filesystem::path& installerPath, const std::filesystem::path& installationPath);
 };
 
 #endif //UPDATE_WORKER_H

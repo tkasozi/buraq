@@ -36,7 +36,7 @@ void UpdateWorker::doUpdate(const std::filesystem::path& installerPath,
     emit progressChanged(20);
 
     // extracting files
-    if (!installNewVersion(installerPath))
+    if (!installNewVersion(installerPath, installationPath))
     {
         return;
     }
@@ -276,9 +276,11 @@ bool UpdateWorker::waitForAppWindow(HANDLE hProcess, DWORD timeout_ms)
 /**
  * Runs the installer app after removing the old installation.
  * @param installerPath Runs the installer app, waits for the app to complete
+ * @param installationPath The location where the new installation will be created.
  * @return Returns true if the installer app completes successfully.
  */
-bool UpdateWorker::installNewVersion(const std::filesystem::path& installerPath)
+bool UpdateWorker::installNewVersion(const std::filesystem::path& installerPath,
+                                     const std::filesystem::path& installationPath)
 {
     if (installerPath.extension() != ".exe")
     {
@@ -290,6 +292,19 @@ bool UpdateWorker::installNewVersion(const std::filesystem::path& installerPath)
     }
 
     emit progressChanged(60);
+
+    std::error_code ec;
+    if (std::filesystem::is_directory(installationPath, ec))
+    {
+        if (const uintmax_t removed_count = std::filesystem::remove_all(installationPath, ec);
+            removed_count == 0 || ec
+        )
+        {
+            emit logMessage("Failed to remove any files");
+        }
+    }
+
+    emit progressChanged(70); // Installer finished
 
     emit statusTextChanged("Running installer...");
     emit logMessage(
@@ -346,7 +361,15 @@ bool UpdateWorker::installNewVersion(const std::filesystem::path& installerPath)
             // For now, let's assume it proceeds, but warns.
         }
 
-        emit progressChanged(70); // Installer finished
+        if (const uintmax_t removed_count = std::filesystem::remove_all(installerPath, ec);
+            removed_count == 0 || ec
+        )
+        {
+            emit logMessage("Failed to delete the installer");
+            return false;
+        }
+
+        emit progressChanged(80); // Installer finished
         emit statusTextChanged("Installer finished. Verifying installation...");
         return true; // Installer successfully launched and finished
     }

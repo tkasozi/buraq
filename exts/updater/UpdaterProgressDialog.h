@@ -20,13 +20,13 @@ Q_OBJECT
 
 public:
 	explicit UpdateProgressDialog(QWidget *parent = nullptr);
-	~UpdateProgressDialog();
+	~UpdateProgressDialog() override = default;
 
 public slots:
 	// Slots to receive updates from the worker thread
-	void setStatusText(const QString& text);
-	void addLogMessage(const QString& message);
-	void setProgress(int percentage);
+	void setStatusText(const QString& text) const;
+	void addLogMessage(const QString& message) const;
+	void setProgress(int percentage) const;
 	void onUpdateFinished(bool success, const QString& finalMessage);
 
 private:

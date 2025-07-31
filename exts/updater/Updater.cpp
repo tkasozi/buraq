@@ -25,13 +25,13 @@ int main(int argc, char *argv[])
 		qCritical() << "Usage: Updater.exe <packagePath> <installPath> <parentPID>";
 		return 1;
 	}
-	const QString installer = QApplication::arguments().at(1);
-	const QString installPath = QApplication::arguments().at(2);
+	const std::filesystem::path installer(QApplication::arguments().at(1).toStdString());
+	const std::filesystem::path installPath(QApplication::arguments().at(2).toStdString());
 	const unsigned long parentPID = QApplication::arguments().at(3).toULong();
 
 	log("Updater started.");
-	log("Installer: " + installer.toStdString());
-	log("Install Dir: " + installPath.toStdString());
+	log("Installer: " + installer.string());
+	log("Install Dir: " + installPath.string());
 	log("Parent PID: " + std::to_string(parentPID));
 
 	// --- Setup Dialog and Worker Thread ---

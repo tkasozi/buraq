@@ -4,7 +4,7 @@ name: release.yml
 on:
   release:
     types: [ published ]
-  pull_request: # <-- THIS IS THE KEY CHANGE
+  pull_request:
     types: [ opened, synchronize, reopened ]
   push:
     branches:
@@ -27,8 +27,8 @@ jobs:
         build_type: [ Release ]
         include:
           - os: windows-latest
-            vcpkg_triplet: x64-windows
-            generator: "Visual Studio 17 2022"
+            vcpkg_triplet: x64-mingw-dynamic
+            generator: "Ninja"
             arch: x64
     #          - os: ubuntu-latest
     #            vcpkg_triplet: x64-linux

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <configuration>
-    <Title>ITools</Title>
-    <Version>ITools x.x.x</Version>
+    <Title>Buraq</Title>
+    <Version>Buraq x.x.x</Version>
     <AppLogo>:/icons/workflow</AppLogo>
     <window minWidth="800"
         minHeight="720"

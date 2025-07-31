@@ -22,9 +22,9 @@ set(UPDATER_SOURCES Updater.cpp # ${UPDATER_RESOURCES}
 set(UPDATER_HEADERS ${CMAKE_SOURCE_DIR}/include/IToolsAPI.h)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
-	add_executable(${PROJECT_NAME} WIN32 ${UPDATER_SOURCES} ${CMAKE_SOURCE_DIR}/app/res/ITools.rc)
+	add_executable(${PROJECT_NAME} WIN32 ${UPDATER_SOURCES} ${CMAKE_SOURCE_DIR}/app/res/buraq.rc)
 elseif (CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
-	add_executable(${PROJECT_NAME} ${UPDATER_SOURCES} ${CMAKE_SOURCE_DIR}/app/res/ITools.rc)
+	add_executable(${PROJECT_NAME} ${UPDATER_SOURCES} ${CMAKE_SOURCE_DIR}/app/res/buraq.rc)
 endif ()
 
 # Adds Qt, Boost, and Standard Library headers that are used everywhere

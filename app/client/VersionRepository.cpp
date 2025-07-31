@@ -42,7 +42,7 @@ static std::string get(const boost::property_tree::basic_ptree<std::string, std:
 
 void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInfo& info)
 {
-    std::filesystem::path manifest_json = std::filesystem::temp_directory_path() / "ITools" / "manifest.json";
+    std::filesystem::path manifest_json = std::filesystem::temp_directory_path() / "Buraq" / "manifest.json";
 
     {
         std::string response;
@@ -212,7 +212,7 @@ std::filesystem::path VersionRepository::downloadNewVersion() const
 
     if (has_errors)
     {
-        return std::filesystem::temp_directory_path() / "ITools";
+        return std::filesystem::temp_directory_path() / "Buraq";
     }
 
     return latestRelease;

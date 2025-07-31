@@ -59,7 +59,6 @@
     </qresource>
 
 	<qresource prefix="/">
-		<file>version.json</file>
 		<file>test/temp.ps1</file>
 	</qresource>
 </RCC>

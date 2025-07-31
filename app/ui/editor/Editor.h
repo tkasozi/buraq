@@ -13,7 +13,7 @@
 #include <QStack>
 
 #include "EditorMargin.h"
-#include "IToolsAPI.h"
+#include "BuraqApi.h"
 
 class Editor final : public QWidget {
 

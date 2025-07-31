@@ -10,17 +10,11 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QApplication> // For QApplication::processEvents()
-#include <QDebug>
 
 UpdateProgressDialog::UpdateProgressDialog(QWidget *parent)
 		: QDialog(parent)
 {
 	setupUi();
-}
-
-UpdateProgressDialog::~UpdateProgressDialog()
-{
-	qDebug() << "UpdateProgressDialog destroyed.";
 }
 
 void UpdateProgressDialog::setupUi()
@@ -32,7 +26,7 @@ void UpdateProgressDialog::setupUi()
 	setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::WindowTitleHint);
 
 	m_statusLabel = new QLabel("Initializing update...", this);
-	// m_statusLabel->setStyleSheet("font-weight: bold;");
+	m_statusLabel->setStyleSheet("font-weight: bold;");
 
 	m_progressBar = new QProgressBar(this);
 	m_progressBar->setRange(0, 100);
@@ -55,18 +49,18 @@ void UpdateProgressDialog::setupUi()
 	setLayout(mainLayout);
 }
 
-void UpdateProgressDialog::setStatusText(const QString& text)
+void UpdateProgressDialog::setStatusText(const QString& text) const
 {
 	m_statusLabel->setText(text);
 }
 
-void UpdateProgressDialog::addLogMessage(const QString& message)
+void UpdateProgressDialog::addLogMessage(const QString& message) const
 {
 	m_logArea->appendPlainText(message);
 	QApplication::processEvents(); // Process events to ensure the UI updates immediately
 }
 
-void UpdateProgressDialog::setProgress(int percentage)
+void UpdateProgressDialog::setProgress(const int percentage) const
 {
 	m_progressBar->setValue(percentage);
 }

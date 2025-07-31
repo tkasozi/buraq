@@ -36,7 +36,7 @@
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include <fstream>
 
-#include "../include/IToolsAPI.h"
+#include "../include/BuraqApi.h"
 #include "FileObject.h"
 
 const auto FILES_SQL = QLatin1String(R"(

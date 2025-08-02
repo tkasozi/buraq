@@ -210,6 +210,7 @@ jobs:
 
       - name: Install dependencies with vcpkg
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
+        shell: msys2 {0}
         run: D:\a\buraq\buraq\vcpkg\vcpkg.exe install
 
       - name: Configure CMake and Install Vcpkg Dependencies

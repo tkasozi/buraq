@@ -218,8 +218,12 @@ jobs:
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
-        shell: bash
+        shell: msys2 {0}
         run: |
+          # INFORMATION
+          cmake --version
+          ninja --version
+    
           ls -alh
           
           echo "******Dotnet at ${{ env.DOTNET_ROOT }}/packs: **********"

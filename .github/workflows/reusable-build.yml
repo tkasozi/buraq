@@ -239,7 +239,8 @@ jobs:
           cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
 
           # Use the POSIX-style path for vcpkg
-          ${{ env.VCPKG_EXE }} --triplet=x64-mingw-dynamic install
+          # ${{ env.VCPKG_EXE }} install --triplet=x64-mingw-dynamic
+          ${{ env.VCPKG_EXE }} install
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           cmake -B build \

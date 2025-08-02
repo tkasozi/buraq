@@ -209,6 +209,7 @@ jobs:
             ${{ inputs.os }}-vcpkg-assets-
 
       - name: Install dependencies with vcpkg
+        working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
         run: ${{ env.VCPKG_EXE }} install
 
       - name: Configure CMake and Install Vcpkg Dependencies

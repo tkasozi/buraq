@@ -198,8 +198,6 @@ jobs:
           if [ -z "$NUGET_PATH" ]; then echo "Failed to get nuget.exe path." && exit 1; fi
           mono "$NUGET_PATH" setapikey "${{ env.GH_PACKAGES_TOKEN }}" -Source "GitHubPackages" -NonInteractive 2>&1 | cat
 
-
-
       - name: Cache Vcpkg Asset Downloads
         uses: actions/cache@v4
         with:
@@ -209,6 +207,9 @@ jobs:
           key: ${{ inputs.os }}-${{ inputs.build_type }}-vcpkg-assets-${{ hashFiles('buraq/vcpkg.json') }}
           restore-keys: |
             ${{ inputs.os }}-vcpkg-assets-
+
+      - name: Install dependencies with vcpkg
+        run: ${{ env.VCPKG_EXE }} install
 
       - name: Configure CMake and Install Vcpkg Dependencies
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
@@ -240,7 +241,6 @@ jobs:
 
           # Use the POSIX-style path for vcpkg
           # ${{ env.VCPKG_EXE }} install --triplet=x64-mingw-dynamic
-          eval (echo "${{ env.VCPKG_EXE }} install")
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           cmake -B build \

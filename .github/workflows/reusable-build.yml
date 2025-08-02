@@ -218,7 +218,7 @@ jobs:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
           CMAKE_CXX_COMPILER : /mingw64/bin/g++
           VCPKG_ROOT: "D:/a/buraq/buraq/vcpkg"
-        shell: bash
+        shell: msys2 {0}
         run: |
           cmake --version
           ninja --version
@@ -246,7 +246,7 @@ jobs:
           cmake -B build \
                -S . \
                -G "Ninja" \
-               -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+               -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" \
                -DVCPKG_TARGET_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \

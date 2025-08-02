@@ -215,7 +215,6 @@ jobs:
         env:
           VCPKG_ROOT: "D:/a/buraq/buraq/vcpkg"
         shell: msys2 {0}
-        #run: D:/a/buraq/buraq/vcpkg/vcpkg.exe install --triplet=x64-mingw-dynamic
         run: "${{VCPKG_ROOT}}/vcpkg.exe" --version
 
       - name: Configure CMake and Install Vcpkg Dependencies

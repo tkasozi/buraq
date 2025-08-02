@@ -215,7 +215,8 @@ jobs:
         env:
           VCPKG_ROOT: "D:/a/buraq/buraq/vcpkg"
         shell: msys2 {0}
-        run: D:/a/buraq/buraq/vcpkg/vcpkg.exe install --triplet=x64-mingw-dynamic
+        #run: D:/a/buraq/buraq/vcpkg/vcpkg.exe install --triplet=x64-mingw-dynamic
+        run: "${{VCPKG_ROOT}}/vcpkg.exe" --version
 
       - name: Configure CMake and Install Vcpkg Dependencies
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
@@ -224,7 +225,7 @@ jobs:
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
-          VCPKG_ROOT: "/d/a/buraq/buraq/vcpkg"
+          #VCPKG_ROOT: "/d/a/buraq/buraq/vcpkg"
         shell: msys2 {0}
         run: |
           cmake --version

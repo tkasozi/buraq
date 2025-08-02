@@ -242,15 +242,15 @@ jobs:
           "${{ env.VCPKG_EXE }}" install --triplet=x64-mingw-dynamic
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
-          cmake -B build \
-               -S . \
-               -G "Ninja" \
-               -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
-               -DVCPKG_TARGET_TRIPLET="${{ inputs.vcpkg_triplet }}" \
-               -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
-               -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \
-               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
-               "${cmake_make_program_arg}"
+#          cmake -B build \
+#               -S . \
+#               -G "Ninja" \
+#               -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+#               -DVCPKG_TARGET_TRIPLET="${{ inputs.vcpkg_triplet }}" \
+#               -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
+#               -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \
+#               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
+#               "${cmake_make_program_arg}"
 
       - name: Build Project (Windows - MSVC)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-windows'  && success()

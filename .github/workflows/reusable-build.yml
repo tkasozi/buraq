@@ -219,7 +219,6 @@ jobs:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
         shell: msys2 {0}
         run: |
-          # INFORMATION
           cmake --version
           ninja --version
     
@@ -231,52 +230,16 @@ jobs:
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
           ls -al "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 
-
-          if [[ "${{ inputs.os }}" == "windows-latest" ]]; then
-            # For MSVC (x64-windows), let CMake find Ninja, it's typically bundled or in PATH
-            # For MinGW (x64-mingw-dynamic), find it from msys2 setup
-
-            # Initialize variables for the Windows case
-            cmake_make_program_arg=""
-            host_triplet_arg="-DVCPKG_DEFAULT_HOST_TRIPLET=x64-windows" # Default for Windows host
-
-            if [[ "${{ inputs.vcpkg_triplet }}" == "x64-windows" ]]; then
-            # If using x64-windows triplet, CMake usually finds Ninja automatically
-            # so cmake_make_program_arg remains empty.
-            true # No-op
-            else # For MinGW (x64-mingw-dynamic)
-            # Use 'command -v' for a more robust way to find executables in PATH than 'which'
-            ninja_path=$(command -v ninja)
-            if [[ -z "$ninja_path" ]]; then
-            echo "Error: Ninja not found in PATH for MinGW build!" >&2
-            exit 1
-            fi
-            # Ensure path is correctly quoted for CMake if it contains spaces
-            cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
-          fi
-          else # For Linux/macOS
-
-          # Use 'command -v' for a more robust way to find executables in PATH
-          ninja_path=$(command -v ninja)
-          if [[ -z "$ninja_path" ]]; then
-              echo "Error: Ninja not found in PATH!" >&2
-          exit 1
-          fi
-          cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=$ninja_path"
-          host_triplet_arg="" # Not typically set for Linux/macOS like this
-          fi
-
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           # Example of how you'd use them (assuming you have a line_continuation variable defined):
           cmake -B build \
                -S . \
-               -G "${{ inputs.generator }}" \
+               -G "Ninja" \
                -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
                -DVCPKG_TARGET_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \
-               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
-               "${cmake_make_program_arg}"
+               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 
       - name: Build Project (Windows - MSVC)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-windows'  && success()

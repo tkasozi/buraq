@@ -85,7 +85,6 @@ jobs:
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
         uses: msys2/setup-msys2@v2
         with:
-          msys2-architecture: x86_64
           update: true
           install: >
             mingw-w64-x86_64-toolchain
@@ -224,6 +223,7 @@ jobs:
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
+          CMAKE_CXX_COMPILER : /mingw64/bin/g++
         shell: msys2 {0}
         run: |
           cmake --version

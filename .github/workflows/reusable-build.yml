@@ -217,6 +217,7 @@ jobs:
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
+          VCPKG_ROOT: "/d/a/buraq/buraq/vcpkg"
         shell: msys2 {0}
         run: |
           cmake --version
@@ -238,13 +239,13 @@ jobs:
           cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
 
           # Use the POSIX-style path for vcpkg
-          /d/a/buraq/buraq/vcpkg/vcpkg install --triplet=x64-mingw-dynamic
+          vcpkg install --triplet=x64-mingw-dynamic
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           cmake -B build \
                -S . \
                -G "Ninja" \
-               -DCMAKE_TOOLCHAIN_FILE="/d/a/buraq/buraq/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+               -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
                -DVCPKG_TARGET_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \

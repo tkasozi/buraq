@@ -87,10 +87,10 @@ jobs:
         with:
           msys2-architecture: x86_64
           update: true
+          # ninja
+          # git
           install: >
             mingw-w64-x86_64-toolchain
-            git
-            ninja
             cmake
           path-type: minimal
           msystem: MINGW64

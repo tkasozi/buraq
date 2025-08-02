@@ -221,7 +221,9 @@ jobs:
         run: |
           cmake --version
           ninja --version
-    
+
+          which ninja
+          
           ls -alh
           
           echo "******Dotnet at ${{ env.DOTNET_ROOT }}/packs: **********"
@@ -229,6 +231,9 @@ jobs:
 
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
           ls -al "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
+          
+          ninja_path=$(which ninja)
+          cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           # Example of how you'd use them (assuming you have a line_continuation variable defined):

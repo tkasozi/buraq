@@ -232,9 +232,14 @@ jobs:
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
           ls -al "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
           
+          ls -alh vcpkg
+          
           ninja_path=$(which ninja)
           cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
+          
+          ./vcpkg/vcpkg.exe install --triplet=x64-mingw-dynamic
 
+          # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           # Example of how you'd use them (assuming you have a line_continuation variable defined):
           cmake -B build \

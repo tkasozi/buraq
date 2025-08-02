@@ -245,7 +245,8 @@ jobs:
           cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
 
           # Use the POSIX-style path for vcpkg
-          # ${{ env.VCPKG_EXE }} install --triplet=x64-mingw-dynamic
+          gpp_path=$(which g++)
+          echo "g++ path: $gpp_path"
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           cmake -B build \
@@ -257,6 +258,7 @@ jobs:
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \
                -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
                "${cmake_make_program_arg}"
+
 
       - name: Build Project (Windows - MSVC)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-windows'  && success()

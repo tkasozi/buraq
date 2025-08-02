@@ -218,7 +218,7 @@ jobs:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
           CMAKE_CXX_COMPILER : /mingw64/bin/g++
           VCPKG_ROOT: "D:/a/buraq/buraq/vcpkg"
-        shell: msys2 {0}
+        shell: bash
         run: |
           cmake --version
           ninja --version

@@ -176,8 +176,7 @@ jobs:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
         shell: msys2 {0}
         run: |
-          "${{ env.VCPKG_EXE }}" install vcpkg-tool-ninja
-          "${{ env.VCPKG_EXE }}" install vcpkg-tool-cmake
+          "${{ env.VCPKG_EXE }}" install vcpkg-tool-ninja vcpkg-tool-cmake
           
           which ninja
           

@@ -177,8 +177,12 @@ jobs:
         shell: msys2 {0}
         run: |
            # install ninja
-           ${{ env.VCPKG_EXE }} install vcpkg-tool-ninja
-           ${{ env.VCPKG_EXE }} install vcpkg-tool-cmake
+           "${{ env.VCPKG_EXE }}" install vcpkg-tool-ninja
+           "${{ env.VCPKG_EXE }}" install vcpkg-tool-cmake
+          
+          which ninja
+          
+          which cmake
           
            cmake -B build \
                -S . \

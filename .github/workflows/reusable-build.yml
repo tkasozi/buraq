@@ -216,7 +216,7 @@ jobs:
           VCPKG_INSTALL_OPTIONS: "--debug"
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
-          CMAKE_CXX_COMPILER : /mingw64/bin/g++
+          CMAKE_CXX_COMPILER :  "C:/mingw64/bin/x86_64-w64-mingw32-g++.exe"
           VCPKG_ROOT: "D:/a/buraq/buraq/vcpkg"
         shell: msys2 {0}
         run: |
@@ -239,8 +239,8 @@ jobs:
           cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
 
           # Use the POSIX-style path for vcpkg
-          gpp_path=$(which g++)
-          echo "g++ path: $gpp_path"
+          ls /mingw64/bin/
+          
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           cmake -B build \

@@ -1,9 +1,9 @@
 {
-  "url": "https://api.github.com/repos/tkasozi/buraq/releases/236690838",
-  "assets_url": "https://api.github.com/repos/tkasozi/buraq/releases/236690838/assets",
-  "upload_url": "https://uploads.github.com/repos/tkasozi/buraq/releases/236690838/assets{?name,label}",
-  "html_url": "https://github.com/tkasozi/buraq/releases/tag/v0.0.28",
-  "id": 236690838,
+  "url": "https://api.github.com/repos/tkasozi/buraq/releases/237183371",
+  "assets_url": "https://api.github.com/repos/tkasozi/buraq/releases/237183371/assets",
+  "upload_url": "https://uploads.github.com/repos/tkasozi/buraq/releases/237183371/assets{?name,label}",
+  "html_url": "https://github.com/tkasozi/buraq/releases/tag/v0.0.29",
+  "id": 237183371,
   "author": {
     "login": "tkasozi",
     "id": 12478423,
@@ -25,21 +25,21 @@
     "user_view_type": "public",
     "site_admin": false
   },
-  "node_id": "RE_kwDOOng-j84OG52W",
-  "tag_name": "v0.0.28",
+  "node_id": "RE_kwDOOng-j84OIyGL",
+  "tag_name": "v0.0.29",
   "target_commitish": "main",
-  "name": "v0.0.28",
+  "name": "v0.0.29",
   "draft": false,
   "immutable": false,
   "prerelease": false,
-  "created_at": "2025-07-31T19:52:58Z",
-  "published_at": "2025-07-31T19:53:58Z",
+  "created_at": "2025-08-03T18:15:47Z",
+  "published_at": "2025-08-03T18:27:00Z",
   "assets": [
     {
-      "url": "https://api.github.com/repos/tkasozi/buraq/releases/assets/278208985",
-      "id": 278208985,
-      "node_id": "RA_kwDOOng-j84QlSHZ",
-      "name": "setup-buraq-windows-latest-v0.0.28.exe",
+      "url": "https://api.github.com/repos/tkasozi/buraq/releases/assets/278991727",
+      "id": 278991727,
+      "node_id": "RA_kwDOOng-j84QoRNv",
+      "name": "setup-buraq-windows-latest-v0.0.29.exe",
       "label": "",
       "uploader": {
         "login": "github-actions[bot]",
@@ -64,15 +64,15 @@
       },
       "content_type": "application/octet-stream",
       "state": "uploaded",
-      "size": 24161533,
-      "digest": "sha256:dd7031c7d04bc821270bad53465914feb593e7f125d04487464b9fc78ebc6a11",
+      "size": 25062042,
+      "digest": "sha256:8be90617aa845c27be6e173c2f72642cd50aa8820c202e948b288917fa4ed91e",
       "download_count": 0,
-      "created_at": "2025-07-31T19:59:07Z",
-      "updated_at": "2025-07-31T19:59:08Z",
-      "browser_download_url": "https://github.com/tkasozi/buraq/releases/download/v0.0.28/setup-buraq-windows-latest-v0.0.28.exe"
+      "created_at": "2025-08-03T18:32:28Z",
+      "updated_at": "2025-08-03T18:32:29Z",
+      "browser_download_url": "https://github.com/tkasozi/buraq/releases/download/v0.0.29/setup-buraq-windows-latest-v0.0.29.exe"
     }
   ],
-  "tarball_url": "https://api.github.com/repos/tkasozi/buraq/tarball/v0.0.28",
-  "zipball_url": "https://api.github.com/repos/tkasozi/buraq/zipball/v0.0.28",
-  "body": "## What's Changed\r\n\r\n[Bug]\r\n\r\n* Fixes application start up failure.\r\n\r\n"
+  "tarball_url": "https://api.github.com/repos/tkasozi/buraq/tarball/v0.0.29",
+  "zipball_url": "https://api.github.com/repos/tkasozi/buraq/zipball/v0.0.29",
+  "body": "## What's Changed\r\n\r\n* Building with x64-mingw-dynamic\r\n"
 }

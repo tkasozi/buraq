@@ -243,7 +243,7 @@ jobs:
 
           # Use the POSIX-style path for vcpkg
           ls C:/mingw64
-          ls C:/mingw64/usr/bin/
+          ls C:/mingw64/bin/
           
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           cmake -B build \

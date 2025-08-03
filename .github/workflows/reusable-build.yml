@@ -178,7 +178,9 @@ jobs:
         run: |
           "${{ env.VCPKG_EXE }}" install
           
-          which ninja
+          ls "${{ env.VCPKG_ROOT }}/downloads"
+          ls "${{ env.VCPKG_ROOT }}/downloads/tools"
+          ls "${{ env.VCPKG_ROOT }}/downloads/tools/ninja"
           
           which cmake
           

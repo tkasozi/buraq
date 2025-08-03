@@ -228,7 +228,6 @@ jobs:
             ${{ inputs.os }}-${{ inputs.vcpkg_triplet }}-vcpkg-assets-
 
       - name: Configure CMake and Install Vcpkg Dependencies
-        if: false
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
         env:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
@@ -243,6 +242,8 @@ jobs:
           cmake --version
           ninja --version
 
+          which cmake
+          
           which ninja
 
           ls
@@ -264,7 +265,7 @@ jobs:
           ls "D:\a\_temp\msys64"
           
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
-          cmake -B build `
+          /usr/bin/cmake -B build `
                -S . `
                -G "Ninja" `
                -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" `
@@ -272,7 +273,7 @@ jobs:
                -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" `
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" `
                -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" `
-               -DCMAKE_MAKE_PROGRAM="/c/ProgramData/Chocolatey/bin/ninja"
+               -DCMAKE_MAKE_PROGRAM="/usr/bin/ninja"
 
 
       - name: Build Project (Windows - MSVC)

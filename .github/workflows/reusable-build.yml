@@ -264,28 +264,28 @@ jobs:
           # Use the POSIX-style path for vcpkg
           ls "D:\a\_temp\msys64"
           
-          /usr/bin/cmake.exe -B build `
-               -S . `
-               -G "Ninja" `
-               -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" `
-               -DVCPKG_TARGET_TRIPLET="${{ inputs.vcpkg_triplet }}" `
-               -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" `
-               -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" `
-               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" `
+          /usr/bin/cmake.exe -B build \
+               -S . \
+               -G "Ninja" \
+               -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" \
+               -DVCPKG_TARGET_TRIPLET="${{ inputs.vcpkg_triplet }}" \
+               -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
+               -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \
+               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" \
                -DCMAKE_MAKE_PROGRAM="/usr/bin/ninja"
 
 
       - name: Build Project (Windows - MSVC)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-windows'  && success()
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}/build
-        run: cmake --build --config ${{ inputs.build_type }}
+        run: cmake --build . --config ${{ inputs.build_type }}
         # Use cmd to ensure vcvars64.bat context persists from the configure step
         shell: cmd
 
       - name: Build Project (Windows - MinGW)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}/build
-        run: cmake --build --config ${{ inputs.build_type }}
+        run: cmake --build . --config ${{ inputs.build_type }}
         shell: pwsh # Use pwsh to continue the MinGW context
 
       - name: Build Project (Linux/macOS)

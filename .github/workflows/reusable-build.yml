@@ -221,7 +221,7 @@ jobs:
         shell: msys2 {0}
         run: |
           cmake --version
-          ninja --version
+          ninja --versionc
 
           which ninja
 
@@ -240,6 +240,8 @@ jobs:
 
           # Use the POSIX-style path for vcpkg
           ls /mingw64/bin/
+          
+          mkdir "${{ env.VCPKG_ROOT }}/scripts/detect_compiler"
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           cmake -B build \

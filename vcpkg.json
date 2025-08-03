@@ -23,6 +23,8 @@
     {
       "name": "qtsvg",
       "version>=": "6.5.0"
-    }
+    },
+    "vcpkg-tool-ninja",
+    "vcpkg-tool-cmake"
   ]
 }

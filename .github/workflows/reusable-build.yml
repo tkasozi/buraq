@@ -107,6 +107,8 @@ jobs:
         run: |
           which ninja
           
+          ls -alh /usr/bin
+          
 
       - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}
         if: false

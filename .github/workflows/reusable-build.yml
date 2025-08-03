@@ -240,7 +240,7 @@ jobs:
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
           #ls "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 
-          ls "D:\a\_temp\msys64"
+          ls "${{ steps.msys2-setup.outputs.msys2-location }}/mingw64"
           
           exit
 

@@ -173,7 +173,7 @@ jobs:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
           VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
           VCPKG_DEFAULT_HOST_TRIPLET: ${{ inputs.vcpkg_triplet }}
-        shell: msys2 {0}
+        #shell: msys2 {0}
         run: |
            cmake -B build \
                -S . \

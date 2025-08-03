@@ -175,18 +175,16 @@ jobs:
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
           VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
           VCPKG_DEFAULT_HOST_TRIPLET: ${{ inputs.vcpkg_triplet }}
-          CMAKE_EXE: "/usr/bin/cmake"
         shell: msys2 {0}
         run: |
-           /usr/bin/cmake.exe -B build \
+           cmake -B build \
                -S . \
                -G "Ninja" \
                -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" \
                -DVCPKG_TARGET_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \
-               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" \
-               -DCMAKE_MAKE_PROGRAM="/usr/bin/ninja"
+               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 
       - name: Build Project
         if: inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()

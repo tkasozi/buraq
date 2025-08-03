@@ -160,10 +160,6 @@ foreach (DLL_FILENAME ${QT_THIRD_PARTY_DEPENDENCY_DLLS})
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different "${LIB_SQLITE_PATH}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
             COMMENT "Copying ${LIB_SQLITE_PATH} to build directory"
-
-#            set(LIBS_DIR "$<TARGET_FILE_DIR:${PROJECT_NAME}>/libs")
-#            COMMAND ${CMAKE_COMMAND} -E rename "$<TARGET_FILE_DIR:${PROJECT_NAME}>/libsqlite3.dll" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/sqlite3.dll"
-#            COMMENT "Renaming libsqlite3.dll to sqlite3.dll for Qt compatibility"
     )
 endforeach ()
 

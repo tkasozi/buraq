@@ -252,6 +252,7 @@ jobs:
                -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \
                -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
+               -DCURRENT_PORT_DIR="${{ github.workspace }}/vcpkg/scripts/detect_compiler" \
                -DCMAKE_MAKE_PROGRAM="$ninja_path"
 
 

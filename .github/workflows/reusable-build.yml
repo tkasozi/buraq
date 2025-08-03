@@ -240,7 +240,8 @@ jobs:
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
           #ls "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 
-          ls "${{ github.workspace }}/vcpkg/downloads/tools/ninja"
+          ls "${{ github.workspace }}/vcpkg/downloads/"
+          ls "${{ github.workspace }}/vcpkg/downloads/tools"
           
           exit
 

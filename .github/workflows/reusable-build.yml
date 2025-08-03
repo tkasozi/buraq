@@ -236,8 +236,8 @@ jobs:
 
           ls "${{ github.workspace }}/vcpkg"
 
-          ninja_path=$(which ninja)
-          cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
+          #          ninja_path=$(which ninja)
+          #          cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
 
           # Use the POSIX-style path for vcpkg
           ls /mingw64/bin/
@@ -250,8 +250,8 @@ jobs:
                -DVCPKG_TARGET_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \
-               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
-               -DCMAKE_MAKE_PROGRAM="$ninja_path"
+               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"
+               #-DCMAKE_MAKE_PROGRAM="$ninja_path"
 
 
       - name: Build Project (Windows - MSVC)

@@ -80,7 +80,7 @@ jobs:
           path: vcpkg
           fetch-depth: 0
 
-      - name: Set up MSYS2 with Build Tools (Windows Only, if needed)
+      - name: Set up MSYS2 with Build Tools
         if: inputs.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
         uses: msys2/setup-msys2@v2
         id: msys2-setup
@@ -93,20 +93,6 @@ jobs:
             git
           path-type: minimal
           msystem: MINGW64
-
-      - name: Display MSYS2 location
-        run: |
-          which ninja
-          echo "MSYS2 is installed at ${{ steps.msys2-setup.outputs.msys2-location }}"
-          # ls "${{ steps.msys2-setup.outputs.msys2-location }}/mingw64/bin"
-          ls "${{ steps.msys2-setup.outputs.msys2-location }}/mingw64/x86_64-w64-mingw32/bin"
-
-      - name: Display MSYS2 location2
-        shell: msys2 {0}
-        run: |
-          which ninja
-          
-          ls -alh /usr/bin
           
 
       - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}
@@ -128,12 +114,12 @@ jobs:
 
         shell: bash
 
-      - name: Bootstrap Vcpkg (Windows)
+      - name: Bootstrap Vcpkg
         working-directory: ${{ github.workspace }}/vcpkg
         run: git pull origin master; ./bootstrap-vcpkg.bat
         shell: pwsh
 
-      - name: Configure NuGet for GitHub Packages (Windows)
+      - name: Configure NuGet for GitHub Packages
         shell: pwsh
         env:
           USERNAME: ${{ github.repository_owner }}
@@ -159,7 +145,7 @@ jobs:
           $nugetConfigContent | Out-File $nugetConfigPath
           Write-Host "Created NuGet.Config at $nugetConfigPath"
 
-      - name: Set NuGet API Key for GitHub Packages (Windows)
+      - name: Set NuGet API Key for GitHub Packages
         shell: pwsh
         env:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
@@ -203,7 +189,7 @@ jobs:
                -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" \
                -DCMAKE_MAKE_PROGRAM="/usr/bin/ninja"
 
-      - name: Build Project (Windows - MinGW)
+      - name: Build Project
         if: inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}/build
         run: cmake --build . --config ${{ inputs.build_type }}

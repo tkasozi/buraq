@@ -179,9 +179,12 @@ jobs:
         run: |
           "${{ env.VCPKG_EXE }}" install
           
-          ls -al "${{ env.VCPKG_ROOT }}/downloads/tools/ninja/1.12.1-windows"
           
-          cmake -B build \
+          VCPKG_CMAKE_PATH=$(cygpath -u "$("$VCPKG_EXECUTABLE" find vcpkg-tool-cmake | head -n 1)")
+    
+          echo "Found Vcpkg CMake executable at: $VCPKG_CMAKE_PATH"
+          
+          "$VCPKG_CMAKE_PATH" -B build \
                -S . \
                -G "Ninja" \
                -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" \

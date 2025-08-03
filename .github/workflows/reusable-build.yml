@@ -163,6 +163,7 @@ jobs:
             ${{ inputs.os }}-${{ inputs.vcpkg_triplet }}-vcpkg-assets-
 
       - name: Configure CMake and Install Vcpkg Dependencies
+        id: set-cmake-path
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
         env:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"
@@ -182,6 +183,8 @@ jobs:
     
           echo "Found Vcpkg CMake executable at: $VCPKG_CMAKE_PATH"
           
+          echo "vcpkg-cmake-path=$VCPKG_CMAKE_PATH" >> $GITHUB_OUTPUT
+          
           "$VCPKG_CMAKE_PATH" -B build \
                -S . \
                -G "Ninja" \
@@ -195,8 +198,10 @@ jobs:
       - name: Build Project
         if: inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}/build
-        run: cmake --build . --config ${{ inputs.build_type }}
-        shell: pwsh # Use pwsh to continue the MinGW context
+        run: |
+          VCPKG_CMAKE_PATH="${{ steps.set-cmake-path.outputs.vcpkg-cmake-path }}"
+          "$VCPKG_CMAKE_PATH" --build . --config ${{ inputs.build_type }}
+        shell: msys2 {0}
 
       - name: Download Inno Setup
         run: |

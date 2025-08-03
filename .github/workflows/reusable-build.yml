@@ -221,7 +221,7 @@ jobs:
         shell: msys2 {0}
         run: |
           cmake --version
-          ninja --versionc
+          ninja --version
 
           which ninja
 

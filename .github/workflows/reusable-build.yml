@@ -242,7 +242,8 @@ jobs:
           #          cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
 
           # Use the POSIX-style path for vcpkg
-          ls C:/
+          ls C:/mingw64
+          ls C:/mingw64/usr/bin/
           
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           cmake -B build \

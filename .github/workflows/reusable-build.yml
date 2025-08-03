@@ -95,12 +95,14 @@ jobs:
           msystem: MINGW64
 
       - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}
+        if: false
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
 
       - name: Build Managed project
         id: dotnet-project
+        if: false
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
         run: |
           ls -alh

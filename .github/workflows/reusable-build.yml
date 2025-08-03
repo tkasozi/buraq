@@ -97,9 +97,15 @@ jobs:
 
       - name: Display MSYS2 location
         run: |
+          which ninja
           echo "MSYS2 is installed at ${{ steps.msys2-setup.outputs.msys2-location }}"
           # ls "${{ steps.msys2-setup.outputs.msys2-location }}/mingw64/bin"
           ls "${{ steps.msys2-setup.outputs.msys2-location }}/mingw64/x86_64-w64-mingw32/bin"
+
+      - name: Display MSYS2 location2
+        shell: msys2 {0}
+        run: |
+          which ninja
           
 
       - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}

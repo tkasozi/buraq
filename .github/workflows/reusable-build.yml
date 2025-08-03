@@ -84,6 +84,7 @@ jobs:
       - name: Set up MSYS2 with Build Tools (Windows Only, if needed)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' # Only run if MinGW is used
         uses: msys2/setup-msys2@v2
+        id: msys2-setup
         with:
           update: true
           install: >
@@ -93,6 +94,9 @@ jobs:
             git
           path-type: minimal
           msystem: MINGW64
+
+      - name: Display MSYS2 location
+        run: echo "MSYS2 is installed at ${{ steps.msys2-setup.outputs.msys2-location }}"
 
       - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}
         if: false

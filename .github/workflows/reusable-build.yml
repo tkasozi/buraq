@@ -88,8 +88,6 @@ jobs:
           update: true
           install: >
             mingw-w64-x86_64-toolchain
-            cmake
-            ninja
             git
           path-type: minimal
           msystem: MINGW64
@@ -185,7 +183,7 @@ jobs:
                -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \
                -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" \
-               -DCMAKE_MAKE_PROGRAM="/usr/bin/ninja"
+               -DCMAKE_MAKE_PROGRAM="$(which ninja)"
 
       - name: Build Project
         if: inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()

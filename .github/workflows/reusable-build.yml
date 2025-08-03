@@ -231,10 +231,10 @@ jobs:
           ls
 
           echo "******Dotnet at ${{ env.DOTNET_ROOT }}/packs: **********"
-          ls "${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64"
+          #ls "${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64"
 
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
-          ls "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
+          #ls "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 
           ls "${{ github.workspace }}/vcpkg"
 

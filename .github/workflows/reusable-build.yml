@@ -207,7 +207,7 @@ jobs:
             ${{ github.workspace }}/vcpkg/toolsrc
           key: ${{ inputs.os }}-${{ inputs.build_type }}-${{ inputs.vcpkg_triplet }}-vcpkg-assets-${{ hashFiles('buraq/vcpkg.json') }}
           restore-keys: |
-            ${{ inputs.os }}-vcpkg-assets-
+            ${{ inputs.os }}-${{ inputs.vcpkg_triplet }}-vcpkg-assets-
 
       - name: Configure CMake and Install Vcpkg Dependencies
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}

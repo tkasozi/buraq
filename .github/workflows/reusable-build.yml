@@ -253,8 +253,8 @@ jobs:
                -DVCPKG_TARGET_TRIPLET="${{ inputs.vcpkg_triplet }}" `
                -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" `
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" `
-               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"
-               #-DCMAKE_MAKE_PROGRAM="$ninja_path"
+               -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" `
+               -DCMAKE_MAKE_PROGRAM="/c/ProgramData/Chocolatey/bin/ninja"
 
 
       - name: Build Project (Windows - MSVC)

@@ -93,7 +93,6 @@ jobs:
             git
           path-type: minimal
           msystem: MINGW64
-          
 
       - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}
         if: false
@@ -117,7 +116,7 @@ jobs:
       - name: Bootstrap Vcpkg
         working-directory: ${{ github.workspace }}/vcpkg
         run: git pull origin master; ./bootstrap-vcpkg.bat
-        shell: pwsh
+        shell: msys2 {0}
 
       - name: Configure NuGet for GitHub Packages
         shell: pwsh
@@ -177,7 +176,7 @@ jobs:
           VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
           VCPKG_DEFAULT_HOST_TRIPLET: ${{ inputs.vcpkg_triplet }}
           CMAKE_EXE: "/usr/bin/cmake"
-        shell: pwsh
+        shell: msys2 {0}
         run: |
            /usr/bin/cmake.exe -B build \
                -S . \

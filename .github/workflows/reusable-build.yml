@@ -178,6 +178,8 @@ jobs:
         run: |
           "${{ env.VCPKG_EXE }}" install
           
+          ls -alh "${{ env.VCPKG_ROOT }}/downloads/tools"
+          
           VCPKG_CMAKE_PATH=$(cygpath -u "$("$VCPKG_EXECUTABLE" find vcpkg-tool-cmake | head -n 1)")
     
           echo "Found Vcpkg CMake executable at: $VCPKG_CMAKE_PATH"

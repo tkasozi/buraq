@@ -89,6 +89,7 @@ jobs:
           install: >
             mingw-w64-x86_64-toolchain
             git
+            cmake
           path-type: minimal
           msystem: MINGW64
 

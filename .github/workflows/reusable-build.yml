@@ -89,7 +89,6 @@ jobs:
           install: >
             mingw-w64-x86_64-toolchain
             git
-            cmake
           path-type: minimal
           msystem: MINGW64
 
@@ -178,7 +177,6 @@ jobs:
         shell: msys2 {0}
         run: |
           "${{ env.VCPKG_EXE }}" install
-          
           
           VCPKG_CMAKE_PATH=$(cygpath -u "$("$VCPKG_EXECUTABLE" find vcpkg-tool-cmake | head -n 1)")
     

@@ -217,7 +217,7 @@ jobs:
           VCPKG_NUGET_ACCESSTOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           CMAKE_DOTNET_TARGET_FRAMEWORK: ${{ env.DOTNET_ROOT }}/packs/Microsoft.NETCore.App.Host.win-x64/${{ env.DOTNET_VERSION }}/runtimes/win-x64/native
           CMAKE_CXX_COMPILER :  /mingw64/bin/x86_64-w64-mingw32-g++.exe
-          VCPKG_ROOT: "D:/a/buraq/buraq/vcpkg"
+          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
         shell: msys2 {0}
         run: |
           cmake --version

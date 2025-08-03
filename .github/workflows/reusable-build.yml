@@ -96,7 +96,12 @@ jobs:
           msystem: MINGW64
 
       - name: Display MSYS2 location
-        run: echo "MSYS2 is installed at ${{ steps.msys2-setup.outputs.msys2-location }}"
+        run: |
+          echo "MSYS2 is installed at ${{ steps.msys2-setup.outputs.msys2-location }}"
+          echo "MSYS2 is installed at ${{ steps.msys2-setup.outputs.msys2-location }}"
+          ls "${{ steps.msys2-setup.outputs.msys2-location }}/mingw64/bin"
+          ls "${{ steps.msys2-setup.outputs.msys2-location }}/mingw64/x86_64-w64-mingw32"
+          
 
       - name: Setup .NET SDK ${{ env.DOTNET_SDK_VERSION }}
         if: false
@@ -216,6 +221,7 @@ jobs:
             ${{ inputs.os }}-${{ inputs.vcpkg_triplet }}-vcpkg-assets-
 
       - name: Configure CMake and Install Vcpkg Dependencies
+        if: false
         working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
         env:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json,readwrite"

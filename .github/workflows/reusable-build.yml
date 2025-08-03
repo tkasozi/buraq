@@ -111,11 +111,11 @@ jobs:
 
         shell: bash
 
-      - name: Bootstrap Vcpkg (Windows)
-        working-directory: ${{ github.workspace }}/vcpkg
-        if: inputs.os == 'windows-latest'
-        run: git pull origin master; ./bootstrap-vcpkg.bat
-        shell: msys2 {0}
+#      - name: Bootstrap Vcpkg (Windows)
+#        working-directory: ${{ github.workspace }}/vcpkg
+#        if: inputs.os == 'windows-latest'
+#        run: git pull origin master; ./bootstrap-vcpkg.bat
+#        shell: msys2 {0}
 
       - name: Bootstrap Vcpkg (Linux/macOS)
         if: inputs.os != 'windows-latest'
@@ -240,7 +240,6 @@ jobs:
 
           # Use the POSIX-style path for vcpkg
           ls /mingw64/bin/
-          
 
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           cmake -B build \

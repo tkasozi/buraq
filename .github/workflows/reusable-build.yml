@@ -176,15 +176,14 @@ jobs:
           VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg.exe
         shell: msys2 {0}
         run: |
-           # install ninja
-           "${{ env.VCPKG_EXE }}" install vcpkg-tool-ninja
-           "${{ env.VCPKG_EXE }}" install vcpkg-tool-cmake
+          "${{ env.VCPKG_EXE }}" install vcpkg-tool-ninja
+          "${{ env.VCPKG_EXE }}" install vcpkg-tool-cmake
           
           which ninja
           
           which cmake
           
-           cmake -B build \
+          cmake -B build \
                -S . \
                -G "Ninja" \
                -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" \

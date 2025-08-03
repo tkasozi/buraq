@@ -180,7 +180,7 @@ jobs:
           
           ls -alh "${{ env.VCPKG_ROOT }}/downloads/tools"
           
-          VCPKG_CMAKE_PATH= "$("${{ env.VCPKG_EXE }}" fetch cmake)"
+          VCPKG_CMAKE_PATH="$("${{ env.VCPKG_EXE }}" fetch cmake | tail -n 1)"
     
           echo "Found Vcpkg CMake executable at: $VCPKG_CMAKE_PATH"
           

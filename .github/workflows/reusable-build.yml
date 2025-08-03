@@ -205,7 +205,7 @@ jobs:
           path: |
             ${{ github.workspace }}/vcpkg/downloads
             ${{ github.workspace }}/vcpkg/toolsrc
-          key: ${{ inputs.os }}-${{ inputs.build_type }}-vcpkg-assets-${{ hashFiles('buraq/vcpkg.json') }}
+          key: ${{ inputs.os }}-${{ inputs.build_type }}-${{ inputs.vcpkg_triplet }}-vcpkg-assets-${{ hashFiles('buraq/vcpkg.json') }}
           restore-keys: |
             ${{ inputs.os }}-vcpkg-assets-
 

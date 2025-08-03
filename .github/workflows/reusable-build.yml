@@ -192,7 +192,7 @@ jobs:
                -DVCPKG_DEFAULT_HOST_TRIPLET="${{ inputs.vcpkg_triplet }}" \
                -DCMAKE_BUILD_TYPE="${{ inputs.build_type }}" \
                -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}" \
-               -DCMAKE_MAKE_PROGRAM= "${{ env.VCPKG_ROOT }}/downloads/tools/ninja/1.12.1-windows/ninja.exe"
+               -DCMAKE_MAKE_PROGRAM="${{ env.VCPKG_ROOT }}/downloads/tools/ninja/1.12.1-windows/ninja.exe"
 
       - name: Build Project
         if: inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()

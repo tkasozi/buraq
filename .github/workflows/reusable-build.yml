@@ -264,7 +264,6 @@ jobs:
           # Use the POSIX-style path for vcpkg
           ls "D:\a\_temp\msys64"
           
-          # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           /usr/bin/cmake -B build `
                -S . `
                -G "Ninja" `
@@ -278,15 +277,15 @@ jobs:
 
       - name: Build Project (Windows - MSVC)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-windows'  && success()
-        working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}/build
-        run: cmake --build . --config ${{ inputs.build_type }}
+        working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
+        run: cmake --build build --config ${{ inputs.build_type }}
         # Use cmd to ensure vcvars64.bat context persists from the configure step
         shell: cmd
 
       - name: Build Project (Windows - MinGW)
         if: inputs.os == 'windows-latest' && inputs.vcpkg_triplet == 'x64-mingw-dynamic' && success()
-        working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}/build
-        run: cmake --build . --config ${{ inputs.build_type }}
+        working-directory: ${{ github.workspace }}/${{ env.PROJECT_NAME }}
+        run: cmake --build build --config ${{ inputs.build_type }}
         shell: pwsh # Use pwsh to continue the MinGW context
 
       - name: Build Project (Linux/macOS)

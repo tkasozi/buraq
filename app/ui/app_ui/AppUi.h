@@ -58,7 +58,7 @@ private:
 
 	void configureAppContext();
 	static void launchUpdaterAndExit(const  std::filesystem::path &updaterPath, const  std::filesystem::path &packagePath,
-								 const  std::filesystem::path &installPath);
+								 const  std::filesystem::path &installationPath);
 };
 
 

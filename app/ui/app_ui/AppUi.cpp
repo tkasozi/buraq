@@ -35,6 +35,7 @@
 #include <map>
 
 #include <windows.h>
+#include <shlobj.h> // SHGetKnownFolderPath
 #include <string>
 
 #include "client/VersionRepository.h"
@@ -178,10 +179,37 @@ void AppUi::onWindowFullyLoaded()
         {
             const std::filesystem::path installerExe = repo.downloadNewVersion();
 
-            launchUpdaterAndExit(
+            qDebug() << "AppUi.cpp";
+            qDebug() << installerExe.string();
+            qDebug() << (api_context->searchPath / "updater.exe").string();
+            qDebug() << api_context->searchPath.parent_path().string();
+            qDebug() << "ENDs AppUi.cpp";
+            // Get the path to the AppData\Local folder
+            PWSTR pszPath = NULL;
+            if (const HRESULT hr = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &pszPath); SUCCEEDED(hr))
+            {
+                // Convert the wide character string to a narrow character string (std::string)
+                std::wstring wsPath(pszPath);
+                std::string sPath(wsPath.begin(), wsPath.end());
+
+                sPath += "\\Programs\\Buraq";
+
+                // Print the resulting path
+                std::cout << "The path is: " << sPath << std::endl;
+
+                launchUpdaterAndExit(
                 api_context->searchPath / "updater.exe",
                 installerExe,
-                api_context->searchPath.parent_path());
+                sPath);
+
+                // Free the memory allocated by SHGetKnownFolderPath
+                CoTaskMemFree(pszPath);
+            }
+            else
+            {
+                std::cerr << "Failed to get the path." << std::endl;
+            }
+
         }
         else
         {
@@ -278,16 +306,17 @@ EditorMargin* AppUi::getEditorMargin() const
     return editorMargin.get();
 }
 
-void AppUi::launchUpdaterAndExit(const std::filesystem::path& updaterPath, const std::filesystem::path& userPath,
-                                 const std::filesystem::path& installPath)
+void AppUi::launchUpdaterAndExit(const std::filesystem::path& updaterPath, const std::filesystem::path& packagePath,
+                                 const std::filesystem::path& installationPath)
 {
-    // TODO incomplete package path, should be set to the actual package path.
-    const std::filesystem::path packagePath = userPath / "";
     std::string commandLine = "\"" + updaterPath.string() + "\"";
     commandLine += " \"" + packagePath.string() + "\"";
-    commandLine += " \"" + installPath.string() + "\"";
+    commandLine += " \"" + installationPath.string() + "\"";
     commandLine += " " + std::to_string(GetCurrentProcessId()); // Pass current process ID
 
+    qDebug() << "commandLine: " << commandLine;
+
+    //updater.exe setup-x.x.x.dev.exe C:\Users\user\AppData\Local\Programs\Buraq\ 16572
     STARTUPINFOA si;
     PROCESS_INFORMATION pi;
 

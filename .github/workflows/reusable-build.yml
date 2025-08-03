@@ -240,8 +240,7 @@ jobs:
           echo "****************${CMAKE_DOTNET_TARGET_FRAMEWORK}******************"
           #ls "${CMAKE_DOTNET_TARGET_FRAMEWORK}"
 
-          ls "${{ github.workspace }}/vcpkg/downloads/"
-          ls "${{ github.workspace }}/vcpkg/downloads/tools"
+          ls "D:\a\_temp\msys64"
           
           exit
 
@@ -249,9 +248,7 @@ jobs:
           #          cmake_make_program_arg="-DCMAKE_MAKE_PROGRAM=\"$ninja_path\""
 
           # Use the POSIX-style path for vcpkg
-          ls C:/mingw64/x86_64-w64-mingw32/bin
-          ls C:/mingw64/bin/
-          ls 
+          ls "D:\a\_temp\msys64"
           
           # Now use cmake_make_program_arg and host_triplet_arg in your cmake command
           cmake -B build `

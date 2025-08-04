@@ -12,7 +12,7 @@
 
 void log(const std::string& _log)
 {
-    db_log("[Updater.exe] " + _log);
+    file_log("[Updater.exe] " + _log);
 }
 
 int main(int argc, char* argv[])

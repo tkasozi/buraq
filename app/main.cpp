@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
     if (!db_conn())
     {
-        db_log("db_conn() EXIT_FAILURE..");
+        file_log("db_conn() EXIT_FAILURE..");
         // failed to connect to the database
         return EXIT_FAILURE;
     }
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
     // Initialize the database:
     if (const QSqlError err = init_db(); err.type() != QSqlError::NoError)
     {
-        db_log("Error executing initializing db:" + err.text().toStdString());
+        file_log("Error executing initializing db:" + err.text().toStdString());
         return EXIT_FAILURE;
     }
 

@@ -74,7 +74,7 @@ struct EditorState
 };
 
 // Function to log messages (example)
-static void db_log(const std::string &message)
+static void file_log(const std::string &message)
 {
     // Optionally, log to a file in a writable location:
     std::filesystem::path logFilePath = std::filesystem::temp_directory_path() / "Buraq" / ".data" / "log.txt";

@@ -15,6 +15,8 @@
 
 #endif
 
+void log(const std::string& _log);
+
 class UpdateWorker final : public QObject
 {
     Q_OBJECT

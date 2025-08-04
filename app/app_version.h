@@ -25,6 +25,7 @@ struct UpdateInfo {
 		std::to_string(APP_VERSION_PATCH);
 	std::string releaseNotes;
 	github_manifest_asset asset;
+	bool isConnFailure = false;
 };
 
 std::string getCurrentAppVersion();

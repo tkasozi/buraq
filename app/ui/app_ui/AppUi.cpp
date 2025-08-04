@@ -155,9 +155,6 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 
     // Schedule onWindowFullyLoaded to run after current event processing is done
     QTimer::singleShot(0, this, &AppUi::onWindowFullyLoaded);
-
-    // Add a temporary message that disappears after 5 seconds
-    processStatusSlot("Ready.", 2000);
 }
 
 void AppUi::onWindowFullyLoaded()
@@ -170,10 +167,17 @@ void AppUi::onWindowFullyLoaded()
     VersionUpdateDialog versionUpdater(this);
     VersionRepository repo(api_context.get());
 
-    if (const UpdateInfo info = repo.main_version_logic(); !info.latestVersion.empty())
+    if (const UpdateInfo update_info = repo.main_version_logic(); update_info.isConnFailure == false)
     {
-        versionUpdater.setWindowTitle("A new version " + QString::fromStdString(info.latestVersion) + " is available!");
-        versionUpdater.setContent(QString::fromStdString(info.releaseNotes));
+        if (update_info.latestVersion.empty())
+        {
+            // No version was set
+            qDebug() << "app version is empty or already upto date!";
+            return;
+        }
+        versionUpdater.setWindowTitle(
+            "A new version " + QString::fromStdString(update_info.latestVersion) + " is available!");
+        versionUpdater.setContent(QString::fromStdString(update_info.releaseNotes));
 
         if (versionUpdater.exec() == QDialog::Accepted)
         {
@@ -198,9 +202,9 @@ void AppUi::onWindowFullyLoaded()
                 std::cout << "The path is: " << sPath << std::endl;
 
                 launchUpdaterAndExit(
-                api_context->searchPath / "updater.exe",
-                installerExe,
-                sPath);
+                    api_context->searchPath / "updater.exe",
+                    installerExe,
+                    sPath);
 
                 // Free the memory allocated by SHGetKnownFolderPath
                 CoTaskMemFree(pszPath);
@@ -209,13 +213,18 @@ void AppUi::onWindowFullyLoaded()
             {
                 std::cerr << "Failed to get the path." << std::endl;
             }
-
+            processStatusSlot("Ready.", 2000);
         }
         else
         {
             // New version was rejected or modal was closed.
             // do nothing
         }
+    }
+    else if (update_info.isConnFailure)
+    {
+        qDebug() << "Update failed to connect to github repository.";
+        processStatusSlot("Failed to get updates. Check connection!", 10000);
     }
 }
 
@@ -280,7 +289,6 @@ void AppUi::processResultSlot(int exitCode, const QString& output, const QString
 void AppUi::configureAppContext()
 {
     const std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "Buraq";
-    // FIXME change the dirname
 
     // app search_path for plugins
     const std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());

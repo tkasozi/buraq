@@ -1,14 +1,14 @@
 {
-  "version": "v0.0.30",
-  "release_date": "2025-08-03T20:41:55Z",
-  "release_url": "https://github.com/tkasozi/buraq/releases/tag/v0.0.30",
-  "notes": "## What's Changed\r\n* Fixing updater.exe",
+  "version": "v0.0.31",
+  "release_date": "2025-08-04T00:19:03Z",
+  "release_url": "https://github.com/tkasozi/buraq/releases/tag/v0.0.31",
+  "notes": "## What's Changed\r\n* Enabling debugging",
   "assets": [
     {
-      "name": "setup-buraq-windows-latest-v0.0.30.exe",
-      "download_url": "https://github.com/tkasozi/buraq/releases/download/v0.0.30/setup-buraq-windows-latest-v0.0.30.exe",
-      "size": 25197246,
-      "sha": "sha256:2db66b18279743f222c2a5cb0f67241f4321aeab058fe1aed5ce821feb469db7",
+      "name": "setup-buraq-windows-latest-v0.0.31.exe",
+      "download_url": "https://github.com/tkasozi/buraq/releases/download/v0.0.31/setup-buraq-windows-latest-v0.0.31.exe",
+      "size": 25202101,
+      "sha": "sha256:9d06155054fbd9439dd3e207dcacd39d67738278e391f7913ea9d3e5ba2f35f9",
       "content_type": "application/octet-stream"
     }
   ]

@@ -42,25 +42,25 @@ static std::string get(const boost::property_tree::basic_ptree<std::string, std:
 
 void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInfo& info)
 {
+    namespace pt = boost::property_tree;
+
     std::filesystem::path manifest_json = std::filesystem::temp_directory_path() / "Buraq" / "manifest.json";
 
-    {
-        std::string response;
-        // Create a scope for the lock_guard
-        std::lock_guard<std::mutex> lock(network_mutex); // Lock before accessing network methods
-
-        Network& net = Network::singleton(); // Get the singleton instance
-        response = net.http_get(endpoint); // Call the method
-        std::ofstream outputFile(manifest_json, std::ios::out);
-        outputFile << response;
-        outputFile.close();
-        // Mutex is released when 'lock' goes out of scope
-    } // network_mutex is unlocked here
-
-    namespace pt = boost::property_tree;
     try
     {
         pt::ptree loadPtreeRoot;
+        {
+            std::string response;
+            // Create a scope for the lock_guard
+            std::lock_guard<std::mutex> lock(network_mutex); // Lock before accessing network methods
+
+            Network& net = Network::singleton(); // Get the singleton instance
+            response = net.http_get(endpoint); // Call the method
+            std::ofstream outputFile(manifest_json, std::ios::out);
+            outputFile << response;
+            outputFile.close();
+            // Mutex is released when 'lock' goes out of scope
+        } // network_mutex is unlocked here
 
         pt::read_json(manifest_json.string(), loadPtreeRoot);
         std::vector<std::tuple<std::string, std::string, std::string>> version;
@@ -69,6 +69,8 @@ void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInf
         {
             throw std::runtime_error("Failed to download update manifest.");
         }
+
+        info.isConnFailure = false;
 
         auto latest_version_node = loadPtreeRoot.get_child("version");
         info.latestVersion = latest_version_node.get_value<std::string>();
@@ -92,7 +94,12 @@ void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInf
     }
     catch (const pt::ptree_error& e)
     {
-        qDebug() << e.what();
+        qDebug() << "Related to the manifest.json file: " << e.what();
+    }
+    catch (const std::exception& e)
+    {
+        info.isConnFailure = true;
+        qDebug() << "Other Error (ie. Network): " << e.what();
     }
 }
 
@@ -124,7 +131,7 @@ UpdateInfo VersionRepository::main_version_logic()
             std::cerr << "No version" << std::endl;
 
             // no version
-            return {};
+            return versionInfo;
         }
 
         const std::vector<std::string> ver = split_version(versionInfo.latestVersion);
@@ -134,7 +141,7 @@ UpdateInfo VersionRepository::main_version_logic()
             std::cerr << "Bad version format" << std::endl;
 
             // invalid version
-            return {};
+            return {.isConnFailure = versionInfo.isConnFailure};
         }
 
         if (std::stoi(ver[0]) > APP_VERSION_MAJOR || std::stoi(ver[1]) > APP_VERSION_MINOR || std::stoi(ver[2]) >
@@ -154,7 +161,7 @@ UpdateInfo VersionRepository::main_version_logic()
     {
         std::cerr << "Exception while comparing versions" << std::endl;
         // exceptions
-        return {};
+        return {.isConnFailure = versionInfo.isConnFailure};
     }
 }
 

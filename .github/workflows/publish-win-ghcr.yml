@@ -45,18 +45,15 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
           labels: |
             org.opencontainers.image.description="Windows Vcpkg MinGW64 Qt C++ Minimal Docker Image"
             org.opencontainers.image.version=latest
             org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: windows/amd64
-          file: ./base_image/win/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+        run: |
+          docker build . -f ./base_image/win/Dockerfile --platform windows/amd64 -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 

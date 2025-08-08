@@ -1,0 +1,9 @@
+cmake-build-debug/
+cmake-build-release/
+Output/
+.github
+.idea/
+.vscode/
+ManagedLibrary/bin
+ManagedLibrary/obj
+ManagedLibrary/publish

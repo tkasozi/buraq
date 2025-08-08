@@ -27,18 +27,6 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-# Compile C# ManagedLibrary code
-
-if [[ ! -n "${CI}" ]]; then
-  echo "CI variable is not set."
-
-  pushd ManagedLibrary
-
-  ./build.sh
-
-  popd
-fi
-
 # --- Configuration ---
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -58,67 +46,6 @@ BUILD_TYPE="Release"
 CLEAN_BUILD=false
 NUM_JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 1) # Number of parallel jobs
 
-# --- Helper Functions ---
-print_usage() {
-    echo "Usage: $0 [options]"
-    echo ""
-    echo "Options:"
-    echo "  --debug         Set build type to Debug (default: Release)"
-    echo "  --release       Set build type to Release"
-    echo "  --clean         Perform a clean build (removes build directory before configuring)"
-    echo "  --build-dir <name> Set the build subdirectory name (default: build)"
-    echo "  -j <N>          Set the number of parallel jobs (default: auto-detect)"
-    echo "  -h, --help      Show this help message"
-}
-
-# --- Argument Parsing ---
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
-    --debug)
-        BUILD_TYPE="Debug"
-        BUILD_DIR="${BUILD_DIR}-debug"
-        shift
-        ;;
-    --release)
-        BUILD_TYPE="Release"
-        BUILD_DIR="${BUILD_DIR}-release"
-        shift
-        ;; # Default, but explicit option
-    --clean)
-        CLEAN_BUILD=true
-        shift
-        ;;
-    --build-dir)
-        if [[ -n "$2" && "$2" != --* ]]; then
-            BUILD_SUBDIR="$2"
-            BUILD_DIR="${SOURCE_DIR}/${BUILD_SUBDIR}" # Update full build path
-            shift 2
-        else
-            echo "Error: --build-dir requires a name." >&2
-            exit 1
-        fi
-        ;;
-    -j)
-        if [[ -n "$2" && "$2" =~ ^[0-9]+$ ]]; then
-            NUM_JOBS="$2"
-            shift 2
-        else
-            echo "Error: -j requires a number." >&2
-            exit 1
-        fi
-        ;;
-    -h | --help)
-        print_usage
-        exit 0
-        ;;
-    *)
-        echo "Unknown parameter passed: $1"
-        print_usage
-        exit 1
-        ;;
-    esac
-done
-
 # --- Main Script Logic ---
 
 echo "----------------------------------------------------"
@@ -132,15 +59,7 @@ echo "Clean Build:        ${CLEAN_BUILD}"
 echo "Parallel Jobs:      ${NUM_JOBS}"
 echo "----------------------------------------------------"
 
-# 1. Clean build directory if requested
-if [ "$CLEAN_BUILD" = true ] && [ -d "$BUILD_DIR" ]; then
-    echo ""
-    echo "--- Cleaning previous build directory: ${BUILD_DIR} ---"
-    rm -rf "${BUILD_DIR}"
-    echo "Clean complete."
-fi
-
-# 2. Create build directory (if it doesn't exist)
+# 1. Create build directory (if it doesn't exist)
 echo ""
 echo "--- Ensuring build directory exists: ${BUILD_DIR} ---"
 mkdir -p "${BUILD_DIR}"
@@ -150,17 +69,53 @@ echo "Build directory ready."
 # We run cmake from any directory, specifying source and build dirs explicitly.
 echo ""
 echo "--- Configuring CMake project (Build Type: ${BUILD_TYPE}) ---"
+
+if [ ! -d "${VCPKG_ROOT}" ]; then
+    echo "Error: Vcpkg root directory not found at ${VCPKG_ROOT}."
+    exit 1
+fi
+
+VCPKG_CMAKE_PATH="$("${VCPKG_ROOT}/vcpkg.exe" fetch cmake | tail -n 1)"
+VCPKG_NINJA_PATH="$("${VCPKG_ROOT}/vcpkg.exe" fetch ninja | tail -n 1)"
+DOTNET_PATH="$(which "dotnet.exe" | tail -n 1)"
+
+if [ -z "$VCPKG_CMAKE_PATH" ] || [ -z "$VCPKG_NINJA_PATH" ] || [ -z "$DOTNET_PATH" ]; then
+    echo "Error: Could not find Vcpkg CMake dotnet or Ninja executables."
+    exit 1
+fi
+
+echo "Found Vcpkg CMake executable at: $VCPKG_CMAKE_PATH"
+echo "Found Vcpkg Ninja executable at: $VCPKG_NINJA_PATH"
+echo "Found dotnet installation at: $DOTNET_PATH"
+
+CMAKE_BIN_DIR=$(dirname "$VCPKG_CMAKE_PATH")
+NINJA_BIN_DIR=$(dirname "$VCPKG_NINJA_PATH")
+DOTNET_BIN_DIR=$(dirname "$DOTNET_PATH")
+
+# Re set the PATH to include the MinGW compiler binaries. 
+# For some reason, the PATH is not set correctly to include Mingw in the base image.
+export PATH="${CMAKE_BIN_DIR};${NINJA_BIN_DIR};${DOTNET_BIN_DIR};C:/msys64/mingw64/bin;C:/msys64/usr/bin;${PATH}"
+
+echo "Env PATH: ${PATH}"
+
+# ls -la .
+
+cp -r ./vcpkg_installed ./build/vcpkg_installed
+
+# Install the vcpkg.json file. Should resolve dependencies and install them if needed.
+"${VCPKG_ROOT}/vcpkg.exe" install --triplet=${VCPKG_TARGET_TRIPLET} --host-triplet=${VCPKG_TARGET_TRIPLET} --allow-unsupported
+
 # The -S option specifies the source directory.
 # The -B option specifies the build directory (created if it doesn't exist).
-"${CMAKE_EXE}" -S "${SOURCE_DIR}"  -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
- -G "Ninja" \
- -B "${BUILD_DIR}" \
- -DCMAKE_MAKE_PROGRAM="${CMAKE_MAKE_PROGRAM}" \
- -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
- -DVCPKG_TARGET_TRIPLET="${VCPKG_DEFAULT_TRIPLET}" \
- -DCMAKE_DOTNET_TARGET_FRAMEWORK="${CMAKE_DOTNET_TARGET_FRAMEWORK}"  \
- -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc.exe \
- -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++.exe
+"$VCPKG_CMAKE_PATH" -B build \
+    -S . \
+    -G "Ninja" \
+    -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+    -DVCPKG_TARGET_TRIPLET="${VCPKG_TARGET_TRIPLET}" \
+    -DVCPKG_DEFAULT_HOST_TRIPLET="${VCPKG_TARGET_TRIPLET}" \
+    -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
+    -DCMAKE_DOTNET_TARGET_FRAMEWORK="${DOTNET_BIN_DIR}" \
+    -DCMAKE_MAKE_PROGRAM="${VCPKG_NINJA_PATH}"
 
 echo "CMake configuration complete."
 
@@ -171,7 +126,8 @@ echo "--- Building project using CMake (Jobs: ${NUM_JOBS}) ---"
 # --config is mostly for multi-configuration generators (like Visual Studio).
 # For single-config (Makefiles, Ninja), CMAKE_BUILD_TYPE is used at configure time.
 # The -- -j${NUM_JOBS} part passes the parallel job count to the underlying build tool (make/ninja).
-"$CMAKE_EXE" --build "${BUILD_DIR}" --config "${BUILD_TYPE}" -- -j"${NUM_JOBS}"
+"$VCPKG_CMAKE_PATH" --build "${BUILD_DIR}" --config "${BUILD_TYPE}" -- -j"${NUM_JOBS}"
+
 echo "Build complete."
 
 echo ""

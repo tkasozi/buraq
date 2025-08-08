@@ -16,6 +16,8 @@ RUN C:\msys64\msys2_shell.cmd -c 'C:\msys64\usr\bin\pacman-key --populate msys'
 # Install the MinGW toolchain and other necessary packages
 # This avoids PowerShell pathing issues and ensures the environment is set up correctly.
 RUN C:\msys64\msys2_shell.cmd -c 'env.exe \
+    C:/msys64/usr/bin/pacman-key --init && \
+    C:/msys64/usr/bin/pacman-key --populate msys && \
     C:/msys64/usr/bin/pacman --noconfirm -Syu && \
     C:/msys64/usr/bin/pacman --noconfirm -S --needed git base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake'
 

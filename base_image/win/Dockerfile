@@ -52,5 +52,5 @@ COPY vcpkg.json C:/app/vcpkg.json
 # Install dependencies from vcpkg.json using the MinGW triplet
 RUN cmd /c "C:/vcpkg/vcpkg.exe install --triplet=x64-mingw-dynamic --host-triplet=x64-mingw-dynamic --allow-unsupported"
 
-# Set a label to make this a unique, publishable image
+# Set a label to make this a unique, publishable image.
 LABEL maintainer="tkasozi/win-vcpkg-mingw64-qt-cpp-minimal"

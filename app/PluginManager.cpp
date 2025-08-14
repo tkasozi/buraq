@@ -215,8 +215,8 @@ ProcessedData PluginManager::callPerformAction(void *cmd) {
 	if (plugins_.empty()) {
 		return {};
 	}
-	auto p_info = plugins_.front();
-	if (p_info.instance) {
+
+	if (const auto &p_info = plugins_.front(); p_info.instance) {
 		return p_info.instance->performAction(cmd);
 	}
 	return {};

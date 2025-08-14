@@ -141,7 +141,6 @@ void Editor::highlightCurrentLine()
         }
         else
         {
-            state.isSelected = false;
             state.selectedBlockNumbers.clear();
         }
 

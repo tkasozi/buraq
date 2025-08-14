@@ -63,7 +63,6 @@ void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInf
         } // network_mutex is unlocked here
 
         pt::read_json(manifest_json.string(), loadPtreeRoot);
-        std::vector<std::tuple<std::string, std::string, std::string>> version;
 
         if (loadPtreeRoot.empty())
         {
@@ -78,9 +77,6 @@ void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInf
         auto release_notes_node = loadPtreeRoot.get_child("notes");
         info.releaseNotes = release_notes_node.get_value<std::string>();
 
-        std::list<std::string> asset_names;
-
-        std::vector<std::string> item_list;
         for (auto& asset : loadPtreeRoot.get_child("assets") | std::views::values)
         {
             info.asset = {
@@ -185,11 +181,11 @@ std::vector<std::string> VersionRepository::split_version(const std::string& str
     size_t end = str_version.find(46); // 46 => '.'
     while (end != std::string::npos)
     {
-        tokens.push_back(str_version.substr(start, end - start));
+        tokens.emplace_back(str_version.substr(start, end - start));
         start = end + 1;
         end = str_version.find(46, start);
     }
-    tokens.push_back(str_version.substr(start));
+    tokens.emplace_back(str_version.substr(start));
     return tokens;
 }
 

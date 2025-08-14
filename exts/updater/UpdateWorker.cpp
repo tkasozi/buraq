@@ -51,7 +51,7 @@ void UpdateWorker::doUpdate(const std::filesystem::path& installerPath,
     const auto mainAppExePath = std::filesystem::path(installationPath.string()) / "buraq.exe";
 
 #ifdef _WIN32
-    if (HANDLE hLaunchedProcess = nullptr; launchApp(mainAppExePath, &hLaunchedProcess, "--show-gui"), true)
+    if (HANDLE hLaunchedProcess = nullptr; launchApp(mainAppExePath, &hLaunchedProcess, "--show-gui", true))
     {
         emit logMessage(
             QString("Relaunching %1. Waiting for it to become responsive...").arg(

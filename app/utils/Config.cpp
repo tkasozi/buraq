@@ -269,11 +269,12 @@ void Config::processStyleBlock(const QDomElement& element, StyleSheetStruct& aSt
     // includes styles
     if (element.hasAttribute("inherits") && element.attributes().item(0).nodeValue() == "commonStyle")
     {
-        aStruct.color = mainStyles->commonStyle.color;
-        aStruct.backgroundColor = mainStyles->commonStyle.backgroundColor;
-        aStruct.padding = mainStyles->commonStyle.padding;
-        aStruct.border = mainStyles->commonStyle.border;
-        aStruct.height = mainStyles->commonStyle.height;
+        const StyleSheetStruct commonStyle =  mainStyles->commonStyle;
+        aStruct.color = commonStyle.color;
+        aStruct.backgroundColor = commonStyle.backgroundColor;
+        aStruct.padding = commonStyle.padding;
+        aStruct.border = commonStyle.border;
+        aStruct.height = commonStyle.height;
     }
 
     const auto styleNodes = element.childNodes();

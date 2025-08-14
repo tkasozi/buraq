@@ -56,5 +56,6 @@
     },
     "csharp.debug.logging.exceptions": true,
     "clang-format.language.c.enable": true,
-    "C_Cpp.codeAnalysis.clangTidy.codeAction.formatFixes": true
+    "C_Cpp.codeAnalysis.clangTidy.codeAction.formatFixes": true,
+    "github-actions.workflows.pinned.workflows": []
 }

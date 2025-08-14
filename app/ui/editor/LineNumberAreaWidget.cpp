@@ -27,10 +27,6 @@ void LineNumberAreaWidget::paintEvent(QPaintEvent *event) {
 
 	// Use this widget's fontMetrics
 	const int lineHeight =  std::max(19, m_editorState.lineHeight);
-	if (lineHeight <= 0) {
-		qWarning() << "LineNumberAreaWidget::paintEvent: fontMetrics().height() is zero or negative.";
-		return;
-	}
 
 	int currentY = 0; // Start Y position from the top. Add padding if needed.
 

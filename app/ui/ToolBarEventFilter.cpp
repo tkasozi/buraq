@@ -9,18 +9,17 @@
 #include "app_ui/AppUi.h"
 #include "ToolBar.h"
 
-bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e)
+bool ToolBarEventFilter::eventFilter(QObject* obj, QEvent* e)
 {
-
-    auto *toolBar = dynamic_cast<ToolBar *>(obj);
-    auto *event = dynamic_cast<QMouseEvent *>(e);
+    auto* toolBar = dynamic_cast<ToolBar*>(obj);
+    auto* event = dynamic_cast<QMouseEvent*>(e);
 
     if (toolBar == nullptr || event == nullptr)
     {
         return false; // Pass event to the object's normal handlers
     }
 
-    auto *ui = dynamic_cast<AppUi *>(obj->parent());
+    auto* ui = dynamic_cast<AppUi*>(obj->parent());
     auto geo = toolBar->geometry();
 
     switch (event->type())
@@ -33,7 +32,6 @@ bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e)
 
         if (event->button() == Qt::LeftButton)
         {
-
             isMouseBtnPressed = true;
             this->dragStartPos = event->pos();
 
@@ -69,8 +67,9 @@ bool ToolBarEventFilter::eventFilter(QObject *obj, QEvent *e)
     }
 }
 
-ToolBarEventFilter::ToolBarEventFilter()
-    : dragStartPos(0, 0),
+ToolBarEventFilter::ToolBarEventFilter(QObject* parent)
+    : QObject(parent),
+      dragStartPos(0, 0),
       isMouseBtnPressed(false)
 {
 }

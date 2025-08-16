@@ -121,17 +121,17 @@ void Editor::highlightCurrentLine()
 
         selection.format.setBackground(lineColor);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-        selection.cursor = textEdit->textCursor();
-
-        extraSelections.append(selection);
-
         state.hasText = currentFile.isEmpty();
         state.isBlockValid = false;
         state.isSelected = false;
         state.blockCount = textEdit->blockCount();
-        state.cursorBlockNumber = textEdit->textCursor().blockNumber(); // TODO not used
-        state.blockNumber = textEdit->textCursor().blockNumber();
+
+        const auto text_cursor = textEdit->textCursor();
+        selection.cursor = text_cursor;
+        extraSelections.append(selection);
+        state.blockNumber = state.cursorBlockNumber = text_cursor.blockNumber();
         state.lineHeight = fontMetrics().height();
+
         state.currentLineHeight = textEdit->cursorRect().height();
 
         if (selection.cursor.hasSelection())

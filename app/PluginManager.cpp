@@ -47,7 +47,7 @@ void PluginManager::logWindowsError(const std::string &action) {
 
 #endif
 
-PluginManager::PluginManager(BuraqApi *app_context) : application_context_(app_context) {}
+PluginManager::PluginManager(buraq_api *app_context) : application_context_(app_context) {}
 
 PluginManager::~PluginManager() {
 //	std::cout << "~PluginManager()" << std::endl;

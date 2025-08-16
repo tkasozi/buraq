@@ -21,41 +21,34 @@
 // SOFTWARE.
 
 //
-// Created by talik on 2/16/2024.
+// Created by talik on 4/26/2024.
 //
 
-#ifndef IT_TOOLS_ICON_BUTTON_H
-#define IT_TOOLS_ICON_BUTTON_H
+#ifndef IT_TOOLS_DB_CONN_H
+#define IT_TOOLS_DB_CONN_H
 
-#include <QString>
-#include <QWidget>
+#include <QSqlError>
+#include <QSqlQuery>
 
-#include "ToolButton.h"
+#include "../FileObject.h"
 
-class IconButton : public ToolButton
+namespace database
 {
+    constexpr auto FILES_SQL = "CREATE TABLE IF NOT EXISTS files(id INTEGER PRIMARY KEY, file_path VARCHAR UNIQUE, file_name VARCHAR);";
 
-public:
-    explicit IconButton(QWidget *ptr = nullptr) : ToolButton(ptr) {};
-    explicit IconButton(const QString &fileName) : ToolButton(fileName) {};
-    explicit IconButton(const QString &fileName, const int w = 24, const int h = 24)
-        : ToolButton(fileName)
-    {
-        setFixedSize(w, h);
-        setIconSize(QSize(18, 18));
-    }
+    constexpr auto INSERT_FILE_SQL = "INSERT INTO files(file_path, file_name) VALUES(?, ?);";
 
-    explicit IconButton(const QIcon &icon, const int w = 24, const int h = 24)
-        : ToolButton(icon)
-    {
-        setFixedSize(w, h);
-        setIconSize(QSize(18, 18));
-    }
+    constexpr auto SELECT_FILES_SQL = "SELECT * FROM files;";
 
-    ~IconButton() override = default;
+    constexpr auto SELECT_FILE_BY_FILE_PATH_SQL = "SELECT * FROM files WHERE file_path = ?;";
 
-private:
-    QString customStyles;
-};
+    constexpr auto DELETE_BY_FILE_PATH_SQL ="DELETE FROM files WHERE file_path = ?;";
 
-#endif // IT_TOOLS_ICON_BUTTON_H
+    QVariant insertFile(const QString& filePath, const QString& title);
+    QVariant deleteRow(const QString& filePath);
+    QList<FileObject*> findPreviouslyOpenedFiles();
+    QSqlError init_db();
+    bool db_conn();
+}
+
+#endif // IT_TOOLS_DB_CONN_H

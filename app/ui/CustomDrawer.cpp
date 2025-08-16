@@ -32,22 +32,7 @@
 #include <QPushButton>
 
 #include "IconButton.h"
-#include "../db_connection.h"
-
-namespace
-{
-    // TODO clean up for best practices
-    QString getFilename(const QString& filePath)
-    {
-        if (!filePath.isEmpty())
-        {
-            long long int i = filePath.lastIndexOf("/") + 1;
-            return filePath.mid(i);
-        }
-
-        return nullptr;
-    }
-}
+#include "../database/db_conn.h"
 
 CustomDrawer::CustomDrawer(Editor* editor) : QWidget(editor), editor(editor)
 {
@@ -143,11 +128,12 @@ void CustomDrawer::onAddButtonClicked()
         if (const QStringList fileNames = dialog.selectedFiles(); !fileNames.empty())
         {
             const QString& filePath = fileNames.at(0);
-            const QString& fileName = getFilename(filePath);
+            const std::string &fileName = file_utils::getFilename(filePath.toStdString());
 
-            if (const QVariant result = insertFile(filePath, fileName); result.isValid())
+            const QString qFileName = QString::fromStdString(fileName);
+            if (const QVariant result = database::insertFile(filePath, qFileName); result.isValid())
             {
-                createFileLabel(filePath, fileName, true);
+                createFileLabel(filePath, qFileName, true);
             }
         }
     }
@@ -231,7 +217,7 @@ void CustomDrawer::setActive(QWidget* pLabel)
 
 void CustomDrawer::showPreviouslyOpenedFiles() const
 {
-    auto previousOpenedFiles = findPreviouslyOpenedFiles();
+    auto previousOpenedFiles = database::findPreviouslyOpenedFiles();
 
     bool isFirstTime = true;
     for (const auto file : previousOpenedFiles)
@@ -247,7 +233,7 @@ void CustomDrawer::showPreviouslyOpenedFiles() const
         }
         catch (...)
         {
-            deleteRow(file->getFilePath());
+            database::deleteRow(file->getFilePath());
         }
     }
 }

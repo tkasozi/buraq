@@ -18,7 +18,10 @@ set(UPDATER_SOURCES Updater.cpp # ${UPDATER_RESOURCES}
 		UpdaterProgressDialog.cpp
 		UpdaterProgressDialog.h
 		UpdateWorker.cpp
-		UpdateWorker.h)
+		UpdateWorker.h
+		../../include/buraq_api.h
+		../../include/buraq_api.cpp
+)
 set(UPDATER_HEADERS ${CMAKE_SOURCE_DIR}/include/IToolsAPI.h)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)

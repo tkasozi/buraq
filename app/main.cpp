@@ -5,7 +5,7 @@
 #include <QDir>
 
 #include "network.h"
-#include "db_connection.h"
+#include "database/db_conn.h"
 #include "theme_manager.h"
 #include "client/VersionRepository.h"
 #include "app_ui/AppUi.h"
@@ -31,7 +31,8 @@ int main(int argc, char* argv[])
     // though Meyers singleton handles this.
     Network::singleton(); // Initialize network singleton if not already.
 
-    if (!db_conn())
+    using file_utils::file_log;
+    if (!database::db_conn())
     {
         file_log("db_conn() EXIT_FAILURE..");
         // failed to connect to the database
@@ -39,7 +40,7 @@ int main(int argc, char* argv[])
     }
 
     // Initialize the database:
-    if (const QSqlError err = init_db(); err.type() != QSqlError::NoError)
+    if (const QSqlError err = database::init_db(); err.type() != QSqlError::NoError)
     {
         file_log("Error executing initializing db:" + err.text().toStdString());
         return EXIT_FAILURE;

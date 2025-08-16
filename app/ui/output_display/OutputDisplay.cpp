@@ -29,134 +29,132 @@
 #include "Utils.h"
 #include "app_ui/AppUi.h"
 
-void init_main_out_area(QPlainTextEdit *, QVBoxLayout *, int);
+void init_main_out_area(QPlainTextEdit*, QVBoxLayout*, int);
 
-OutputDisplay::OutputDisplay(QWidget *appUi) : QWidget(appUi), appUi(appUi)
+OutputDisplay::OutputDisplay(QWidget* appUi) : QWidget(appUi), appUi(appUi)
 {
-// 	setStyleSheet(
-// //		"background-color : #252525;"
-// 		"border:0px;");
+    // TODO This will eventually become a tool bar
+    const auto pMainLabel = new QLabel;
+    pMainLabel->setFixedHeight(25);
+    pMainLabel->setText("Output:");
 
-	auto layout = new QVBoxLayout(this);
-	layout->setSpacing(0);
-	layout->setContentsMargins(0, 0, 0, 0);
+    const auto layout = new QVBoxLayout(this);
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    pMainLabel->setStyleSheet(
+        "color: #fff;"
+        "border-bottom: 1px solid #000;");
+    layout->addWidget(pMainLabel);
 
-	// TODO This will eventually become a tool bar
-	auto pMainLabel = new QLabel;
-	pMainLabel->setFixedHeight(25);
-	pMainLabel->setText("Output:");
-	pMainLabel->setStyleSheet(
-		"color: #fff;"
-		"border-bottom: 1px solid #000;");
-	layout->addWidget(pMainLabel);
+    main = std::make_unique<QPlainTextEdit>();
+    init_main_out_area(main.get(), layout, 0);
 
-	main = std::make_unique<QPlainTextEdit>();
-	init_main_out_area(main.get(), layout, 0);
-
-	hide();
+    hide();
 }
 
-void init_main_out_area(QPlainTextEdit *main, QVBoxLayout *layout, int editorWidth = 0)
+void init_main_out_area(QPlainTextEdit* main, QVBoxLayout* layout, int editorWidth = 0)
 {
-	// For displaying the output_display
-	layout->addWidget(main);
+    // For displaying the output_display
+    layout->addWidget(main);
 
-	// Get the current palette
-	QPalette palette = main->palette();
+    // Get the current palette
+    QPalette palette = main->palette();
 
-	// Set the color for the background of the selection
-	palette.setColor(QPalette::Highlight, QColor(0, 120, 215)); // A common blue selection background
-	palette.setColor(QPalette::Text, QColor(Qt::white));		// A common blue selection background
-	main->setPalette(palette);
+    // Set the color for the background of the selection
+    palette.setColor(QPalette::Highlight, QColor(0, 120, 215)); // A common blue selection background
+    palette.setColor(QPalette::Text, QColor(Qt::white)); // A common blue selection background
+    main->setPalette(palette);
 
-	main->setReadOnly(true);
-	main->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
+    main->setReadOnly(true);
+    main->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
 
-	main->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    main->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	qDebug() << "appWidth: " << editorWidth;
-	if (editorWidth > 0)
-	{
-		main->setMinimumWidth(editorWidth);
-	}
+    qDebug() << "appWidth: " << editorWidth;
+    if (editorWidth > 0)
+    {
+        main->setMinimumWidth(editorWidth);
+    }
 
-	// --- QSS for Custom Scrollbar ---
-	// Apply the stylesheet directly to the textEdit widget
-	// This ensures only this textEdit's scrollbars are affected (and its children if any)
-	main->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
-	main->setMinimumHeight(550);
+    // --- QSS for Custom Scrollbar ---
+    // Apply the stylesheet directly to the textEdit widget
+    // This ensures only this textEdit's scrollbars are affected (and its children if any)
+    main->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+    main->setMinimumHeight(550);
 }
 
 void OutputDisplay::toggle()
 {
-	if (isVisible())
-	{
-		hide();
-	}
-	else
-	{
-		show();
-	}
+    if (isVisible())
+    {
+        hide();
+    }
+    else
+    {
+        show();
+    }
 }
 
-void OutputDisplay::log(const QString &strOutput, const QString &errorOutput)
+void OutputDisplay::log(const QString& strOutput, const QString& errorOutput)
 {
-	QStringList list = strOutput.split("\\u2029");
-	QStringList errorsList = errorOutput.split("\\u2029");
+    QStringList list = strOutput.split("\\u2029");
+    QStringList errorsList = errorOutput.split("\\u2029");
 
-	QLabel *error = createLabel(errorOutput, "error");
-	auto layout = new QVBoxLayout;
+    QLabel* error = createLabel(errorOutput, "error");
 
-	// Adds timestamp
-	QDateTime currentDateTime = QDateTime::currentDateTime();
-	QString formattedDateTime = currentDateTime.toString("yyyy-MM-dd hh:mm:ss"); // Custom format
-	main->appendHtml("<h4 style=\"color: #FFFDD0;\">Executed: " +
-					 formattedDateTime + "</h4>");
-	// End Adds timestamp
+    // Adds timestamp
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString formattedDateTime = currentDateTime.toString("yyyy-MM-dd hh:mm:ss"); // Custom format
+    main->appendHtml("<h4 style=\"color: #FFFDD0;\">Executed: " +
+        formattedDateTime + "</h4>");
+    // End Adds timestamp
 
-	main->appendHtml("<div>");
-	for (const QString &qString : list)
-	{
-		main->appendHtml("<p  style=\"color: #FFFFFF;\">" + qString + "</p>");
-	}
-	for (const QString &qString : errorsList)
-	{
-		// error logs
-		main->appendHtml("<p style=\"color: #FF6347;\">" + qString + "</p>");
-	}
-	main->appendHtml("</div>");
+    main->appendHtml("<div>");
+    for (const QString& qString : list)
+    {
+        main->appendHtml("<p  style=\"color: #FFFFFF;\">" + qString + "</p>");
+    }
+    for (const QString& qString : errorsList)
+    {
+        // error logs
+        main->appendHtml("<p style=\"color: #FF6347;\">" + qString + "</p>");
+    }
+    main->appendHtml("</div>");
 
-	if (error != nullptr)
-		layout->addWidget(error);
+    if (error != nullptr)
+    {
+        const auto layout = new QVBoxLayout;
+        layout->addWidget(error);
+    }
 }
 
-QLabel *OutputDisplay::createLabel(const QString &text, QString state)
+QLabel* OutputDisplay::createLabel(const QString& text, QString state)
 {
-	if (text.isEmpty())
-		return nullptr;
+    if (text.isEmpty())
+        return nullptr;
 
-	auto label = new QLabel;
-	label->setText(text);
-	label->setFont(QFont("Arial", 32));
+    auto label = new QLabel;
+    label->setText(text);
+    label->setFont(QFont("Arial", 32));
 
 	//@formatter:off
 	// label->setStyleSheet(
 	// 	std::equal(state.begin(), state.end(), "error") ? "color: #FF6347;" : "color: #F9F6EE;");
-	//@formatter:on
+    //@formatter:on
 
-	label->setAlignment(Qt::AlignLeft);
+    label->setAlignment(Qt::AlignLeft);
 
-	// Call adjustSize() after setting the text
-	label->adjustSize();
+    // Call adjustSize() after setting the text
+    label->adjustSize();
 
-	// Get the recommended size from sizeHint()
-	QSize recommendedSize = label->sizeHint();
-	recommendedSize.setWidth(recommendedSize.width() * 2); // Add some extra width
-	// auto n = std::max(100, recommendedSize.height());
-	recommendedSize.setHeight(recommendedSize.height() + 100); // Add some extra width
+    // Get the recommended size from sizeHint()
+    QSize recommendedSize = label->sizeHint();
+    recommendedSize.setWidth(recommendedSize.width() * 2); // Add some extra width
+    // auto n = std::max(100, recommendedSize.height());
+    recommendedSize.setHeight(recommendedSize.height() + 100); // Add some extra width
 
-	// Set the label's size manually
-	label->setFixedSize(recommendedSize);
+    // Set the label's size manually
+    label->setFixedSize(recommendedSize);
 
-	return label;
+    return label;
 }

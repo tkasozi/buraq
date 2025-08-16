@@ -28,17 +28,12 @@
 #define BURAQ_API_H
 
 #include <filesystem>
-#include <iostream>
 #include <string>
 #include <set>
 #include <map>
-#include <fstream>
-#include <chrono>
-#include <iomanip> // For std::put_time
-#include <ctime> // For std::localtime, std::time_t
 
-    // Example of an application context you might pass to plugins
-    struct buraq_api
+// Example of an application context you might pass to plugins
+struct buraq_api
 {
     std::filesystem::path searchPath;
     std::filesystem::path userPath;
@@ -48,7 +43,6 @@
 
 struct EditorState
 {
-
     bool hasText;
     bool isBlockValid;
     bool isSelected;
@@ -60,14 +54,14 @@ struct EditorState
     std::set<int> selectedBlockNumbers;
 
     // For the updateEditorState check if states are different
-    bool operator!=(const EditorState &other) const
+    bool operator!=(const EditorState& other) const
     {
         return blockCount != other.blockCount ||
-               blockNumber != other.blockNumber ||
-               cursorBlockNumber != other.cursorBlockNumber;
+            blockNumber != other.blockNumber ||
+            cursorBlockNumber != other.cursorBlockNumber;
     }
 
-    bool operator==(const EditorState &other) const
+    bool operator==(const EditorState& other) const
     {
         return !(*this != other);
     }
@@ -76,8 +70,8 @@ struct EditorState
 
 namespace file_utils
 {
-	std::string getFilename(const std::string& filePath);
-	void file_log(const std::string &message);
+    std::string getFilename(const std::string& filePath);
+    void file_log(const std::string& message);
 }
 
 #endif // BURAQ_API_H

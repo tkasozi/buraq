@@ -6,9 +6,11 @@
 #define REPO_H
 
 #include <string>
+#include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
+#include <vector>
+
 #include "network.h"
 #include "app_version.h"
-#include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include "client/VersionRepository.h"
 #include "buraq_api.h"
 

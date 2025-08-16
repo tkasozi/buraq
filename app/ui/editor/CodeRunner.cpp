@@ -122,7 +122,7 @@ void CodeRunner::handleTaskResults(const QVariant &result)
         if (!resultString.isEmpty() && resultString.contains("exception", Qt::CaseInsensitive))
         {
             error = resultString;
-            resultString = "";
+            resultString.clear();
             statusCode = 1;
         }
         emit updateOutputResult(statusCode, resultString, error);

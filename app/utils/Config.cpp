@@ -148,11 +148,11 @@ void Config::loadConfig(Config* _this)
 
 void Config::processWindowAttr(const QDomElement& element) const
 {
-    // element.attributes().item(1).nodeValue()
-    for (int i = 0; i < element.attributes().size(); ++i)
+    const auto attrs = element.attributes();
+    for (int i = 0; i < attrs.size(); ++i)
     {
-        QString attrName = element.attributes().item(i).nodeName();
-        QString attrValue = element.attributes().item(i).nodeValue();
+        QString attrName = attrs.item(i).nodeName();
+        QString attrValue = attrs.item(i).nodeValue();
 
         if (attrName == "minWidth")
         {

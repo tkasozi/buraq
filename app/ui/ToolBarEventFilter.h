@@ -9,11 +9,11 @@
 #include <QMetaObject>
 #include <iostream>
 
-class ToolBarEventFilter : public QObject {
+class ToolBarEventFilter final : public QObject {
 	Q_OBJECT
 
 public:
-	ToolBarEventFilter();
+	explicit ToolBarEventFilter(QObject *parent = nullptr);
 	~ToolBarEventFilter() override;
 	bool eventFilter(QObject *obj, QEvent *event) override;
 

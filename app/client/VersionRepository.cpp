@@ -20,7 +20,7 @@
 std::mutex network_mutex;
 
 
-VersionRepository::VersionRepository(BuraqApi* api_context) :
+VersionRepository::VersionRepository(buraq_api* api_context) :
     endpoint("https://raw.githubusercontent.com/tkasozi/buraq/refs/heads/main/manifest.json"),
     network(Network::singleton()),
     api_context(api_context)
@@ -101,27 +101,13 @@ void VersionRepository::get_manifest_json(const std::string& endpoint, UpdateInf
 
 UpdateInfo VersionRepository::main_version_logic()
 {
-    std::vector<std::thread> threads;
-    constexpr int num_threads = 1;
-
-    // create a separate thread..
-    for (int i = 0; i < num_threads; ++i)
+    if (std::thread thread(get_manifest_json, endpoint, std::ref(versionInfo)); thread.joinable())
     {
-        threads.emplace_back(get_manifest_json, endpoint, std::ref(versionInfo));
-    }
-
-    for (std::thread& t : threads)
-    {
-        if (t.joinable())
-        {
-            t.join();
-        }
+        thread.join();
     }
 
     try
     {
-        const std::string currentVersion = getCurrentAppVersion();
-
         if (versionInfo.latestVersion.empty())
         {
             std::cerr << "No version" << std::endl;
@@ -149,7 +135,7 @@ UpdateInfo VersionRepository::main_version_logic()
         }
         else
         {
-            std::cout << "You have the latest version. " << currentVersion << std::endl;
+            std::cout << "You have the latest version. " << getCurrentAppVersion() << std::endl;
             return {};
         }
     }

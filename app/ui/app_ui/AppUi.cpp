@@ -97,7 +97,8 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 
     centralWidgetLayout2->addWidget(centralWidgetControlPanelA, 0, 0, 1, 12, Qt::AlignJustify);
 
-    folderButton = std::make_unique<IconButton>(Config::singleton().getAppIcons()->folderIcon);
+    const auto appIcons = Config::singleton().getAppIcons();
+    folderButton = std::make_unique<IconButton>(appIcons->folderIcon);
 
     layoutA->addWidget(folderButton.get());
 
@@ -111,11 +112,11 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 
     centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
 
-    const auto outputButton = new IconButton(Config::singleton().getAppIcons()->terminalIcon);
+    const auto outputButton = new IconButton(appIcons->terminalIcon);
     connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
     layoutB->addWidget(outputButton);
 
-    const auto settingsButton = new IconButton(Config::singleton().getAppIcons()->settingsIcon);
+    const auto settingsButton = new IconButton(appIcons->settingsIcon);
     layoutB->addWidget(settingsButton);
 
     // add to central widget
@@ -129,8 +130,6 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     layoutB->setContentsMargins(0, 0, 0, 0);
 
     // Editor helper component.
-    // editorMargin = std::make_unique<EditorMargin>(this);
-    // The text or script editor.
     itoolsEditor = std::make_unique<Editor>(this);
     // Handles file nav
     drawer = std::make_unique<CustomDrawer>(itoolsEditor.get());
@@ -146,7 +145,7 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 1);
 
     // add main content area
-    auto editorAndDrawerAreaPanel = new QWidget;
+    const auto editorAndDrawerAreaPanel = new QWidget;
     editorAndDrawerAreaPanel->setLayout(placeHolderLayout.get());
     centralWidgetLayout->addWidget(editorAndDrawerAreaPanel, 0, 2, 12, 12);
     centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
@@ -159,12 +158,6 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 
 void AppUi::onWindowFullyLoaded()
 {
-    // Perform your actions here
-    // For example:
-    // - Load data from a database/network without blocking the UI initially
-
-    // MyCustomDialog customDlg(this); // 'this' would be the parent widget
-    VersionUpdateDialog versionUpdater(this);
     VersionRepository repo(api_context.get());
 
     if (const UpdateInfo update_info = repo.main_version_logic(); update_info.isConnFailure == false)
@@ -175,6 +168,8 @@ void AppUi::onWindowFullyLoaded()
             qDebug() << "app version is empty or already upto date!";
             return;
         }
+
+        VersionUpdateDialog versionUpdater(this);
         versionUpdater.setWindowTitle(
             "A new version " + QString::fromStdString(update_info.latestVersion) + " is available!");
         versionUpdater.setContent(QString::fromStdString(update_info.releaseNotes));
@@ -297,7 +292,7 @@ void AppUi::configureAppContext()
         {"power_shell", searchPath.string() + "/libpowershell_plugin.dll"}
     };
 
-    api_context = std::make_unique<BuraqApi>();
+    api_context = std::make_unique<buraq_api>();
     api_context->searchPath = searchPath;
     api_context->plugins = plugins_;
     api_context->userDataPath = userDataPath / ".data";

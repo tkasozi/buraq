@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 #include <QApplication>
-#include "../../include/BuraqApi.h"
+#include "../../include/buraq_api.h"
 
 #include "UpdaterProgressDialog.h"
 #include "UpdateWorker.h"
@@ -12,7 +12,7 @@
 
 void log(const std::string& _log)
 {
-    file_log("[Updater.exe] " + _log);
+    file_utils::file_log("[Updater.exe] " + _log);
 }
 
 int main(int argc, char* argv[])

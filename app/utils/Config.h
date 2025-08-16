@@ -53,12 +53,12 @@ struct AppIcons
 };
 struct StyleSheetStruct
 {
-	QString color = QString("");
-	QString backgroundColor = QString("");
-	QString padding = QString("");
-	QString border = QString("");
-	QString height = QString("");
-	QString borderColor = QString("");
+	QString color = QString();
+	QString backgroundColor = QString();
+	QString padding = QString();
+	QString border = QString();
+	QString height = QString();
+	QString borderColor = QString();
 	QString borderBottom = QString();
 	/**
 	 * String combining all the styleSheet object's properties

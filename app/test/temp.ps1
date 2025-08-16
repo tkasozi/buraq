@@ -19,3 +19,4 @@ $idk = "what this is."
 if ("$idk") {
 Write-Output "This is an example script by $idk."
 }
+ 

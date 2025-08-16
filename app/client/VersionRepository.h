@@ -10,12 +10,12 @@
 #include "app_version.h"
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include "client/VersionRepository.h"
-#include "BuraqApi.h"
+#include "buraq_api.h"
 
 class VersionRepository {
 
 public:
-	explicit VersionRepository(BuraqApi *api_context);
+	explicit VersionRepository(buraq_api *api_context);
 
 	~VersionRepository() = default;
 
@@ -28,7 +28,7 @@ public:
 
 
 private:
-	BuraqApi *api_context;
+	buraq_api *api_context;
 	std::string endpoint;
 	UpdateInfo versionInfo;
 	Network &network;

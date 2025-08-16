@@ -7,7 +7,7 @@
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include <fstream>
 
-#include "../../include/buraq_api.h"
+#include "../../include/buraq.h"
 
 #include "./db_conn.h"
 
@@ -76,8 +76,7 @@ namespace database
 
     QSqlError init_db()
     {
-        QSqlQuery query;
-        if (!query.exec(FILES_SQL))
+        if (QSqlQuery query; !query.exec(FILES_SQL))
         {
             file_utils::file_log("Error executing query: " + query.lastError().text().toStdString());
             return query.lastError();
@@ -106,15 +105,14 @@ namespace database
 
         try
         {
-            std::fstream db(dbName, std::ios::in);
-
-            if (db.is_open())
+            if (std::fstream db(dbName, std::ios::in); db.is_open())
             {
                 // db file exists
                 db.close();
             }
             else
             {
+                // create the db file
                 std::ofstream outputFile(dbName, std::ios::out);
                 outputFile.close();
             }

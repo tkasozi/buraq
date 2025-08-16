@@ -16,9 +16,9 @@
 class EditorMargin final : public CommonWidget {
 
 public slots:
-	void updateState(const EditorState &newState) const;
+	void updateState(const buraq::EditorState &newState) const;
 	void onEditorScrolled();
-	void updateMarginWidth(const EditorState& state) const;
+	void updateMarginWidth(const buraq::EditorState& state) const;
 
 public:
 

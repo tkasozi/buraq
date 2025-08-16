@@ -28,7 +28,7 @@
 #define PLUGIN_INTERFACE_H
 
 #include <string>
-#include "buraq_api.h"
+#include "buraq.h"
 
 struct ProcessedData {
 	std::wstring resultValue;
@@ -37,7 +37,7 @@ struct ProcessedData {
 class IPlugin {
 public:
 
-	explicit IPlugin(buraq_api *api_context) : api_context(api_context){};
+	explicit IPlugin(buraq::buraq_api *api_context) : api_context(api_context){};
 
 	virtual ~IPlugin() = default;
 
@@ -51,14 +51,14 @@ public:
 	 * the plugin.
 	 * @return True if successfully initialized.
 	 */
-	virtual bool initialize(buraq_api* app_context) = 0;
+	virtual bool initialize(buraq::buraq_api* app_context) = 0;
 private:
-	buraq_api *api_context;
+	buraq::buraq_api *api_context;
 };
 
 // Avoid C++ name mangling
 extern "C" {
-typedef  IPlugin* (*CreatePluginFunc)(buraq_api *);
+typedef  IPlugin* (*CreatePluginFunc)(buraq::buraq_api *);
 typedef void (*DestroyPluginFunc)(IPlugin*);
 }
 

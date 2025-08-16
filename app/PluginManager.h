@@ -28,7 +28,7 @@
 #define ITOOLS_PLUGIN_MANAGER_H
 
 #include "../include/PluginInterface.h"
-#include "../include/buraq_api.h"
+#include "../include/buraq.h"
 #include <string>
 #include <vector>
 #include <memory> // For std::unique_ptr or managing plugin instances
@@ -44,7 +44,7 @@
 
 class PluginManager {
 public:
-	explicit PluginManager(buraq_api *app_context); // Application context to pass to plugins
+	explicit PluginManager(buraq::buraq_api *app_context); // Application context to pass to plugins
 
 	~PluginManager();
 
@@ -80,7 +80,7 @@ private:
 	};
 
 	std::vector<LoadedPlugin> plugins_;
-	buraq_api *application_context_; // Store the application context
+	buraq::buraq_api *application_context_; // Store the application context
 
 #ifdef _WIN32
 

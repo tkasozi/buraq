@@ -9,7 +9,7 @@
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include <qlogging.h>
 #include <QDebug>
-#include <list>
+#include <iostream>
 #include <ranges>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -20,7 +20,7 @@
 std::mutex network_mutex;
 
 
-VersionRepository::VersionRepository(buraq_api* api_context) :
+VersionRepository::VersionRepository(buraq::buraq_api* api_context) :
     endpoint("https://raw.githubusercontent.com/tkasozi/buraq/refs/heads/main/manifest.json"),
     network(Network::singleton()),
     api_context(api_context)

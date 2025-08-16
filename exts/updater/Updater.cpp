@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 #include <QApplication>
-#include "../../include/buraq_api.h"
+#include "../../include/buraq.h"
 
 #include "UpdaterProgressDialog.h"
 #include "UpdateWorker.h"

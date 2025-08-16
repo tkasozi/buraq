@@ -92,9 +92,9 @@ set(ITOOLS_HEADERS
         ui/dialog/VersionUpdateDialog.h
         ../include/theme_manager.h
         ../include/theme_manager.cpp
-        ../include/buraq_api.h
+        ../include/buraq.h
         database/db_conn.cpp
-        ../include/buraq_api.cpp
+        ../include/buraq.cpp
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)

@@ -11,7 +11,7 @@ LineNumberAreaWidget::LineNumberAreaWidget(QWidget *parent) : QWidget(parent) {
 	setMinimumWidth(5);
 }
 
-void LineNumberAreaWidget::updateEditorState(const EditorState &state) {
+void LineNumberAreaWidget::updateEditorState(const buraq::EditorState &state) {
 	if (m_editorState != state) { // Basic check to avoid unnecessary updates
 		m_editorState = state;
 		update(); // This is KEY: it schedules a call to paintEvent()

@@ -13,70 +13,66 @@
 #include <QStack>
 
 #include "EditorMargin.h"
-#include "buraq_api.h"
+#include "buraq.h"
 
-class Editor final : public QWidget {
-
-Q_OBJECT
+class Editor final : public QWidget
+{
+    Q_OBJECT
 
 protected:
+    // void focusInEvent(QFocusEvent *e) override;
 
-	// void focusInEvent(QFocusEvent *e) override;
+    void keyPressEvent(QKeyEvent* e) override;
 
-	void keyPressEvent(QKeyEvent *e) override;
+    void keyReleaseEvent(QKeyEvent* e) override;
 
-	void keyReleaseEvent(QKeyEvent *e) override;
-
-	void mousePressEvent(QMouseEvent *e) override;
+    void mousePressEvent(QMouseEvent* e) override;
 
 signals:
-	void statusUpdate(QString status, int timeout = 10000);
+    void statusUpdate(QString status, int timeout = 10000);
 
-	void readyToSaveEvent();
+    void readyToSaveEvent();
 
-	void syntaxtHighlightingEvent();
+    void syntaxtHighlightingEvent();
 
-	void inlineSyntaxtHighlightingEvent();
+    void inlineSyntaxtHighlightingEvent();
 
-	void lineNumberAreaPaintEventSignal(const EditorState &state);
-
+    void lineNumberAreaPaintEventSignal(const buraq::EditorState& state);
 
 public:
-	explicit Editor(QWidget *appUi = nullptr);
+    explicit Editor(QWidget* appUi = nullptr);
 
-	~Editor() override  = default;
+    ~Editor() override = default;
 
-	void openAndParseFile(const QString &filePath, QFile::OpenModeFlag modeFlag = QFile::OpenModeFlag::ReadOnly);
-	// Add forwarding methods if external code calls QPlainTextEdit methods on Editor
-	[[nodiscard]] QString toPlainText() const { return m_plainTextEdit->toPlainText(); }
-	[[nodiscard]] QString selectedText() const { return m_plainTextEdit->textCursor().selectedText(); }
-	void setPlainText(const QString &text) const { m_plainTextEdit->setPlainText(text); }
+    void openAndParseFile(const QString& filePath, QFile::OpenModeFlag modeFlag = QFile::OpenModeFlag::ReadOnly);
+    // Add forwarding methods if external code calls QPlainTextEdit methods on Editor
+    [[nodiscard]] QString toPlainText() const { return m_plainTextEdit->toPlainText(); }
+    [[nodiscard]] QString selectedText() const { return m_plainTextEdit->textCursor().selectedText(); }
+    void setPlainText(const QString& text) const { m_plainTextEdit->setPlainText(text); }
 
 private slots:
+    void highlightCurrentLine();
 
-	void highlightCurrentLine();
+    void documentSyntaxHighlighting();
 
-	void documentSyntaxHighlighting();
+    void inlineSyntaxHighlighting();
 
-	void inlineSyntaxHighlighting();
-
-	void autoSave();
+    void autoSave();
 
 private:
+    std::unique_ptr<QPlainTextEdit> m_plainTextEdit; // FIX: Internal QPlainTextEdit
+    std::unique_ptr<EditorMargin> editorMargin; // Your margin widget
+    QWidget* appUi;
+    QStack<QString> history;
+    QString currentFile;
+    QString previousText;
+    QTimer autoSaveTimer;
+    buraq::EditorState state;
 
-	std::unique_ptr<QPlainTextEdit> m_plainTextEdit; // FIX: Internal QPlainTextEdit
-	std::unique_ptr<EditorMargin> editorMargin;      // Your margin widget
-	QWidget *appUi;
-	QStack<QString> history;
-	QString currentFile;
-	QString previousText;
-	QTimer autoSaveTimer;
-	EditorState state;
+    static QString convertTextToHtml(QString&);
+    static QString convertRhsTextToHtml(const QString&);
 
-	static QString convertTextToHtml(QString &);
-	static QString convertRhsTextToHtml(const QString &);
-
-	void setupSignals();
+    void setupSignals();
 };
 
 #endif //IT_TOOLS_EDITOR_H2

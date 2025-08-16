@@ -20,7 +20,7 @@
 std::mutex network_mutex;
 
 
-VersionRepository::VersionRepository(buraq_api* api_context) :
+VersionRepository::VersionRepository(buraq::buraq_api* api_context) :
     endpoint("https://raw.githubusercontent.com/tkasozi/buraq/refs/heads/main/manifest.json"),
     network(Network::singleton()),
     api_context(api_context)

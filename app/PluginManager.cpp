@@ -47,7 +47,7 @@ void PluginManager::logWindowsError(const std::string &action) {
 
 #endif
 
-PluginManager::PluginManager(buraq_api *app_context) : application_context_(app_context) {}
+PluginManager::PluginManager(buraq::buraq_api *app_context) : application_context_(app_context) {}
 
 PluginManager::~PluginManager() {
 //	std::cout << "~PluginManager()" << std::endl;
@@ -170,13 +170,13 @@ void PluginManager::loadPluginsFromDirectory(const std::string &directory_path) 
 	const char *pluginPath = directory_path.c_str();
 	char fullPath[MAX_PATH];
 	if (GetFullPathNameA(pluginPath, MAX_PATH, fullPath, NULL) != 0) {
-		printf("Attempting to load plugin from: %s\n", fullPath);
+		std::cout <<"Attempting to load plugin from: %s\n", fullPath;
 	} else {
-		printf("Could not resolve full path for: %s\n", pluginPath);
+		std::cout <<"Could not resolve full path for: %s\n", pluginPath;
 	}
 	HMODULE hPlugin = LoadLibraryA(pluginPath);
 	if (hPlugin == NULL) {
-		printf("Error in LoadLibraryA for %s (Code %lu)\n", pluginPath, GetLastError());
+		std::cout <<"Error in LoadLibraryA for %s (Code %lu)\n" << pluginPath << "" << GetLastError();
 	}
 	// ----------------------------------------------------------------------------------
 	namespace fs = std::filesystem;

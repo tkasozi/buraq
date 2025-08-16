@@ -59,7 +59,7 @@ EditorMargin::EditorMargin(QWidget* appUi, QWidget* parent) : CommonWidget(paren
 
 // Call this method whenever the editor's state changes
 // For example, when text is edited, or the view is scrolled.
-void EditorMargin::updateState(const EditorState& newState) const
+void EditorMargin::updateState(const buraq::EditorState& newState) const
 {
     if (line_numbers_widget)
     {
@@ -71,7 +71,7 @@ void EditorMargin::onEditorScrolled()
 {
 }
 
-void EditorMargin::updateMarginWidth(const EditorState& state) const
+void EditorMargin::updateMarginWidth(const buraq::EditorState& state) const
 {
     line_numbers_widget->updateEditorState(state);
 }

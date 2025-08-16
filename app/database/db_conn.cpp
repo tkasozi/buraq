@@ -7,7 +7,7 @@
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
 #include <fstream>
 
-#include "../../include/buraq_api.h"
+#include "../../include/buraq.h"
 
 #include "./db_conn.h"
 

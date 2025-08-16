@@ -25,7 +25,7 @@
 //
 
 #include "PluginInterface.h"
-#include "buraq_api.h"
+#include "buraq.h"
 #include <string>
 #include <vector>
 
@@ -142,12 +142,12 @@ typedef wchar_t *(CORECLR_DELEGATE_CALLTYPE *execute_method_fn)(void *args, int 
 
 class PowershellPlugin : public IPlugin {
 private:
-	buraq_api *app_api_;
+	buraq::buraq_api *app_api_;
 	execute_method_fn execute_fptr;
 	fs::path assembly_path;
 
 public:
-	explicit PowershellPlugin(buraq_api *searchPath) : IPlugin(searchPath), app_api_(searchPath), execute_fptr(nullptr) {
+	explicit PowershellPlugin(buraq::buraq_api *searchPath) : IPlugin(searchPath), app_api_(searchPath), execute_fptr(nullptr) {
 		// --- 1. Load hostfxr and get exported hosting functions ---
 		if (!load_hostfxr()) {
 			exit(-1); // Or handle error appropriately
@@ -196,7 +196,7 @@ public:
 		return "Powershell Plugin";
 	}
 
-	bool initialize(buraq_api *app_context) override {
+	bool initialize(buraq::buraq_api *app_context) override {
 		app_api_ = app_context;
 		return true;
 	}
@@ -256,7 +256,7 @@ public:
 extern "C"
 {
 // Functions will be looked up by name by the plugin manager
-PLUGIN_API IPlugin *create_plugin(buraq_api *app_context) {
+PLUGIN_API IPlugin *create_plugin(buraq::buraq_api *app_context) {
 	return new PowershellPlugin(app_context);
 }
 PLUGIN_API void destroy_plugin(IPlugin *plugin) {

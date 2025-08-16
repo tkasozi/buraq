@@ -32,41 +32,42 @@
 #include <set>
 #include <map>
 
-// Example of an application context you might pass to plugins
-struct buraq_api
+namespace buraq
 {
-    std::filesystem::path searchPath;
-    std::filesystem::path userPath;
-    std::filesystem::path userDataPath;
-    std::map<std::string, std::string> plugins;
-};
-
-struct EditorState
-{
-    bool hasText;
-    bool isBlockValid;
-    bool isSelected;
-    int blockCount;
-    int cursorBlockNumber;
-    int blockNumber;
-    int lineHeight;
-    int currentLineHeight;
-    std::set<int> selectedBlockNumbers;
-
-    // For the updateEditorState check if states are different
-    bool operator!=(const EditorState& other) const
+    struct buraq_api
     {
-        return blockCount != other.blockCount ||
-            blockNumber != other.blockNumber ||
-            cursorBlockNumber != other.cursorBlockNumber;
-    }
+        std::filesystem::path searchPath;
+        std::filesystem::path userPath;
+        std::filesystem::path userDataPath;
+        std::map<std::string, std::string> plugins;
+    };
 
-    bool operator==(const EditorState& other) const
+    struct EditorState
     {
-        return !(*this != other);
-    }
-};
+        bool hasText;
+        bool isBlockValid;
+        bool isSelected;
+        int blockCount;
+        int cursorBlockNumber;
+        int blockNumber;
+        int lineHeight;
+        int currentLineHeight;
+        std::set<int> selectedBlockNumbers;
 
+        // For the updateEditorState check if states are different
+        bool operator!=(const EditorState& other) const
+        {
+            return blockCount != other.blockCount ||
+                blockNumber != other.blockNumber ||
+                cursorBlockNumber != other.cursorBlockNumber;
+        }
+
+        bool operator==(const EditorState& other) const
+        {
+            return !(*this != other);
+        }
+    };
+}
 
 namespace file_utils
 {

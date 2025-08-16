@@ -19,8 +19,8 @@ set(UPDATER_SOURCES Updater.cpp # ${UPDATER_RESOURCES}
 		UpdaterProgressDialog.h
 		UpdateWorker.cpp
 		UpdateWorker.h
-		../../include/buraq_api.h
-		../../include/buraq_api.cpp
+		../../include/buraq.h
+		../../include/buraq.cpp
 )
 set(UPDATER_HEADERS ${CMAKE_SOURCE_DIR}/include/IToolsAPI.h)
 

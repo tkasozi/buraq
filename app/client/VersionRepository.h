@@ -12,12 +12,12 @@
 #include "network.h"
 #include "app_version.h"
 #include "client/VersionRepository.h"
-#include "buraq_api.h"
+#include "buraq.h"
 
 class VersionRepository {
 
 public:
-	explicit VersionRepository(buraq_api *api_context);
+	explicit VersionRepository(buraq::buraq_api *api_context);
 
 	~VersionRepository() = default;
 
@@ -30,7 +30,7 @@ public:
 
 
 private:
-	buraq_api *api_context;
+	buraq::buraq_api *api_context;
 	std::string endpoint;
 	UpdateInfo versionInfo;
 	Network &network;

@@ -13,13 +13,13 @@ RUN powershell -Command Invoke-WebRequest -Uri 'https://repo.msys2.org/distrib/x
 # This avoids PowerShell pathing issues and ensures the environment is set up correctly.
 #    C:\msys64\usr\bin\pacman-key --init && \
 #    C:\msys64\usr\bin\pacman-key --populate msys && \
-RUN C:\msys64\usr\bin\bash -lc '\
+RUN C:\msys64\usr\bin\bash -lc "\
     rm -r C:\msys64\etc\pacman.d\gnupg && \
     curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20250619-1-any.pkg.tar.zst && \
     curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20250619-1-any.pkg.tar.zst.sig && \
     echo "Hello world" && \
     C:/msys64/usr/bin/pacman -U msys2-keyring-1~20250619-1-any.pkg.tar.zst && \
-    dir && \'
+    dir && \"
 
 # This single RUN command handles the entire initialization and update process
 RUN C:\msys64\usr\bin\bash -lc "\
@@ -37,7 +37,7 @@ RUN C:\msys64\usr\bin\bash -lc "\
     mingw-w64-x86_64-toolchain \
     git \
     make \
-    mingw-w64-x86_64-cmake" \
+    mingw-w64-x86_64-cmake"
 
 # Stage 2: The Runtime Environment
 # This stage uses dotnet/sdk image and just copies the final executable.

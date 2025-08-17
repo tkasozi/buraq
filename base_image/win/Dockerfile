@@ -19,7 +19,6 @@ RUN C:\msys64\msys2_shell.cmd -c 'C:\msys64\usr\bin\pacman-key --populate msys'
 # This avoids PowerShell pathing issues and ensures the environment is set up correctly.
 RUN C:\msys64\msys2_shell.cmd -c 'env.exe \
     rm -r C:\msys64\etc\pacman.d\gnupg && \
-    C:/msys64/usr/bin/pacman --noconfirm -Syu && \
     pacman-key --init && \
     pacman-key --populate msys && \
     C:/msys64/usr/bin/pacman --noconfirm -S --needed git base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake'

@@ -11,10 +11,10 @@ RUN powershell -Command Invoke-WebRequest -Uri 'https://repo.msys2.org/distrib/x
 
 # Install the MinGW toolchain and other necessary packages
 # This avoids PowerShell pathing issues and ensures the environment is set up correctly.
+#    C:\msys64\usr\bin\pacman-key --init && \
+#    C:\msys64\usr\bin\pacman-key --populate msys && \
 RUN C:\msys64\msys2_shell.cmd -c '\
     rm -r C:\msys64\etc\pacman.d\gnupg && \
-    C:\msys64\usr\bin\pacman-key --init && \
-    C:\msys64\usr\bin\pacman-key --populate msys && \
     curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20250619-1-any.pkg.tar.zst && \
     curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20250619-1-any.pkg.tar.zst.sig && \
     C:/msys64/usr/bin/pacman -U --config <(echo) msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz && \

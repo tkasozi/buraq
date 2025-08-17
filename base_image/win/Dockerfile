@@ -7,7 +7,7 @@ USER ContainerAdministrator
 RUN powershell -Command Invoke-WebRequest -Uri 'https://repo.msys2.org/distrib/x86_64/msys2-base-x86_64-20250221.sfx.exe' -OutFile 'C:\msys2-base-x86_64-20250221.sfx.exe'; \
     Start-Process 'C:\msys2-base-x86_64-20250221.sfx.exe' -Wait;
 
-RUN powershell -Command Get-ChildItem -Path "." -Recurse -Filter "pacman.conf"
+#RUN powershell -Command Get-ChildItem -Path "." -Recurse -Filter "pacman.conf"
 
 # Install the MinGW toolchain and other necessary packages
 # This avoids PowerShell pathing issues and ensures the environment is set up correctly.

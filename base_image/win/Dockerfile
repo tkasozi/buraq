@@ -7,20 +7,17 @@ USER ContainerAdministrator
 RUN powershell -Command Invoke-WebRequest -Uri 'https://repo.msys2.org/distrib/x86_64/msys2-base-x86_64-20250221.sfx.exe' -OutFile 'C:\msys2-base-x86_64-20250221.sfx.exe'; \
     Start-Process 'C:\msys2-base-x86_64-20250221.sfx.exe' -Wait;
 
-# Initialize the pacman keyring
-RUN C:\msys64\msys2_shell.cmd -c 'C:\msys64\usr\bin\pacman-key --init'
-
-# Populate the keyring with default keys
-RUN C:\msys64\msys2_shell.cmd -c 'C:\msys64\usr\bin\pacman-key --populate msys'
-
 #RUN powershell -Command Get-ChildItem -Path "." -Recurse -Filter "pacman.d"
 
 # Install the MinGW toolchain and other necessary packages
 # This avoids PowerShell pathing issues and ensures the environment is set up correctly.
-RUN C:\msys64\msys2_shell.cmd -c 'env.exe \
+RUN C:\msys64\msys2_shell.cmd -c '\
     rm -r C:\msys64\etc\pacman.d\gnupg && \
-    pacman-key --init && \
-    pacman-key --populate msys && \
+    C:\msys64\usr\bin\pacman-key --init && \
+    C:\msys64\usr\bin\pacman-key --populate msys && \
+    curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20250619-1-any.pkg.tar.zst && \
+    curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20250619-1-any.pkg.tar.zst.sig && \
+    C:/msys64/usr/bin/pacman -U --config <(echo) msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz && \
     C:/msys64/usr/bin/pacman --noconfirm -S --needed git base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake'
 
 # Stage 2: The Runtime Environment

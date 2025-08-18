@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: write
       packages: write # Required to push cache to GHCR
+      actions: write
 
     steps:
       - 

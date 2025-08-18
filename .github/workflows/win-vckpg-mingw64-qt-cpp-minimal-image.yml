@@ -5,11 +5,6 @@ on:
     paths:
       - 'vcpkg.json'
       - 'base_image/win/Dockerfile'
-  pull_request:
-    branches: [ "develop" ]
-    paths:
-      - 'vcpkg.json'
-      - 'base_image/win/Dockerfile'
   workflow_dispatch:
 
 env:

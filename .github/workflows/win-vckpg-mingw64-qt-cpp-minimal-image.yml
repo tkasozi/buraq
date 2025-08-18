@@ -12,6 +12,9 @@ on:
       - 'base_image/win/Dockerfile'
   workflow_dispatch:
 
+env:
+  IMAGE_NAME: win-vcpkg-mingw64-qt-cpp-minimal
+
 jobs:
   build-and-push:
     runs-on: windows-latest
@@ -22,7 +25,6 @@ jobs:
       fail-fast: false
       matrix:
         registry: [ ghcr.io, docker.io ]
-        image: "win-vcpkg-mingw64-qt-cpp-minimal"
 
     steps:
       - name: Checkout repository
@@ -53,7 +55,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{matrix.registry }}/${{ matrix.image }}
+          images: ${{matrix.registry }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest
           labels: |
@@ -63,5 +65,5 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build . -f ./base_image/win/Dockerfile --platform windows/amd64 -t ${{ matrix.registry }}/${{ matrix.image }}:latest
-          docker push ${{ matrix.registry }}/${{ matrix.image }}:latest
+          docker build . -f ./base_image/win/Dockerfile --platform windows/amd64 -t ${{ matrix.registry }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ matrix.registry }}/${{ env.IMAGE_NAME }}:latest

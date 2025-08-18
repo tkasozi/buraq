@@ -1,0 +1,69 @@
+name: win-vckpg-mingw64-qt-cpp-minimal-image.yml
+on:
+  push:
+    branches: [ "develop" ]
+    paths:
+      - 'vcpkg.json'
+      - 'base_image/win/Dockerfile'
+  pull_request:
+    branches: [ "develop" ]
+    paths:
+      - 'vcpkg.json'
+      - 'base_image/win/Dockerfile'
+  workflow_dispatch:
+
+
+jobs:
+  build-and-push:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        registries: [ ghcr, docker ]
+        image: ${{ github.actor }}/win-vcpkg-mingw64-qt-cpp-minimal
+        include:
+          - registries: ghcr
+            registry: ghcr.io
+            secret: ${{ secrets.GHCR_TOKEN }}
+          - registries: docker
+            registry: docker.io
+            secret: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ matrix.include.registry }}
+          username: ${{ github.actor }}
+          password: ${{ matrix.include.secret }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{matrix.include.registry }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.description="Windows Vcpkg MinGW64 Qt C++ Minimal Docker Image"
+            org.opencontainers.image.version=latest
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Build and push Docker image
+        if: false
+        run: |
+          docker build . -f ./base_image/win/Dockerfile --platform windows/amd64 -t ${{ matrix.include.registry }}/${{ matrix.image }}:latest
+          docker push ${{ matrix.include.registry }}/${{ matrix.image }}:latest
+

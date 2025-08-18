@@ -20,6 +20,12 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@v4
 
+        # step to enable cache export
+      - name: Set up container registry engine
+        uses: docker/setup-engine-action@v1
+        with:
+          # This JSON enables the feature that allows the 'docker' driver to export cache
+          config: '{"features": { "containerd-snapshotter": true }}'
       - 
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

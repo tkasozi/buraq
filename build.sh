@@ -138,3 +138,5 @@ echo "----------------------------------------------------"
 echo "Build process finished successfully!"
 echo "Build artifacts are in: ${BUILD_DIR}"
 echo "----------------------------------------------------"
+
+echo "--- Packaging with Inno Setup ---"

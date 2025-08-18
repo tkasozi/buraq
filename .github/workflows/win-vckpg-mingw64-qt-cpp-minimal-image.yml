@@ -12,6 +12,9 @@ on:
       - 'base_image/win/Dockerfile'
   workflow_dispatch:
 
+env:
+  GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+  DOCKER_TOKEN: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
 
 jobs:
   build-and-push:
@@ -28,10 +31,10 @@ jobs:
         include:
           - registries: ghcr
             registry: ghcr.io
-            secret: ${{ secrets.GHCR_TOKEN }}
+            secret: ${{ env.GHCR_TOKEN }}
           - registries: docker
             registry: docker.io
-            secret: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+            secret: ${{ env.DOCKER_TOKEN }}
 
     steps:
       - name: Checkout repository

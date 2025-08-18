@@ -48,6 +48,13 @@ RUN powershell -Command \
     \
     Start-Process -Wait -FilePath "C:\inno_setup.exe" -ArgumentList "/SILENT"
 
+# Set environment variables for vcpkg
+ENV VCPKG_ROOT=C:/vcpkg
+
+# Copy your vcpkg.json manifest into the image
+COPY vcpkg.json C:/vcpkg/vcpkg.json
+# WORKDIR C:/vcpkg
+
 RUN C:/msys64/usr/bin/bash.exe -lc "\
     # Set the PATH to include the MinGW compiler binaries.
     export PATH='/c/msys64/mingw64/bin:/c/msys64/usr/bin:/c/Program Files (x86)/Inno Setup 6:'$PATH && \
@@ -57,16 +64,6 @@ RUN C:/msys64/usr/bin/bash.exe -lc "\
     ./vcpkg install --triplet=x64-mingw-dynamic --host-triplet=x64-mingw-dynamic --allow-unsupported"
 
 RUN powershell -Command "echo Current PATH: $env:PATH"
-
-# Set environment variables for vcpkg
-ENV VCPKG_ROOT=C:/vcpkg
-
-# Copy your vcpkg.json manifest into the image
-COPY vcpkg.json C:/vcpkg/vcpkg.json
-WORKDIR C:/vcpkg
-
-# Install dependencies from vcpkg.json using the MinGW triplet
-RUN C:/msys64/usr/bin/bash.exe -lc "cd C:/vcpkg && ./vcpkg install --triplet=x64-mingw-dynamic --host-triplet=x64-mingw-dynamic --allow-unsupported"
 
 # Set a label to make this a unique, publishable image.
 LABEL maintainer="tkasozi/win-vcpkg-mingw64-qt-cpp-minimal"

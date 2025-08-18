@@ -31,22 +31,27 @@ jobs:
       - 
         name: Build, Export, and Push
         run: |
-          $IMAGE_TAG = "ghcr.io/${{ github.repository_owner }}/win-vcpkg-mingw64-qt-cpp-minimal:latest"
+          # Define the stable base image tag
+          $BASE_IMAGE_TAG = "ghcr.io/${{ github.repository_owner }}/your-image-name:latest"
           
-          # 1. Pull previous image for caching
-          docker pull $IMAGE_TAG || true
+          # Define a separate tag for the build cache
+          $CACHE_TAG = "ghcr.io/${{ github.repository_owner }}/your-image-name:latest-build-cache"
           
+          # 1. Pull both the base and the last cache image to maximize cache hits
+          docker pull $BASE_IMAGE_TAG || true
+          docker pull $CACHE_TAG || true
+
           # 2. Build the new image
-          docker build --cache-from $IMAGE_TAG -t $IMAGE_TAG -f ./build.Dockerfile .
+          docker build --cache-from $BASE_IMAGE_TAG  --cache-from $CACHE_TAG -t $IMAGE_TAG -f ./build.Dockerfile .
           
           # 3. Create a temporary container to extract the artifact from
-          docker create --name extractor $IMAGE_TAG
+          docker create --name extractor $CACHE_TAG
           
           # 4. Copy the setup.exe from the container to the runner's workspace
           docker cp extractor:/app/Output/setup.exe ./setup.exe
           
           # 5. Push the new image to the registry
-          docker push $IMAGE_TAG
+          docker push $CACHE_TAG
         shell: pwsh
 
       - 

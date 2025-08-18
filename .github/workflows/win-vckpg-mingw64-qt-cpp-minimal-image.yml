@@ -10,9 +10,11 @@ on:
 
 jobs:
   build-and-push:
+    runs-on: windows-latest
+
     env:
       IMAGE_NAME: win-vcpkg-mingw64-qt-cpp-minimal
-    runs-on: windows-latest
+      
     permissions:
       contents: read
       packages: write
@@ -48,6 +50,7 @@ jobs:
 
       - name: Set Username for Docker Hub
         if: matrix.registry == 'docker.io'
+        shell: bash
         run: |
            'echo "USERNAME=${{ secrets.DOCKER_USERNAME }}" | Add-Content -Path $env:GITHUB_ENV'
 
@@ -69,6 +72,7 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Build and push Docker image
+        shell: bash
         run: |
           docker build . -f ./base_image/win/Dockerfile --platform windows/amd64 -t "${{ matrix.registry }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:latest"
           docker push ${{ matrix.registry }}/${{ env.IMAGE_NAME }}:latest

@@ -50,7 +50,7 @@ RUN powershell -Command \
 
 # Set the PATH to include the MinGW compiler binaries.
 # This ensures that vcpkg's build system can find g++.
-RUN setx -m PATH "C:/msys64/mingw64/bin;C:/msys64/usr/bin;C:/vcpkg;C:/Program Files (x86)/Inno Setup 6;%PATH%"
+RUN setx -m PATH "C:\msys64\mingw64\bin;C:\msys64\usr\bin;C:\vcpkg;C:\Program Files (x86)\Inno Setup 6;%PATH%"
 RUN powershell -Command "echo Current PATH: $env:PATH"
 
 # Set environment variables for vcpkg

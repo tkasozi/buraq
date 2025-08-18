@@ -1,0 +1,48 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+        - 'develop'
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Application using Dockerfile
+        run: |
+          # 1. Build the image from build.Dockerfile, which runs the compilation
+          docker build -t builder -f build.Dockerfile .
+          
+          # 2. Create a container from the image so we can access its files
+          docker create --name extractor builder
+          
+          # 3. Copy the setup.exe from the container to the runner's workspace
+          docker cp extractor:/app/Output/setup-buraq.exe ./Output/setup.exe
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+
+      - name: Upload Release Asset (setup.exe)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Output/setup.exe
+          asset_name: setup.exe
+          asset_content_type: application/octet-stream

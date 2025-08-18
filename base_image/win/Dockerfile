@@ -14,21 +14,27 @@ RUN powershell -Command Invoke-WebRequest -Uri 'https://repo.msys2.org/distrib/x
 #    C:\msys64\usr\bin\pacman-key --init && \
 #    C:\msys64\usr\bin\pacman-key --populate msys && \
 #    rm -r C:\msys64\etc\pacman.d\gnupg && \
+# Replace your old Step 4 and Step 5 with this single command
 RUN C:\msys64\usr\bin\bash -lc "\
-    curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20250619-1-any.pkg.tar.zst && \
-    curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20250619-1-any.pkg.tar.zst.sig && \
-    echo "Hello world" && \
-    C:/msys64/usr/bin/pacman -U msys2-keyring-1~20250619-1-any.pkg.tar.zst && \
-    dir && \"
-
-# This single RUN command handles the entire initialization and update process
-RUN C:\msys64\usr\bin\bash -lc "\
-    echo 'updating pacman keys...' && \
+    # 1. Create the initial keyring structure
     pacman-key --init && \
-    pacman-key --populate msys && \
-    echo 'updating system...' && \
+    \
+    # 2. Refresh package databases and install the keyring package itself.
+    #    This is the key step that fixes the "keyring file does not exist" error.
+    pacman -Sy --noconfirm msys2-keyring && \
+    \
+    # 3. Now that the keyring is fixed, perform the full two-stage system update
     pacman -Syu --noconfirm && \
     pacman -Su --noconfirm"
+
+# This single RUN command handles the entire initialization and update process
+#RUN C:\msys64\usr\bin\bash -lc "\
+#    echo 'updating pacman keys...' && \
+#    pacman-key --init && \
+#    pacman-key --populate msys && \
+#    echo 'updating system...' && \
+#    pacman -Syu --noconfirm && \
+#    pacman -Su --noconfirm"
 
 # After the update, you can install your required packages in another layer
 RUN C:\msys64\usr\bin\bash -lc "\

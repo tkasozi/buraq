@@ -13,8 +13,8 @@ RUN powershell -Command Invoke-WebRequest -Uri 'https://repo.msys2.org/distrib/x
 # This avoids PowerShell pathing issues and ensures the environment is set up correctly.
 #    C:\msys64\usr\bin\pacman-key --init && \
 #    C:\msys64\usr\bin\pacman-key --populate msys && \
+#    rm -r C:\msys64\etc\pacman.d\gnupg && \
 RUN C:\msys64\usr\bin\bash -lc "\
-    rm -r C:\msys64\etc\pacman.d\gnupg && \
     curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20250619-1-any.pkg.tar.zst && \
     curl -O https://repo.msys2.org/msys/x86_64/msys2-keyring-1~20250619-1-any.pkg.tar.zst.sig && \
     echo "Hello world" && \

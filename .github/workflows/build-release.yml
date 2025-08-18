@@ -24,8 +24,10 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-            # Use the compatible driver for the Windows runner
-            driver: docker
+          # This is the crucial fix. It enables the containerd image store,
+          # allowing the default Linux-based builder to run on the Windows host.
+          driver-opts: image=moby/buildkit:v0.12.4
+          use: true
 
       - 
         name: Log in to Docker Hub
@@ -46,8 +48,8 @@ jobs:
           # This tells the action to copy the final build output to a local directory
           outputs: type=local,dest=./Output
           # This enables caching using the GitHub Actions cache backend.
-          cache-from: type=registry,ref=ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:cache
-          cache-to: type=registry,ref=ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:cache,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - 
         name: Create GitHub Release

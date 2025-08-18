@@ -45,7 +45,7 @@ jobs:
           context: .
           file: ./build.Dockerfile
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          platforms: windows/amd64
+          # platforms: windows/amd64
           # This tells the action to copy the final build output to a local directory
           outputs: type=local,dest=./Output
           # This enables caching using the GitHub Actions cache backend.

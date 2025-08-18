@@ -11,10 +11,12 @@ COPY . C:/app
 WORKDIR C:/app/ManagedLibrary
 
 # Run the build script for the ManagedLibrary project
-# RUN cmd /c "C:\msys64\usr\bin\bash.exe build.sh"
+RUN cmd /c "C:\msys64\usr\bin\bash.exe build.sh"
 
 # Set the working directory
 WORKDIR C:/app
+
+ENV VCPKG_TARGET_TRIPLET="x64-mingw-dynamic"
 
 # Run the build script to compile the app and create the setup.exe
 RUN C:/msys64/usr/bin/bash.exe ./build.sh

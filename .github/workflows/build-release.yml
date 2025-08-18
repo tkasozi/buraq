@@ -42,7 +42,7 @@ jobs:
           docker pull $CACHE_TAG || true
 
           # 2. Build the new image
-          docker build --cache-from $BASE_IMAGE_TAG  --cache-from $CACHE_TAG -t $IMAGE_TAG -f ./build.Dockerfile .
+          docker build --cache-from $BASE_IMAGE_TAG --cache-from $CACHE_TAG -t $CACHE_TAG -f ./build.Dockerfile .
           
           # 3. Create a temporary container to extract the artifact from
           docker create --name extractor $CACHE_TAG

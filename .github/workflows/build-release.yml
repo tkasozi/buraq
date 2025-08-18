@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: windows-2019
+    runs-on: windows-latest
     permissions:
       contents: write
       packages: write # Required to push cache to GHCR

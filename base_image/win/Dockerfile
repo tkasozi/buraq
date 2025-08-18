@@ -10,7 +10,7 @@ RUN powershell -Command Invoke-WebRequest -Uri 'https://repo.msys2.org/distrib/x
 #RUN powershell -Command Get-ChildItem -Path "." -Recurse -Filter "pacman.conf"
 
 # This single RUN command handles the entire initialization and update process
-RUN C:\msys64\usr\bin\bash -lc "\
+RUN (C:\msys64\usr\bin\bash -lc "\
     # 1. Create the initial keyring structure
     pacman-key --init && \
     \
@@ -19,7 +19,8 @@ RUN C:\msys64\usr\bin\bash -lc "\
     pacman -Sy --noconfirm msys2-keyring && \
     \
     # 3. Now that the keyring is fixed, perform the full two-stage system update
-    pacman -Syu --noconfirm || true"
+    pacman -Syu --noconfirm" \
+    ) || (exit 0)
 
 # Step 2: In a new shell, complete the update.
 RUN C:\msys64\usr\bin\bash -lc "pacman -Su --noconfirm"

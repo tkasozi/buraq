@@ -19,8 +19,10 @@ RUN C:\msys64\usr\bin\bash -lc "\
     pacman -Sy --noconfirm msys2-keyring && \
     \
     # 3. Now that the keyring is fixed, perform the full two-stage system update
-    pacman -Syu --noconfirm && \
-    pacman -Su --noconfirm || true"
+    pacman -Syu --noconfirm || true"
+
+# Step 2: In a new shell, complete the update.
+RUN C:\msys64\usr\bin\bash -lc "pacman -Su --noconfirm"
 
 # Install the MinGW toolchain and other necessary packages
 RUN C:\msys64\usr\bin\bash -lc "\

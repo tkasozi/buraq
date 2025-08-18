@@ -9,12 +9,7 @@ RUN powershell -Command Invoke-WebRequest -Uri 'https://repo.msys2.org/distrib/x
 
 #RUN powershell -Command Get-ChildItem -Path "." -Recurse -Filter "pacman.conf"
 
-# Install the MinGW toolchain and other necessary packages
-# This avoids PowerShell pathing issues and ensures the environment is set up correctly.
-#    C:\msys64\usr\bin\pacman-key --init && \
-#    C:\msys64\usr\bin\pacman-key --populate msys && \
-#    rm -r C:\msys64\etc\pacman.d\gnupg && \
-# Replace your old Step 4 and Step 5 with this single command
+# This single RUN command handles the entire initialization and update process
 RUN C:\msys64\usr\bin\bash -lc "\
     # 1. Create the initial keyring structure
     pacman-key --init && \
@@ -25,18 +20,9 @@ RUN C:\msys64\usr\bin\bash -lc "\
     \
     # 3. Now that the keyring is fixed, perform the full two-stage system update
     pacman -Syu --noconfirm && \
-    pacman -Su --noconfirm"
+    pacman -Su --noconfirm" || true
 
-# This single RUN command handles the entire initialization and update process
-#RUN C:\msys64\usr\bin\bash -lc "\
-#    echo 'updating pacman keys...' && \
-#    pacman-key --init && \
-#    pacman-key --populate msys && \
-#    echo 'updating system...' && \
-#    pacman -Syu --noconfirm && \
-#    pacman -Su --noconfirm"
-
-# After the update, you can install your required packages in another layer
+# Install the MinGW toolchain and other necessary packages
 RUN C:\msys64\usr\bin\bash -lc "\
     pacman -S --noconfirm --needed \
     base-devel \

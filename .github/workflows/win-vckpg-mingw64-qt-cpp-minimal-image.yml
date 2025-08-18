@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         registry: [ ghcr.io, docker.io ]
-        image: win-vcpkg-mingw64-qt-cpp-minimal
+        image: "win-vcpkg-mingw64-qt-cpp-minimal"
 
     steps:
       - name: Checkout repository

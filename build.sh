@@ -98,7 +98,10 @@ export PATH="${CMAKE_BIN_DIR};${NINJA_BIN_DIR};${DOTNET_BIN_DIR};C:/msys64/mingw
 
 echo "Env PATH: ${PATH}"
 
-# ls -la .
+export VCPKG_TARGET_TRIPLET="x64-mingw-dynamic"
+export  -DVCPKG_DEFAULT_HOST_TRIPLET="x64-mingw-dynamic"
+
+echo "--- Set VCPKG_TARGET_TRIPLET to: ${VCPKG_TARGET_TRIPLET} ---"
 
 cp -r ./vcpkg_installed ./build/vcpkg_installed
 

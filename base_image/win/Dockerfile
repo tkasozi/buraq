@@ -29,7 +29,7 @@ RUN C:\msys64\usr\bin\bash -lc "\
     mingw-w64-x86_64-toolchain \
     git \
     make \
-    mingw-w64-x86_64-cmake"
+    mingw-w64-x86_64-cmake" || true
 
 # Stage 2: The Runtime Environment
 # This stage uses dotnet/sdk image and just copies the final executable.

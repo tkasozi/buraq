@@ -1,9 +1,6 @@
 # Use your pre-built image as the builder environment
 FROM ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest AS builder
 
-# Stage 1: The Build Environment (using a full Windows Server image)
-USER ContainerUser
-
 # Copy all your source code into the image
 COPY . C:/app
 
@@ -17,6 +14,9 @@ RUN cmd /c "C:\msys64\usr\bin\bash.exe build.sh"
 WORKDIR C:/app
 
 ENV VCPKG_TARGET_TRIPLET="x64-mingw-dynamic"
+
+# Explicitly switch to the Administrator user to ensure correct permissions
+USER ContainerAdministrator
 
 # Run the build script to compile the app and create the setup.exe
 RUN C:/msys64/usr/bin/bash.exe ./build.sh

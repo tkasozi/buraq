@@ -20,7 +20,7 @@ RUN C:\msys64\usr\bin\bash -lc "\
     \
     # 3. Now that the keyring is fixed, perform the full two-stage system update
     pacman -Syu --noconfirm && \
-    pacman -Su --noconfirm" || true
+    pacman -Su --noconfirm || true"
 
 # Install the MinGW toolchain and other necessary packages
 RUN C:\msys64\usr\bin\bash -lc "\
@@ -29,7 +29,7 @@ RUN C:\msys64\usr\bin\bash -lc "\
     mingw-w64-x86_64-toolchain \
     git \
     make \
-    mingw-w64-x86_64-cmake" || true
+    mingw-w64-x86_64-cmake"
 
 # Stage 2: The Runtime Environment
 # This stage uses dotnet/sdk image and just copies the final executable.

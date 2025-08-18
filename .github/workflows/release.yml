@@ -2,13 +2,13 @@
 name: release.yml
 
 on:
-  # release:
-  #   types: [ published ]
+  release:
+    types: [ published ]
   # pull_request:
   #   types: [ opened, synchronize, reopened ]
-  push:
-    branches:
-      - 'main_'
+  # push:
+  #   branches:
+  #     - 'main_'
   #   paths-ignore: # IMPORTANT: Prevent infinite loop if this workflow's PR is merged
   #     - 'manifest.json'
 

@@ -1,5 +1,5 @@
 # Use your pre-built image as the builder environment
-FROM ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal@sha256:d18450e3e878fd2bc06e795825a2e0459185644280d7b28735c6cc2edd21c79c AS builder
+FROM ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest AS builder
 
 # Stage 1: The Build Environment (using a full Windows Server image)
 USER ContainerUser

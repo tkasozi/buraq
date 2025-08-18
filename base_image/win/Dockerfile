@@ -7,19 +7,32 @@ USER ContainerAdministrator
 RUN powershell -Command Invoke-WebRequest -Uri 'https://repo.msys2.org/distrib/x86_64/msys2-base-x86_64-20250221.sfx.exe' -OutFile 'C:\msys2-base-x86_64-20250221.sfx.exe'; \
     Start-Process 'C:\msys2-base-x86_64-20250221.sfx.exe' -Wait;
 
-# Initialize the pacman keyring
-RUN C:\msys64\msys2_shell.cmd -c 'C:\msys64\usr\bin\pacman-key --init'
+#RUN powershell -Command Get-ChildItem -Path "." -Recurse -Filter "pacman.conf"
 
-# Populate the keyring with default keys
-RUN C:\msys64\msys2_shell.cmd -c 'C:\msys64\usr\bin\pacman-key --populate msys'
+# This single RUN command handles the entire initialization and update process
+RUN (C:\msys64\usr\bin\bash -lc "\
+    # 1. Create the initial keyring structure
+    pacman-key --init && \
+    \
+    # 2. Refresh package databases and install the keyring package itself.
+    #    This is the key step that fixes the "keyring file does not exist" error.
+    pacman -Sy --noconfirm msys2-keyring && \
+    \
+    # 3. Now that the keyring is fixed, perform the full two-stage system update
+    pacman -Syu --noconfirm" \
+    ) || (exit 0)
+
+# Step 2: In a new shell, complete the update.
+RUN C:\msys64\usr\bin\bash -lc "pacman -Su --noconfirm"
 
 # Install the MinGW toolchain and other necessary packages
-# This avoids PowerShell pathing issues and ensures the environment is set up correctly.
-RUN C:\msys64\msys2_shell.cmd -c 'env.exe \
-    C:\msys64\usr\bin\pacman-key --init && \
-    C:\msys64\usr\bin\pacman-key --populate msys && \
-    C:/msys64/usr/bin/pacman --noconfirm -Syu && \
-    C:/msys64/usr/bin/pacman --noconfirm -S --needed git base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake'
+RUN C:\msys64\usr\bin\bash -lc "\
+    pacman -S --noconfirm --needed \
+    base-devel \
+    mingw-w64-x86_64-toolchain \
+    git \
+    make \
+    mingw-w64-x86_64-cmake"
 
 # Stage 2: The Runtime Environment
 # This stage uses dotnet/sdk image and just copies the final executable.

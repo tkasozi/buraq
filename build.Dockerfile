@@ -1,5 +1,8 @@
 # Use your pre-built image as the builder environment
-FROM tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest AS builder
+FROM ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest AS builder
+
+# Stage 1: The Build Environment (using a full Windows Server image)
+USER ContainerUser
 
 # Copy all your source code into the image
 COPY . C:/app

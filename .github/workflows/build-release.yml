@@ -23,6 +23,9 @@ jobs:
       - 
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+            # Use the compatible driver for the Windows runner
+            driver: docker
 
       - 
         name: Log in to Docker Hub
@@ -43,8 +46,8 @@ jobs:
           # This tells the action to copy the final build output to a local directory
           outputs: type=local,dest=./Output
           # This enables caching using the GitHub Actions cache backend.
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:cache
+          cache-to: type=registry,ref=ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:cache,mode=max
 
       - 
         name: Create GitHub Release

@@ -48,9 +48,14 @@ RUN powershell -Command \
     \
     Start-Process -Wait -FilePath "C:\inno_setup.exe" -ArgumentList "/SILENT"
 
-# Set the PATH to include the MinGW compiler binaries.
-# This ensures that vcpkg's build system can find g++.
-RUN setx -m PATH "C:\msys64\mingw64\bin;C:\msys64\usr\bin;C:\vcpkg;C:\Program Files (x86)\Inno Setup 6;%PATH%"
+RUN C:/msys64/usr/bin/bash.exe -lc "\
+    # Set the PATH to include the MinGW compiler binaries.
+    export PATH='/c/msys64/mingw64/bin:/c/msys64/usr/bin:/c/Program Files (x86)/Inno Setup 6:'$PATH && \
+    \
+    # Install dependencies from vcpkg.json using the MinGW triplet
+    cd C:/vcpkg && \
+    ./vcpkg install --triplet=x64-mingw-dynamic --host-triplet=x64-mingw-dynamic --allow-unsupported"
+
 RUN powershell -Command "echo Current PATH: $env:PATH"
 
 # Set environment variables for vcpkg

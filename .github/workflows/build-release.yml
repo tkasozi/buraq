@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: windows-latest
+    runs-on: windows-l
     permissions:
       contents: write
       packages: write # Required to push cache to GHCR
@@ -27,16 +27,13 @@ jobs:
   
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          platforms: windows/amd64
-        # with:
-        #   driver: docker
 
       - name: Build image and export artifact
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./build.Dockerfile
+          platforms: windows/amd64
           # This tells the action to copy the final build output to a local directory
           outputs: type=local,dest=./Output
           # This enables caching using the GitHub Actions cache backend

@@ -7,8 +7,10 @@ COPY . C:/app
 # Build the dontnet library in the ManagedLibrary directory
 WORKDIR C:/app/ManagedLibrary
 
+RUN C:/msys64/usr/bin/bash.exe -lc "echo ${PATH}"
+
 # Run the build script for the ManagedLibrary project
-RUN cmd /c "C:\msys64\usr\bin\bash.exe build.sh"
+RUN C:/msys64/usr/bin/bash.exe -lc "build.sh"
 
 # Set the working directory
 WORKDIR C:/app

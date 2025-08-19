@@ -18,5 +18,7 @@ ENV VCPKG_TARGET_TRIPLET="x64-mingw-dynamic"
 # Explicitly switch to the Administrator user to ensure correct permissions
 USER ContainerAdministrator
 
+RUN powershell -Command Get-ChildItem -Path "C:/Program Files/dotnet" -Recurse -Filter "nethost.dll"
+
 # Run the build script to compile the app and create the setup.exe
 RUN C:/msys64/usr/bin/bash.exe ./build.sh

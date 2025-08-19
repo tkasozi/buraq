@@ -10,6 +10,13 @@ on:
 jobs:
   build-and-release:
     runs-on: windows-latest
+    env:
+      PROJECT_NAME: buraq
+      APP_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || '0.0.0-dev' }}
+      APP_EXE_NAME: "buraq-x64-${{ github.ref_type == 'tag' && github.ref_name || '0.0.0-dev' }}"
+      OUTPUT_DIR: C:\app\Output
+      APP_BINARY: C:\app\build\build
+
     permissions:
       contents: write
       packages: write # Required to push cache to GHCR
@@ -43,14 +50,42 @@ jobs:
 
           # 2. Build the new image
           docker build --cache-from $BASE_IMAGE_TAG --cache-from $CACHE_TAG -t $CACHE_TAG -f ./build.Dockerfile .
+
+          # 3.1. Determine the exact .exe name from the build output on the runner
+          $exeName = (Get-ChildItem -Path "${{ env.APP_BINARY }}" -Filter "*.exe" | Select-Object -First 1).Name
+          if (-not $exeName) {
+            Write-Error "Application executable not found in ${{ env.APP_BINARY }}"
+            exit 1
+          }
+          $appName = $exeName.Replace(".exe", "")
+          Write-Host "Found App EXE: $exeName"
+          Write-Host "Derived App Name: $appName"
+
+          # 3.2. Define paths for use INSIDE the Docker container.
+          # We assume the runner's workspace is mounted to C:\app.
+          $containerInnoScriptPath = "C:\app\buraq.iss"
+          $containerOutputDir = "${{ env.OUTPUT_DIR }}"
+          $containerAppBinaryDir = "${{ env.APP_BINARY }}"
+
+          # 3.3. Run the Inno Setup compiler inside the Docker container with all arguments
+          docker run --rm -v "${{ github.workspace }}:C:\app" ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest-build-cache`
+            "ISCC.exe" `
+            "$containerInnoScriptPath" `
+            "/DAppName=$appName" `
+            "/DAppExeName=$exeName" `
+            "/DAppVersion=${{ env.APP_VERSION }}" `
+            "/DOutputDir=$containerOutputDir" `
+            "/DAppBinaryDir=$containerAppBinaryDir" `
+            "/DAppArchSupport=x64compatible" `
+            "/DAppOutputBaseFilename=setup-$appName"
           
-          # 3. Create a temporary container to extract the artifact from
+          # 4. Create a temporary container to extract the artifact from
           docker create --name extractor $CACHE_TAG || true
           
-          # 4. Copy the setup.exe from the container to the runner's workspace
+          # 5. Copy the setup.exe from the container to the runner's workspace
           docker cp extractor:/app/Output/setup.exe ./setup.exe || true
           
-          # 5. Push the new image to the registry
+          # 6. Push the new image to the registry
           docker push $CACHE_TAG
         shell: pwsh
 
@@ -61,8 +96,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
 
       - 
         name: Upload Release Asset (setup.exe)

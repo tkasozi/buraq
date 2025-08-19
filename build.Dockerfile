@@ -4,15 +4,13 @@ FROM ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest AS builder
 # Copy all your source code into the image
 COPY . C:/app
 
-RUN setx -m PATH "C:\msys64\mingw64\bin;C:\msys64\usr\bin;C:\vcpkg;C:\Program Files (x86)\Inno Setup 6;%PATH%"
-
 # Build the dontnet library in the ManagedLibrary directory
 WORKDIR C:/app/ManagedLibrary
 
-RUN C:/msys64/usr/bin/bash.exe -lc "echo ${PATH}"
+RUN C:/msys64/usr/bin/bash.exe -lc "export PATH='/c/msys64/mingw64/bin:/c/msys64/usr/bin:/c/Program Files (x86)/Inno Setup 6:'$PATH"
 
 # Run the build script for the ManagedLibrary project
-RUN C:/msys64/usr/bin/bash.exe -lc "./build.sh"
+RUN C:/msys64/usr/bin/bash.exe ./build.sh
 
 # Set the working directory
 WORKDIR C:/app

@@ -27,7 +27,7 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-export PATH="/c/msys64/mingw64/bin:/c/msys64/usr/bin:/c/Program Files (x86)/Inno Setup 6:$PATH"
+export PATH="/c/msys64/mingw64/bin:/c/msys64/usr/bin:/c/Program Files (x86)/Inno Setup 6:/c/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.7/runtimes/win-x64/native:$PATH"
 
 # --- Configuration ---
 # Get the directory where this script is located
@@ -119,7 +119,7 @@ ls -al "${DOTNET_BIN_DIR}"
     -DVCPKG_TARGET_TRIPLET="${VCPKG_TARGET_TRIPLET}" \
     -DVCPKG_DEFAULT_HOST_TRIPLET="${VCPKG_TARGET_TRIPLET}" \
     -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
-    -DCMAKE_DOTNET_TARGET_FRAMEWORK="${DOTNET_BIN_DIR}" \
+    -DCMAKE_DOTNET_TARGET_FRAMEWORK="/c/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.7/runtimes/win-x64/native" \
     -DCMAKE_MAKE_PROGRAM="${VCPKG_NINJA_PATH}"
 
 echo "CMake configuration complete."

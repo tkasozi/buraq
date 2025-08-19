@@ -27,6 +27,8 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+export PATH="/c/msys64/mingw64/bin:/c/msys64/usr/bin:/c/Program Files (x86)/Inno Setup 6:$PATH"
+
 # --- Configuration ---
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -94,7 +96,7 @@ DOTNET_BIN_DIR=$(dirname "$DOTNET_PATH")
 
 # Re set the PATH to include the MinGW compiler binaries. 
 # For some reason, the PATH is not set correctly to include Mingw in the base image.
-export PATH="${CMAKE_BIN_DIR};${NINJA_BIN_DIR};${DOTNET_BIN_DIR};C:/msys64/mingw64/bin;C:/msys64/usr/bin;${PATH}"
+export PATH="${CMAKE_BIN_DIR}:${NINJA_BIN_DIR}:${DOTNET_BIN_DIR}:${PATH}"
 
 echo "Env PATH: ${PATH}"
 

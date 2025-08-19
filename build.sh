@@ -105,8 +105,6 @@ export  VCPKG_DEFAULT_HOST_TRIPLET="x64-mingw-dynamic"
 
 echo "--- Set VCPKG_TARGET_TRIPLET to: ${VCPKG_TARGET_TRIPLET} ---"
 
-cp -r ./vcpkg_installed ./build/vcpkg_installed
-
 # Install the vcpkg.json file. Should resolve dependencies and install them if needed.
 "${VCPKG_ROOT}/vcpkg.exe" install --triplet=${VCPKG_TARGET_TRIPLET} --host-triplet=${VCPKG_TARGET_TRIPLET} --allow-unsupported
 

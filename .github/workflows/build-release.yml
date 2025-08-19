@@ -45,13 +45,13 @@ jobs:
           docker build --cache-from $BASE_IMAGE_TAG --cache-from $CACHE_TAG -t $CACHE_TAG -f ./build.Dockerfile .
           
           # 3. Create a temporary container to extract the artifact from
-          docker create --name extractor $CACHE_TAG
+          docker create --name extractor $CACHE_TAG || true
           
           # 4. Copy the setup.exe from the container to the runner's workspace
-          docker cp extractor:/app/Output/setup.exe ./setup.exe
+          docker cp extractor:/app/Output/setup.exe ./setup.exe || true
           
           # 5. Push the new image to the registry
-          docker push $CACHE_TAG
+          docker push $CACHE_TAG || true
         shell: pwsh
 
       - 

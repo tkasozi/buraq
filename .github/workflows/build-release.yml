@@ -51,7 +51,7 @@ jobs:
           docker cp extractor:/app/Output/setup.exe ./setup.exe || true
           
           # 5. Push the new image to the registry
-          docker push $CACHE_TAG || true
+          docker push $CACHE_TAG
         shell: pwsh
 
       - 

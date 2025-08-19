@@ -68,7 +68,7 @@ jobs:
           $containerAppBinaryDir = "${{ env.APP_BINARY }}"
 
           # 3.3. Run the Inno Setup compiler inside the Docker container with all arguments
-          docker run --rm -v "${{ github.workspace }}:C:\app" ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest-build-cache`
+          docker run --rm -v "${{ github.workspace }}/Output:C:\app" ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest-build-cache`
             "ISCC.exe" `
             "$containerInnoScriptPath" `
             "/DAppName=$appName" `
@@ -79,13 +79,7 @@ jobs:
             "/DAppArchSupport=x64compatible" `
             "/DAppOutputBaseFilename=setup-$appName"
           
-          # 4. Create a temporary container to extract the artifact from
-          docker create --name extractor $CACHE_TAG || true
-          
-          # 5. Copy the setup.exe from the container to the runner's workspace
-          docker cp extractor:/app/Output/setup.exe ./setup.exe || true
-          
-          # 6. Push the new image to the registry
+          # 5. Push the new image to the registry
           docker push $CACHE_TAG
         shell: pwsh
 
@@ -109,3 +103,173 @@ jobs:
           asset_path: ./Output/setup.exe
           asset_name: setup.exe
           asset_content_type: application/octet-stream
+
+      - 
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.GH_BOT_TOKEN }}
+
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0 # pulls all history and tags
+          token: ${{ steps.app-token.outputs.token }}
+
+      -
+        name: Fetch Latest Release Data & Generate Manifest
+        id: generate_manifest # Give this step an ID to reference its outputs
+        # For scheduled runs, inputs are not available directly in github.event.inputs
+        # So we use an OR condition for REPO_PATH and OUTPUT_FILE, or set fixed values.
+        # For this example, let's assume a scheduled run targets a specific repo,
+        # or you could use repository secrets if the target repo is sensitive/configurable.
+        env:
+            REPO_PATH: ${{ github.event.inputs.repository || 'tkasozi/buraq' }}
+            OUTPUT_FILE: ${{ github.event.inputs.output_filename || 'manifest.json' }}
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use the built-in GitHub token
+        run: |
+                echo "Target Repository: $REPO_PATH"
+                API_URL="https://api.github.com/repos/${REPO_PATH}/releases/latest"
+                echo "Fetching latest release data from ${API_URL}..."
+
+                # Use -w to get HTTP status, handle errors more robustly
+                HTTP_RESPONSE_CODE=$(curl -sL -w "%{http_code}" -o response.json \
+                  -H "Authorization: Bearer $GH_TOKEN" \
+                  -H "Accept: application/vnd.github.v3+json" \
+                  "$API_URL")
+
+                if [ "$HTTP_RESPONSE_CODE" -ne 200 ]; then
+                  echo "Error: Failed to fetch release data from GitHub API."
+                  echo "HTTP Status Code: $HTTP_RESPONSE_CODE"
+                  echo "API URL: $API_URL"
+                  echo "Response:"
+                  cat response.json # Show error response from GitHub API
+                  exit 1
+                fi
+
+                LATEST_RELEASE_DATA=$(cat response.json)
+
+                # Check for common error messages or empty data
+                if [ -z "$LATEST_RELEASE_DATA" ] || \
+                   echo "$LATEST_RELEASE_DATA" | jq -e '.message == "Not Found"' > /dev/null || \
+                   echo "$LATEST_RELEASE_DATA" | jq -e '.tag_name == null' > /dev/null; then
+                  echo "Error: No releases found for '${REPO_PATH}', repository not found, or release data is incomplete."
+                  echo "Raw Response:"
+                  echo "$LATEST_RELEASE_DATA"
+                  exit 1
+                fi
+
+                echo "Successfully fetched release data."
+                # For debugging, you can uncomment the next line:
+                # echo "$LATEST_RELEASE_DATA" | jq .
+
+                VERSION=$(echo "$LATEST_RELEASE_DATA" | jq -r '.tag_name // ""')
+                RELEASE_DATE=$(echo "$LATEST_RELEASE_DATA" | jq -r '.published_at // ""')
+                NOTES=$(echo "$LATEST_RELEASE_DATA" | jq -r '.body // ""')
+                RELEASE_URL=$(echo "$LATEST_RELEASE_DATA" | jq -r '.html_url // ""')
+
+                if [ -z "$VERSION" ]; then
+                    echo "Warning: Could not extract 'tag_name' (version) from the release data."
+                    VERSION="N/A" # Set a default or handle as an error
+                fi
+                echo "Latest version found: ${VERSION}"
+
+                ASSETS_JSON=$(echo "$LATEST_RELEASE_DATA" | jq '
+                  if .assets and (.assets | length > 0) then
+                    [.assets[]? | select(.name and .browser_download_url and .size and .digest) | {
+                      name: .name,
+                      download_url: .browser_download_url,
+                      size: .size,
+                      sha: .digest,
+                      content_type: (if .content_type then .content_type else "application/octet-stream" end)
+                    }]
+                  else
+                    [] # Default to an empty array if no assets or .assets is null/empty
+                  end
+                ')
+
+                echo "Constructing $OUTPUT_FILE..."
+                jq -n \
+                  --arg version "$VERSION" \
+                  --arg release_date "$RELEASE_DATE" \
+                  --arg notes "$NOTES" \
+                  --arg release_url "$RELEASE_URL" \
+                  --argjson assets "$ASSETS_JSON" \
+                  '{
+                    version: $version,
+                    release_date: $release_date,
+                    release_url: $release_url,
+                    notes: $notes,
+                    assets: $assets
+                  }' > "$OUTPUT_FILE"
+
+                if [ $? -eq 0 ]; then
+                  echo "Generated manifest.json content:"
+                  cat manifest.json
+                  echo "::set-output name=manifest_version::$MANIFEST_VERSION" # Output the version for the PR message
+                
+                else
+                  echo "Error: Failed to create '$OUTPUT_FILE' using jq."
+                  exit 1
+                fi
+
+      - 
+        name: Check for changes to manifest.json
+        id: git_status_check
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          # Use 'git diff --staged --quiet' to check if anything was actually added/changed
+          if git diff --staged --quiet; then
+            echo "no_changes=true" >> "$GITHUB_OUTPUT"
+            echo "No changes detected in manifest.json. Skipping PR creation."
+          else
+            echo "no_changes=false" >> "$GITHUB_OUTPUT"
+            echo "Changes detected in manifest.json. Proceeding to create PR."
+          fi
+
+      - 
+        name: Create Pull Request for manifest.json
+        id: create_pr
+        # Only run this step if actual changes were detected in manifest.json
+        if: steps.git_status_check.outputs.no_changes == 'false'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }} # app-token "is the id of the step"
+          commit-message: "chore: Update generated manifest.json for v${{ steps.generate_manifest.outputs.manifest_version }} [skip ci]"
+          title: "Chore: Auto-update manifest.json"
+          body: |
+            This pull request automatically updates the `manifest.json` file.
+            - Generated by workflow run: `${{ github.run_id }}`
+            - Actor: `${{ github.actor }}`
+            - From commit: `${{ github.sha }}`
+            - Manifest Version: `${{ steps.generate_manifest.outputs.manifest_version }}`
+          branch: auto-update-manifest-${{ github.run_number }} # Name of the new branch for the PR
+          base: main # The branch to create the PR against (your protected branch)
+          delete-branch: true # Clean up the temporary branch after merge
+          labels: |
+            automated
+            chore
+
+      - 
+        name: Enable Auto-Merge for Bot PR
+        if: github.actor == 'github-actions[bot]' || github.actor == 'tkasozi' # Replace with YOUR actual App's bot name
+        run: |
+          gh pr merge --auto --merge "${{ env.PULL_REQUEST_NUMBER }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - 
+        name: Create Release and Upload Manifest
+        uses: softprops/action-gh-release@v1
+        with:
+          # If true, a new release will be created. If false, it tries to update an existing release for the tag.
+          # Usually, you want to create a new one when a new tag is pushed.
+          generate_release_notes: true # Auto-generate release notes based on commits
+          files: ./manifest.json # Path to the manifest file to upload
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

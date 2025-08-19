@@ -16,7 +16,3 @@ dotnet build ./ManagedLibrary.sln --configuration Release --no-restore
 
 # Publish project
 dotnet publish -c Release -r win-x64 --no-self-contained -o "./publish"
-
-echo "2"
-
-ls -l ./publish

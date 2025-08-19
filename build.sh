@@ -106,7 +106,9 @@ export  VCPKG_DEFAULT_HOST_TRIPLET="x64-mingw-dynamic"
 echo "--- Set VCPKG_TARGET_TRIPLET to: ${VCPKG_TARGET_TRIPLET} ---"
 
 # Install the vcpkg.json file. Should resolve dependencies and install them if needed.
-"${VCPKG_ROOT}/vcpkg.exe" install --triplet=${VCPKG_TARGET_TRIPLET} --host-triplet=${VCPKG_TARGET_TRIPLET} --allow-unsupported
+# "${VCPKG_ROOT}/vcpkg.exe" install --triplet=${VCPKG_TARGET_TRIPLET} --host-triplet=${VCPKG_TARGET_TRIPLET} --allow-unsupported
+
+ls -al "${DOTNET_BIN_DIR}"
 
 # The -S option specifies the source directory.
 # The -B option specifies the build directory (created if it doesn't exist).

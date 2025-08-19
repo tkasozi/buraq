@@ -82,7 +82,7 @@ jobs:
           $appOutputBaseFilename = "setup-${{ env.APP_EXE_NAME }}"
 
           # 3. Run Inno Setup inside a container, mounting the whole workspace
-          docker run --rm -v "${{ github.workspace }}/Output:C:\project" ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest-build-cache `
+          docker run --rm -v "${{ github.workspace }}/Output:C:\app" ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest-build-cache `
             "$innoSetupExe" `
             "$containerInnoScriptPath" `
             "/DAppName=$appName" `

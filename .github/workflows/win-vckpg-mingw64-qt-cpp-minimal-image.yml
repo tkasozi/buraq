@@ -1,6 +1,8 @@
 name: win-vckpg-mingw64-qt-cpp-minimal-image.yml
 on:
   push:
+    branches:
+      - 'develop'
     paths:
       - 'vcpkg.json'
       - 'base_image/win/Dockerfile'

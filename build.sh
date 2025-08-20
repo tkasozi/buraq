@@ -27,6 +27,8 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+export PATH="/c/msys64/mingw64/bin:/c/msys64/usr/bin:/c/Program Files (x86)/Inno Setup 6:/c/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.7/runtimes/win-x64/native:$PATH"
+
 # --- Configuration ---
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -94,16 +96,19 @@ DOTNET_BIN_DIR=$(dirname "$DOTNET_PATH")
 
 # Re set the PATH to include the MinGW compiler binaries. 
 # For some reason, the PATH is not set correctly to include Mingw in the base image.
-export PATH="${CMAKE_BIN_DIR};${NINJA_BIN_DIR};${DOTNET_BIN_DIR};C:/msys64/mingw64/bin;C:/msys64/usr/bin;${PATH}"
+export PATH="${CMAKE_BIN_DIR}:${NINJA_BIN_DIR}:${DOTNET_BIN_DIR}:${PATH}"
 
 echo "Env PATH: ${PATH}"
 
-# ls -la .
+export VCPKG_TARGET_TRIPLET="x64-mingw-dynamic"
+export  VCPKG_DEFAULT_HOST_TRIPLET="x64-mingw-dynamic"
 
-cp -r ./vcpkg_installed ./build/vcpkg_installed
+echo "--- Set VCPKG_TARGET_TRIPLET to: ${VCPKG_TARGET_TRIPLET} ---"
 
 # Install the vcpkg.json file. Should resolve dependencies and install them if needed.
-"${VCPKG_ROOT}/vcpkg.exe" install --triplet=${VCPKG_TARGET_TRIPLET} --host-triplet=${VCPKG_TARGET_TRIPLET} --allow-unsupported
+# "${VCPKG_ROOT}/vcpkg.exe" install --triplet=${VCPKG_TARGET_TRIPLET} --host-triplet=${VCPKG_TARGET_TRIPLET} --allow-unsupported
+
+ls -al "${DOTNET_BIN_DIR}"
 
 # The -S option specifies the source directory.
 # The -B option specifies the build directory (created if it doesn't exist).
@@ -114,7 +119,7 @@ cp -r ./vcpkg_installed ./build/vcpkg_installed
     -DVCPKG_TARGET_TRIPLET="${VCPKG_TARGET_TRIPLET}" \
     -DVCPKG_DEFAULT_HOST_TRIPLET="${VCPKG_TARGET_TRIPLET}" \
     -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
-    -DCMAKE_DOTNET_TARGET_FRAMEWORK="${DOTNET_BIN_DIR}" \
+    -DCMAKE_DOTNET_TARGET_FRAMEWORK="/c/Program Files/dotnet/packs/Microsoft.NETCore.App.Host.win-x64/9.0.7/runtimes/win-x64/native" \
     -DCMAKE_MAKE_PROGRAM="${VCPKG_NINJA_PATH}"
 
 echo "CMake configuration complete."
@@ -135,3 +140,5 @@ echo "----------------------------------------------------"
 echo "Build process finished successfully!"
 echo "Build artifacts are in: ${BUILD_DIR}"
 echo "----------------------------------------------------"
+
+echo "--- Packaging with Inno Setup ---"

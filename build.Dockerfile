@@ -1,5 +1,5 @@
 # Use your pre-built image as the builder environment
-FROM ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest AS builder
+FROM ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal@sha256:b5e483f69173305cf993945cc15cdb14883beae44a8006ba9efb54ac5035e5df AS builder
 
 # Copy all your source code into the image
 COPY . C:/app

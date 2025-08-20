@@ -16,6 +16,8 @@ jobs:
       APP_EXE_NAME: "buraq-x64-${{ github.ref_type == 'tag' && github.ref_name || '0.0.0-dev' }}"
       OUTPUT_DIR: C:\app\Output
       APP_BINARY: C:\app\build\build
+      BASE_IMAGE_TAG: "ghcr.io/${{ github.repository_owner }}/win-vcpkg-mingw64-qt-cpp-minimal@sha256:b5e483f69173305cf993945cc15cdb14883beae44a8006ba9efb54ac5035e5df"
+      CACHE_TAG: "ghcr.io/${{ github.repository_owner }}/win-vcpkg-mingw64-qt-cpp-minimal:latest-build-cache"
 
     permissions:
       contents: write
@@ -38,26 +40,22 @@ jobs:
       - 
         name: Build Application and Export Binaries
         shell: pwsh
-        run: |
-          # Define tags
-          $BASE_IMAGE_TAG = "ghcr.io/${{ github.repository_owner }}/win-vcpkg-mingw64-qt-cpp-minimal@sha256:b5e483f69173305cf993945cc15cdb14883beae44a8006ba9efb54ac5035e5df"
-          $CACHE_TAG = "ghcr.io/${{ github.repository_owner }}/win-vcpkg-mingw64-qt-cpp-minimal:latest-build-cache"
-          
+        run: |          
           # 1. Pull images for caching
-          docker pull $BASE_IMAGE_TAG -q || true
-          docker pull $CACHE_TAG -q || true
+          docker pull ${{ env.BASE_IMAGE_TAG }} -q || true
+          docker pull ${{ env.CACHE_TAG }} -q || true
 
           # 2. Build the new image with your application code
-          docker build --cache-from $BASE_IMAGE_TAG --cache-from $CACHE_TAG -t $CACHE_TAG -f ./build.Dockerfile .
+          docker build --cache-from ${{ env.BASE_IMAGE_TAG }} --cache-from ${{ env.CACHE_TAG }} -t ${{ env.CACHE_TAG }} -f ./build.Dockerfile .
           
           # 3. Create a temporary container to extract the binaries from
-          docker create --name extractor $CACHE_TAG
+          docker create --name extractor ${{ env.CACHE_TAG }}
           
           # 4. Copy the entire build output directory to the runner's workspace
           docker cp extractor:/app/build ./build
           
           # 5. Push the new cache image
-          docker push $CACHE_TAG
+          docker push ${{ env.CACHE_TAG }}
 
       - 
         name: Package Application with Inno Setup
@@ -82,7 +80,7 @@ jobs:
           $appOutputBaseFilename = "setup-${{ env.APP_EXE_NAME }}"
 
           # 3. Run Inno Setup inside a container, mounting the whole workspace
-          docker run --rm -v "${{ github.workspace }}/Output:C:\app" ghcr.io/tkasozi/win-vcpkg-mingw64-qt-cpp-minimal:latest-build-cache `
+          docker run --rm -v "${{ github.workspace }}/Output:C:\app" ${{ env.CACHE_TAG }} `
             "$innoSetupExe" `
             "$containerInnoScriptPath" `
             "/DAppName=$appName" `

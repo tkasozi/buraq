@@ -6,11 +6,11 @@ on:
     types: [ published ]
   # pull_request:
   #   types: [ opened, synchronize, reopened ]
-  # push:
-  #   branches:
-  #     - 'main_'
-  #   paths-ignore: # IMPORTANT: Prevent infinite loop if this workflow's PR is merged
-  #     - 'manifest.json'
+  push:
+    branches:
+      - 'main'
+    paths-ignore: # IMPORTANT: Prevent infinite loop if this workflow's PR is merged
+      - 'manifest.json'
 
 jobs:
   # This job triggers the reusable workflow for each matrix combination

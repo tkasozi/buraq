@@ -42,7 +42,7 @@ jobs:
         shell: pwsh
         run: |          
           # 1. Pull images for caching
-          docker pull ${{ env.BASE_IMAGE_TAG }} -q || true
+          # docker pull ${{ env.BASE_IMAGE_TAG }} -q || true
           docker pull ${{ env.CACHE_TAG }} -q || true
 
           # 2. Build the new image with your application code

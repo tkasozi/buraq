@@ -43,7 +43,7 @@ jobs:
         run: |          
           # 1. Pull images for caching
           # docker pull ${{ env.BASE_IMAGE_TAG }} -q || true
-          docker pull ${{ env.CACHE_TAG }} -q || true
+          docker pull ${{ env.CACHE_TAG }} || true
 
           # 2. Build the new image with your application code
           # docker build --cache-from ${{ env.BASE_IMAGE_TAG }} --cache-from ${{ env.CACHE_TAG }} -t ${{ env.CACHE_TAG }} -f ./build.Dockerfile .

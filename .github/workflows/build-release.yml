@@ -46,7 +46,7 @@ jobs:
           docker pull ${{ env.CACHE_TAG }} -q || true
 
           # 2. Build the new image with your application code
-          docker build --cache-from ${{ env.BASE_IMAGE_TAG }} --cache-from ${{ env.CACHE_TAG }} -t ${{ env.CACHE_TAG }} -f ./build.Dockerfile .
+          # docker build --cache-from ${{ env.BASE_IMAGE_TAG }} --cache-from ${{ env.CACHE_TAG }} -t ${{ env.CACHE_TAG }} -f ./build.Dockerfile .
           
           # 3. Create a temporary container to extract the binaries from
           docker create --name extractor ${{ env.CACHE_TAG }}

@@ -9,5 +9,5 @@
 #pragma once
 #define APP_VERSION_MAJOR 0
 #define APP_VERSION_MINOR 0
-#define APP_VERSION_PATCH 32
+#define APP_VERSION_PATCH 33
 #endif //VERSION_H

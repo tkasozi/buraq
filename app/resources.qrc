@@ -43,7 +43,6 @@
         <file alias="workflow">icons/workflow.ico</file>
         <file alias="settings_icon_ico">icons/settings_icon.ico</file>
         <file alias="settings_icon_png">icons/dark/png/settings_icon.png</file>
-        <file alias="settings_icon_bmp">icons/dark/png/settings_icon.bmp</file>
         <file alias="folder_icon">icons/dark/png/folder_icon.png</file>
         <file alias="script_icon">icons/dark/png/script_icon.png</file>
         <file alias="terminal_icon">icons/dark/png/terminal_icon.png</file>

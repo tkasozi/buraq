@@ -44,10 +44,10 @@ QWidget br {
         /* You can use an image for the arrows: */
         /*
         QScrollBar::up-arrow:vertical {
-            image: url(:/icons/up_arrow.png);
+            /* image: url(:/icons/up_arrow.png); */
         }
         QScrollBar::down-arrow:vertical {
-            image: url(:/icons/down_arrow.png);
+            /* image: url(:/icons/down_arrow.png); */
         }
         */
         QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {

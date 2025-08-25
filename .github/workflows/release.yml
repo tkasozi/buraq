@@ -30,6 +30,7 @@ jobs:
             vcpkg_triplet: x64-mingw-dynamic
             generator: "Ninja"
             arch: x64
+            system: "windows-x64"
     #          - os: ubuntu-latest
     #            vcpkg_triplet: x64-linux
     #          - os: macos-latest
@@ -43,6 +44,7 @@ jobs:
       vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
       generator: ${{ matrix.generator }}
       arch: ${{ matrix.arch }}
+      system: ${{ matrix.system }}
 
     secrets:
       GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
@@ -65,9 +67,8 @@ jobs:
         build_type: [ Release ]
         include:
           - os: windows-latest
-            vcpkg_triplet: x64-windows
-            generator: "Visual Studio 17 2022"
             arch: x64
+            system: "windows-x64"
 
     steps:
       - name: Get Release Information (from trigger, if this is a release workflow)
@@ -80,7 +81,7 @@ jobs:
       - name: Download Windows Release Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ matrix.build_type }}-build-artifacts # Specific artifact name for Windows Release build
+          name: ${{ matrix.system }}-${{ matrix.build_type }}-build-artifacts # Specific artifact name for Windows Release build
           path: ./windows-release-build/
 
       - name: List Downloaded Artifacts
@@ -93,9 +94,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/windows-release-build/setup-buraq-${{ matrix.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe
+          asset_path: ${{ github.workspace }}/windows-release-build/setup-buraq-${{ matrix.system }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe
           asset_content_type: application/octet-stream
-          asset_name: "setup-buraq-${{ matrix.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe"
+          asset_name: "setup-buraq-${{ matrix.system }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}.exe"
 
   generate-manifest:
     needs: publish_release
@@ -106,19 +107,23 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/create-github-app-token@v1
+      - 
+        uses: actions/create-github-app-token@v1
         id: app-token
         with:
           app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.GH_BOT_TOKEN }}
-      - name: Checkout
+      
+      - 
+        name: Checkout
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0 # pulls all history and tags
           token: ${{ steps.app-token.outputs.token }}
 
-      - name: Install jq (if not pre-installed on runner)
+      - 
+        name: Install jq (if not pre-installed on runner)
         run: |
               if ! command -v jq &> /dev/null; then
                   echo "jq not found, installing..."
@@ -128,7 +133,8 @@ jobs:
                   echo "jq is already installed."
               fi
 
-      - name: Fetch Latest Release Data & Generate Manifest
+      - 
+        name: Fetch Latest Release Data & Generate Manifest
         id: generate_manifest # Give this step an ID to reference its outputs
         # For scheduled runs, inputs are not available directly in github.event.inputs
         # So we use an OR condition for REPO_PATH and OUTPUT_FILE, or set fixed values.
@@ -224,7 +230,8 @@ jobs:
                   exit 1
                 fi
 
-      - name: Check for changes to manifest.json
+      - 
+        name: Check for changes to manifest.json
         id: git_status_check
         run: |
           git config user.name "github-actions[bot]"
@@ -239,7 +246,8 @@ jobs:
             echo "Changes detected in manifest.json. Proceeding to create PR."
           fi
 
-      - name: Create Pull Request for manifest.json
+      - 
+        name: Create Pull Request for manifest.json
         id: create_pr
         # Only run this step if actual changes were detected in manifest.json
         if: steps.git_status_check.outputs.no_changes == 'false'
@@ -261,14 +269,16 @@ jobs:
             automated
             chore
 
-      - name: Enable Auto-Merge for Bot PR
+      - 
+        name: Enable Auto-Merge for Bot PR
         if: github.actor == 'github-actions[bot]' || github.actor == 'tkasozi' # Replace with YOUR actual App's bot name
         run: |
           gh pr merge --auto --merge "${{ env.PULL_REQUEST_NUMBER }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Release and Upload Manifest
+      - 
+        name: Create Release and Upload Manifest
         uses: softprops/action-gh-release@v1
         with:
           # If true, a new release will be created. If false, it tries to update an existing release for the tag.

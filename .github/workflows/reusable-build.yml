@@ -20,17 +20,21 @@ on:
         type: string
         description: 'Build configuration (Debug/Release)'
       vcpkg_triplet:
-        required: true
+        required: false
         type: string
         description: 'Vcpkg triplet for the target platform'
       generator:
-        required: true
+        required: false
         type: string
         description: 'Build generator'
       arch:
         required: true
         type: string
         description: 'Supported Arch'
+      system:
+        required: true
+        type: string
+        description: 'System build plus arch'
 
     secrets:
       GH_PACKAGES_TOKEN:

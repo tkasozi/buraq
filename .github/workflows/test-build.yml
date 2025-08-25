@@ -27,6 +27,7 @@ jobs:
             vcpkg_triplet: x64-mingw-dynamic
             generator: "Ninja"
             arch: x64
+            system: "windows-x64"
     #          - os: ubuntu-latest
     #            vcpkg_triplet: x64-linux
     #          - os: macos-latest
@@ -42,4 +43,5 @@ jobs:
       vcpkg_triplet: ${{ matrix.vcpkg_triplet }}
       generator: ${{ matrix.generator }}
       arch: ${{ matrix.arch }}
+      system: ${{ matrix.system }}
 

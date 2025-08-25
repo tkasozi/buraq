@@ -41,14 +41,6 @@ on:
         required: true
         description: 'GitHub Packages PAT'
 
-    outputs:
-      # If your build logic produces outputs needed by the caller
-      build_success:
-        description: "Whether the build was successful"
-        value: ${{ jobs.build_component.outputs.build_successful }}
-      artifact_name:
-        description: "Name of the uploaded artifact"
-        value: ${{ jobs.build_component.outputs.artifact_name }}
 
 jobs:
   build_component:
@@ -62,7 +54,6 @@ jobs:
 
     outputs:
       build_successful: ${{ steps.build_project_step.outcome == 'success' }}
-      artifact_name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
       executable_name: ${{ env.APP_EXE_NAME }}
 
     permissions:

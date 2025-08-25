@@ -55,7 +55,7 @@ jobs:
     runs-on: ${{ inputs.os }}
     env:
       PROJECT_NAME: buraq
-      APP_EXE_NAME: "buraq-${{ inputs.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
+      APP_EXE_NAME: "buraq-${{ inputs.system }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
       APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
       OUTPUT_DIR: ${{ github.workspace }}\buraq\Output
       APP_BINARY: ${{ github.workspace }}\buraq\build\build

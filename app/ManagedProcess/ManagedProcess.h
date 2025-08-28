@@ -26,8 +26,13 @@ public:
         si.cb = sizeof(si);
         ZeroMemory(&m_processInfo, sizeof(m_processInfo));
 
+        // The creation flag to run the process without a console
+
         // Launch the process
-        if (!CreateProcessW(NULL, commandLine.data(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &m_processInfo))
+        if (constexpr DWORD creationFlags = CREATE_NO_WINDOW;
+            !CreateProcessW(NULL, commandLine.data(), NULL,
+                            NULL, FALSE, creationFlags, NULL,
+                            NULL, &si, &m_processInfo))
         {
             std::cerr << "CreateProcess failed (" << GetLastError() << ").\n";
             return;
@@ -36,7 +41,8 @@ public:
         // Wait briefly for the process to initialize
         WaitForInputIdle(m_processInfo.hProcess, 5000); // 5-second timeout
 
-        std::cout << "Process " << executablePath.filename() << " started with PID: " << m_processInfo.dwProcessId << std::endl;
+        std::cout << "Process " << executablePath.filename() << " started with PID: " << m_processInfo.dwProcessId <<
+            std::endl;
         m_isRunning = true;
     }
 

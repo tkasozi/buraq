@@ -49,8 +49,6 @@
 
 AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 {
-    initBackgroundServices();
-
     // Init application views
     initAppLayout();
 
@@ -63,27 +61,6 @@ AppUi::~AppUi()
     // When the MyApp object is destroyed, m_bridgeProcess's destructor
     // will be called automatically, terminating the child process.
     delete m_bridgeProcess;
-}
-
-void AppUi::initBackgroundServices()
-{
-    // m_workerThread = new QThread(this);
-    // m_minion = new Minion();
-    // m_minion->moveToThread(m_workerThread);
-    //
-    // // --- 2. Connect Signals and Slots ---
-    //
-    // // Minion (worker thread) asks psClient (main thread) to execute a script.
-    // connect(m_minion, &Minion::runScriptRequested, m_psClient, &PSClient::runScript);
-    //
-    // // psClient (main thread) sends result back to CodeRunner (main thread).
-    // connect(m_psClient, &PSClient::scriptResultReceived, this, &CodeRunner::handleTaskResults);
-    //
-    // // Clean up the thread and worker when the thread's event loop finishes.
-    // connect(m_workerThread, &QThread::finished, m_minion, &QObject::deleteLater);
-    // connect(m_workerThread, &QThread::finished, m_workerThread, &QObject::deleteLater);
-    //
-    // m_workerThread->start();
 }
 
 void AppUi::onClicked() const
@@ -127,7 +104,7 @@ void AppUi::processStatusSlot(const QString& message, const int timeout) const
     statusBar->showMessage(message, timeout);
 }
 
-void AppUi::processResultSlot(int exitCode, const QString& output, const QString& error) const
+void AppUi::processResultSlot(const int exitCode, const QString& output, const QString& error) const
 {
     outPutArea->show();
 

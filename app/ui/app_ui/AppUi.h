@@ -34,7 +34,6 @@ private slots:
     void initPSLangSupport();
 
 public:
-    void initBackgroundServices();
     explicit AppUi(QWidget* parent = nullptr);
 
     // The std::unique_ptr members will automatically

@@ -1,4 +1,3 @@
-
 //
 // Created by talik on 5/28/2025.
 //
@@ -10,7 +9,7 @@
 #include "IconButton.h"
 #include "app_ui/AppUi.h"
 
-CodeRunner::CodeRunner(QWidget *appUi) : IconButton(nullptr),
+CodeRunner::CodeRunner(QWidget* appUi) : IconButton(nullptr),
                                          appUi(appUi),
                                          m_workerThread(nullptr),
                                          m_minion(nullptr)
@@ -63,7 +62,7 @@ void CodeRunner::runCode()
     }
 
     // --- Get the script text from the UI in the main thread ---
-    const auto appUi_ = dynamic_cast<AppUi *>(appUi);
+    const auto appUi_ = dynamic_cast<AppUi*>(appUi);
     if (appUi_ == nullptr || !appUi_->getEditor())
     {
         return; // Safety check
@@ -82,13 +81,15 @@ void CodeRunner::runCode()
 
     const auto cleanedScript = script.replace("\u2029", "\n");
 
+    emit statusUpdate("Running code..");
+
     // --- Safely trigger the task on the worker thread via a signal ---
     // The Minion's process slot should be connected to this signal.
     // We assume Minion has a signal like `startProcessing(QString)`.
     QMetaObject::invokeMethod(m_minion, "processScript", Qt::QueuedConnection, Q_ARG(QString, cleanedScript));
 }
 
-void CodeRunner::handleTaskResults(const QVariant &result)
+void CodeRunner::handleTaskResults(const QVariant& result)
 {
     // if (result.isValid() && result.canConvert<QString>())
     if (const auto flag = result.canConvert<QString>(); flag && result.isValid())
@@ -117,7 +118,7 @@ void CodeRunner::handleProgress(int i)
 
 void CodeRunner::handleWorkerFinished()
 {
-    emit statusUpdate("Completed");
+    emit statusUpdate("Completed!");
 
     m_workerThread = nullptr;
     m_minion = nullptr;
@@ -134,9 +135,10 @@ CodeRunner::~CodeRunner()
         m_workerThread->requestInterruption();
         m_workerThread->quit(); // Ask event loop to quit
         if (!m_workerThread->wait(5000))
-        {                              // Wait for max 5 seconds
+        {
+            // Wait for max 5 seconds
             m_workerThread->terminate(); // Force terminate (last resort)
-            m_workerThread->wait();      // Wait for termination
+            m_workerThread->wait(); // Wait for termination
         }
     }
 }
@@ -146,7 +148,7 @@ void CodeRunner::setupSignals()
     // Signal to execute the code
     connect(this, &IconButton::clicked, this, &CodeRunner::runCode);
 
-    const auto appUi_ = dynamic_cast<AppUi *>(appUi);
+    const auto appUi_ = dynamic_cast<AppUi*>(appUi);
     // Signal to update status bar in AppUI component for the running process
     connect(this, &CodeRunner::statusUpdate, appUi_, &AppUi::processStatusSlot);
 

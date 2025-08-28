@@ -30,7 +30,7 @@
 #include <QObject>
 #include <QString>
 
-class Minion : public QObject {
+class Minion final : public QObject {
 Q_OBJECT
 
 signals:
@@ -44,9 +44,17 @@ signals:
 	// Signal that all work is done
 	void workFinished();
 
+	// This signal is emitted to ask the main thread to run a script.
+	void runScriptRequested(const QString &script);
+
 public slots:
+	// This is the main entry point for the worker's task.
+	// It will be called when the QThread starts.
+	void process(const std::function<QVariant()>& task);
 	// Slot to start the work
 	void doWork(const std::function<QVariant()>& task);
+
+	void processScript(const QString& script);
 
 public:
 	explicit Minion(QObject *qObject);

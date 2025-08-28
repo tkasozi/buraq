@@ -32,6 +32,37 @@ Minion::Minion(QObject *parent) : QObject(parent) {
 	// empty
 }
 
+void Minion::process(const std::function<QVariant()>& task)
+{
+	emit progressUpdated(25);
+	if (!task) {
+		emit resultReady(QVariant());
+		emit workFinished();
+		return;
+	}
+
+	QVariant result;
+
+	try {
+		// Execute the provided task function
+		result = task(); // Execute the generic task
+	} catch (const std::exception &e) {
+		// Optionally, wrap the error message in the QVariant
+		result = QVariant("Error: " + QString(e.what()));
+	} catch (...) {
+		// Optionally, wrap the error message in the QVariant
+		result = QVariant("Error: Unknown exception");
+	}
+	emit resultReady(result);
+	emit workFinished();
+}
+
+void Minion::processScript(const QString& script)
+{
+    emit runScriptRequested(script);
+    emit workFinished(); // Signal that this task is done.
+}
+
 void Minion::doWork(const std::function<QVariant()>& task) {
 	if (!task) {
 		emit resultReady(QVariant());

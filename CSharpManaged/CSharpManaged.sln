@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buraq.Bridge", "Buraq.Bridge.csproj", "{858C27AC-5D7C-9534-95BC-02CE36FE6B30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buraq.Powershell", "Buraq.Powershell.csproj", "{373B18CF-8EF1-182A-2797-EC6158922243}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{858C27AC-5D7C-9534-95BC-02CE36FE6B30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{858C27AC-5D7C-9534-95BC-02CE36FE6B30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{858C27AC-5D7C-9534-95BC-02CE36FE6B30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{858C27AC-5D7C-9534-95BC-02CE36FE6B30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{373B18CF-8EF1-182A-2797-EC6158922243}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{373B18CF-8EF1-182A-2797-EC6158922243}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{373B18CF-8EF1-182A-2797-EC6158922243}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{373B18CF-8EF1-182A-2797-EC6158922243}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5293DB70-13BC-487C-82A6-78DB95597D63}
+	EndGlobalSection
+EndGlobal

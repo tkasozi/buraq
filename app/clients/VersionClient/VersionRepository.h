@@ -11,7 +11,7 @@
 
 #include "network.h"
 #include "app_version.h"
-#include "client/VersionRepository.h"
+#include "VersionRepository.h"
 #include "buraq.h"
 
 class VersionRepository {

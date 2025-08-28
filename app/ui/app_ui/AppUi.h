@@ -14,51 +14,53 @@
 #include "PluginManager.h"
 #include "EditorMargin.h"
 
-class AppUi final : public QMainWindow {
-Q_OBJECT
+class AppUi final : public QMainWindow
+{
+    Q_OBJECT
 
 public slots:
-	void processStatusSlot(const QString &, int timeout = 5000) const;
-	void processResultSlot(int exitCode, const QString &output, const QString &error) const;
+    void processStatusSlot(const QString&, int timeout = 5000) const;
+    void processResultSlot(int exitCode, const QString& output, const QString& error) const;
 
 private slots:
+    void onClicked() const;
 
-	void onClicked() const;
+    void onShowOutputButtonClicked() const;
 
-	void onShowOutputButtonClicked() const;
-
-	void onWindowFullyLoaded();
+    void onWindowFullyLoaded();
 
 public:
-	explicit AppUi(QWidget *parent = nullptr);
+    explicit AppUi(QWidget* parent = nullptr);
 
-	// The std::unique_ptr members will automatically
-	// delete their managed objects when AppUi is destroyed.
-	// No manual delete, no manual nullptr.
-	~AppUi() override = default;
+    // The std::unique_ptr members will automatically
+    // delete their managed objects when AppUi is destroyed.
+    // No manual delete, no manual nullptr.
+    ~AppUi() override = default;
 
-Editor *getEditor() const;
-	EditorMargin *getEditorMargin() const;
+    Editor* getEditor() const;
+    EditorMargin* getEditorMargin() const;
 
-	PluginManager *getLangPluginManager() const;
+    PluginManager* getLangPluginManager() const;
 
-	buraq::buraq_api *get_api_context() const { return api_context.get(); };
+    buraq::buraq_api* get_api_context() const { return api_context.get(); };
+
 private:
-	std::unique_ptr<PluginManager> pluginManager;
-	std::unique_ptr<CustomDrawer> drawer;
-	std::unique_ptr<QGridLayout> centralWidgetLayout;
-	std::unique_ptr<IconButton> folderButton;
-	std::unique_ptr<OutputDisplay> outPutArea;
-	std::unique_ptr<QGridLayout> placeHolderLayout;
-	std::unique_ptr<Editor> itoolsEditor;
-	std::unique_ptr<EditorMargin> editorMargin;
-	std::unique_ptr<ToolBar> toolBar;
-	std::unique_ptr<QStatusBar> statusBar;
-	std::unique_ptr<buraq::buraq_api> api_context;
+    std::unique_ptr<PluginManager> pluginManager;
+    std::unique_ptr<CustomDrawer> drawer;
+    std::unique_ptr<QGridLayout> centralWidgetLayout;
+    std::unique_ptr<IconButton> folderButton;
+    std::unique_ptr<OutputDisplay> outPutArea;
+    std::unique_ptr<QGridLayout> placeHolderLayout;
+    std::unique_ptr<Editor> itoolsEditor;
+    std::unique_ptr<EditorMargin> editorMargin;
+    std::unique_ptr<ToolBar> toolBar;
+    std::unique_ptr<QStatusBar> statusBar;
+    std::unique_ptr<buraq::buraq_api> api_context;
 
-	void configureAppContext();
-	static void launchUpdaterAndExit(const  std::filesystem::path &updaterPath, const  std::filesystem::path &packagePath,
-								 const  std::filesystem::path &installationPath);
+    void initAppLayout();
+    void initAppContext();
+    static void launchUpdaterAndExit(const std::filesystem::path& updaterPath, const std::filesystem::path& packagePath,
+                                     const std::filesystem::path& installationPath);
 };
 
 

@@ -34,126 +34,26 @@
 #include <QCoreApplication>
 #include <map>
 
-#include <windows.h>
-#include <shlobj.h> // SHGetKnownFolderPath
 #include <string>
 
-#include "client/VersionRepository.h"
+#include "../../clients/VersionClient/VersionRepository.h"
 #include "dialog/VersionUpdateDialog.h"
+
+#ifdef _WIN32
+
+#include <windows.h>
+#include <shlobj.h> // SHGetKnownFolderPath
+#include <libloaderapi.h> // For AddDllDirectory
+
+#endif
 
 AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 {
-    // setting up default window size
-    const auto windowConfig = Config::singleton().getWindow();
-    resize(windowConfig->normalSize, windowConfig->minHeight);
-    setMinimumSize(windowConfig->minWidth, windowConfig->minHeight);
+    // Init application views
+    initAppLayout();
 
-    // Add Tool bar
-    toolBar = std::make_unique<ToolBar>(this);
-    // Add the File menu first
-    toolBar->addFileMenu();
-
-    setMenuWidget(toolBar.get());
-
-    // Add Status bar
-    statusBar = std::make_unique<QStatusBar>(this);
-    statusBar->setObjectName("appStatusBar");
-    statusBar->setSizeGripEnabled(false);
-
-    setStatusBar(statusBar.get());
-
-    // Setting window title and docking icon
-    setWindowTitle(UpdateInfo().currentVersion.data());
-    setWindowIcon(Config::singleton().getAppLogo());
-
-    // Add CentralWidget
-    auto* centralWidget = new QWidget;
-    setCentralWidget(centralWidget);
-
-    // Add layout to centralWidget
-    centralWidgetLayout = std::make_unique<QGridLayout>();
-    centralWidgetLayout->setSpacing(0);
-    centralWidgetLayout->setContentsMargins(0, 0, 0, 0);
-    centralWidget->setLayout(centralWidgetLayout.get());
-
-    // Add control panel to the central widget.
-    auto* centralWidgetLayout2 = new QGridLayout;
-    centralWidgetLayout2->setSpacing(0);
-    centralWidgetLayout2->setContentsMargins(0, 0, 0, 0);
-
-    const auto centralWidgetControlPanel = new QWidget;
-    centralWidgetControlPanel->setObjectName("ControlToolBar");
-
-    centralWidgetControlPanel->setFixedWidth(64);
-    centralWidgetControlPanel->setLayout(centralWidgetLayout2);
-
-    // panel A
-    auto* layoutA = new QVBoxLayout;
-    layoutA->setSpacing(1);
-    layoutA->setContentsMargins(0, 0, 0, 0);
-
-    auto* centralWidgetControlPanelA = new QWidget;
-    centralWidgetControlPanelA->setLayout(layoutA);
-
-    centralWidgetLayout2->addWidget(centralWidgetControlPanelA, 0, 0, 1, 12, Qt::AlignJustify);
-
-    const auto appIcons = Config::singleton().getAppIcons();
-    folderButton = std::make_unique<IconButton>(appIcons->folderIcon);
-
-    layoutA->addWidget(folderButton.get());
-
-    // Good, to be placed in panel B
-    auto* layoutB = new QVBoxLayout;
-    layoutB->setSpacing(8);
-
-    auto* centralWidgetControlPanelB = new QWidget;
-    centralWidgetControlPanelB->setLayout(layoutB);
-    centralWidgetControlPanelB->setContentsMargins(16, 0, 0, 8);
-
-    centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
-
-    const auto outputButton = new IconButton(appIcons->terminalIcon);
-    connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
-    layoutB->addWidget(outputButton);
-
-    const auto settingsButton = new IconButton(appIcons->settingsIcon);
-    layoutB->addWidget(settingsButton);
-
-    // add to central widget
-    centralWidgetLayout->addWidget(centralWidgetControlPanel, 0, 0, 12, 1);
-
-    // Component
-    connect(folderButton.get(), &IconButton::clicked, this, &AppUi::onClicked);
-
-    // layout c
-    layoutB->setSpacing(0);
-    layoutB->setContentsMargins(0, 0, 0, 0);
-
-    // Editor helper component.
-    itoolsEditor = std::make_unique<Editor>(this);
-    // Handles file nav
-    drawer = std::make_unique<CustomDrawer>(itoolsEditor.get());
-    // This where the output_display generated after executing the script will be displayed
-    outPutArea = std::make_unique<OutputDisplay>(this);
-
-    placeHolderLayout = std::make_unique<QGridLayout>();
-    placeHolderLayout->setSpacing(0);
-    placeHolderLayout->setContentsMargins(0, 0, 0, 0);
-
-    placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
-    // placeHolderLayout->addWidget(editorMargin.get(), 0, 2, 12, 1, Qt::AlignmentFlag::AlignTop);
-    placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 1);
-
-    // add main content area
-    const auto editorAndDrawerAreaPanel = new QWidget;
-    editorAndDrawerAreaPanel->setLayout(placeHolderLayout.get());
-    centralWidgetLayout->addWidget(editorAndDrawerAreaPanel, 0, 2, 12, 12);
-    centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
-
-    configureAppContext();
-
-    // Schedule onWindowFullyLoaded to run after current event processing is done
-    QTimer::singleShot(0, this, &AppUi::onWindowFullyLoaded);
+    // init app's file system
+    initAppContext();
 }
 
 void AppUi::onWindowFullyLoaded()
@@ -281,16 +181,124 @@ void AppUi::processResultSlot(int exitCode, const QString& output, const QString
     }
 }
 
-void AppUi::configureAppContext()
+void AppUi::initAppLayout()
+{
+     // setting up default window size
+    const auto windowConfig = Config::singleton().getWindow();
+    resize(windowConfig->normalSize, windowConfig->minHeight);
+    setMinimumSize(windowConfig->minWidth, windowConfig->minHeight);
+
+    // Add Tool bar
+    toolBar = std::make_unique<ToolBar>(this);
+    // Add the File menu first
+    toolBar->addFileMenu();
+
+    setMenuWidget(toolBar.get());
+
+    // Add Status bar
+    statusBar = std::make_unique<QStatusBar>(this);
+    statusBar->setObjectName("appStatusBar");
+    statusBar->setSizeGripEnabled(false);
+
+    setStatusBar(statusBar.get());
+
+    // Setting window title and docking icon
+    setWindowTitle(UpdateInfo().currentVersion.data());
+    setWindowIcon(Config::singleton().getAppLogo());
+
+    // Add CentralWidget
+    auto* centralWidget = new QWidget;
+    setCentralWidget(centralWidget);
+
+    // Add layout to centralWidget
+    centralWidgetLayout = std::make_unique<QGridLayout>();
+    centralWidgetLayout->setSpacing(0);
+    centralWidgetLayout->setContentsMargins(0, 0, 0, 0);
+    centralWidget->setLayout(centralWidgetLayout.get());
+
+    // Add control panel to the central widget.
+    auto* centralWidgetLayout2 = new QGridLayout;
+    centralWidgetLayout2->setSpacing(0);
+    centralWidgetLayout2->setContentsMargins(0, 0, 0, 0);
+
+    const auto centralWidgetControlPanel = new QWidget;
+    centralWidgetControlPanel->setObjectName("ControlToolBar");
+
+    centralWidgetControlPanel->setFixedWidth(64);
+    centralWidgetControlPanel->setLayout(centralWidgetLayout2);
+
+    // panel A
+    auto* layoutA = new QVBoxLayout;
+    layoutA->setSpacing(1);
+    layoutA->setContentsMargins(0, 0, 0, 0);
+
+    auto* centralWidgetControlPanelA = new QWidget;
+    centralWidgetControlPanelA->setLayout(layoutA);
+
+    centralWidgetLayout2->addWidget(centralWidgetControlPanelA, 0, 0, 1, 12, Qt::AlignJustify);
+
+    const auto appIcons = Config::singleton().getAppIcons();
+    folderButton = std::make_unique<IconButton>(appIcons->folderIcon);
+
+    layoutA->addWidget(folderButton.get());
+
+    // Good, to be placed in panel B
+    auto* layoutB = new QVBoxLayout;
+    layoutB->setSpacing(8);
+
+    auto* centralWidgetControlPanelB = new QWidget;
+    centralWidgetControlPanelB->setLayout(layoutB);
+    centralWidgetControlPanelB->setContentsMargins(16, 0, 0, 8);
+
+    centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
+
+    const auto outputButton = new IconButton(appIcons->terminalIcon);
+    connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
+    layoutB->addWidget(outputButton);
+
+    const auto settingsButton = new IconButton(appIcons->settingsIcon);
+    layoutB->addWidget(settingsButton);
+
+    // add to central widget
+    centralWidgetLayout->addWidget(centralWidgetControlPanel, 0, 0, 12, 1);
+
+    // Component
+    connect(folderButton.get(), &IconButton::clicked, this, &AppUi::onClicked);
+
+    // layout c
+    layoutB->setSpacing(0);
+    layoutB->setContentsMargins(0, 0, 0, 0);
+
+    // Editor helper component.
+    itoolsEditor = std::make_unique<Editor>(this);
+    // Handles file nav
+    drawer = std::make_unique<CustomDrawer>(itoolsEditor.get());
+    // This where the output_display generated after executing the script will be displayed
+    outPutArea = std::make_unique<OutputDisplay>(this);
+
+    placeHolderLayout = std::make_unique<QGridLayout>();
+    placeHolderLayout->setSpacing(0);
+    placeHolderLayout->setContentsMargins(0, 0, 0, 0);
+
+    placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
+    // placeHolderLayout->addWidget(editorMargin.get(), 0, 2, 12, 1, Qt::AlignmentFlag::AlignTop);
+    placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 1);
+
+    // add main content area
+    const auto editorAndDrawerAreaPanel = new QWidget;
+    editorAndDrawerAreaPanel->setLayout(placeHolderLayout.get());
+    centralWidgetLayout->addWidget(editorAndDrawerAreaPanel, 0, 2, 12, 12);
+    centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
+}
+
+void AppUi::initAppContext()
 {
     const std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "Buraq";
 
     // app search_path for plugins
     const std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
     // Add required plugins
-    const std::map<std::string, std::string> plugins_{
-        {"power_shell", searchPath.string() + "/libpowershell_plugin.dll"}
-    };
+    const std::map<std::string, std::string> plugins_{};
 
     api_context = std::make_unique<buraq::buraq_api>();
     api_context->searchPath = searchPath;
@@ -300,8 +308,11 @@ void AppUi::configureAppContext()
 
     pluginManager = std::make_unique<PluginManager>(api_context.get());
 
-    // Load plugins from the specified directory
-    pluginManager->loadPlugin("power_shell");
+    // TBD
+    pluginManager->loadPluginsFromDirectory((searchPath / "plugins").string());
+
+    // Schedule onWindowFullyLoaded to run after current event processing is done
+    QTimer::singleShot(0, this, &AppUi::onWindowFullyLoaded);
 }
 
 EditorMargin* AppUi::getEditorMargin() const

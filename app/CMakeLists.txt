@@ -11,7 +11,7 @@ find_package(Qt6 REQUIRED COMPONENTS
         Sql
         Xml
         Svg
-        REQUIRED)
+        Network)
 find_package(Qt6SvgWidgets CONFIG REQUIRED)
 
 qt_standard_project_setup() # Recommended for standard Qt setup
@@ -86,8 +86,8 @@ set(ITOOLS_HEADERS
         app_version.h
         ${CMAKE_SOURCE_DIR}/include/network.cpp
         ${CMAKE_SOURCE_DIR}/include/network.h
-        client/VersionRepository.cpp
-        client/VersionRepository.h
+        clients/VersionClient/VersionRepository.cpp
+        clients/VersionClient/VersionRepository.h
         ui/dialog/VersionUpdateDialog.cpp
         ui/dialog/VersionUpdateDialog.h
         ../include/theme_manager.h
@@ -95,6 +95,8 @@ set(ITOOLS_HEADERS
         ../include/buraq.h
         database/db_conn.cpp
         ../include/buraq.cpp
+        clients/PSClient/PSClient.cpp
+        clients/PSClient/PSClient.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
@@ -130,6 +132,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         CURL::libcurl
         Boost::property_tree
         unofficial::sqlite3::sqlite3
+        Qt6::Network
 )
 
 set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")

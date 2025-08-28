@@ -7,7 +7,7 @@
 
 #include "../include/version.h"
 #include "../include/network.h"
-#include "client/VersionRepository.h"
+#include "clients/VersionClient/VersionRepository.h"
 
 
 

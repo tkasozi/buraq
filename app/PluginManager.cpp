@@ -27,6 +27,7 @@
 #include "PluginManager.h"
 #include <iostream>
 #include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
+#include <qlogging.h>
 
 #ifdef _WIN32
 
@@ -50,12 +51,11 @@ void PluginManager::logWindowsError(const std::string &action) {
 PluginManager::PluginManager(buraq::buraq_api *app_context) : application_context_(app_context) {}
 
 PluginManager::~PluginManager() {
-//	std::cout << "~PluginManager()" << std::endl;
 	unloadAllPlugins();
 }
 
 bool PluginManager::loadPlugin(const std::string &plugin_name) {
-	std::string plugin_path = application_context_->plugins.at(plugin_name);
+	const std::string plugin_path = application_context_->plugins.at(plugin_name);
 
 #ifdef _WIN32
 	HMODULE plugin_handle = LoadLibraryA(plugin_path.c_str());

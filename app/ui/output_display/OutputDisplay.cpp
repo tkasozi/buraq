@@ -70,7 +70,6 @@ void init_main_out_area(QPlainTextEdit* main, QVBoxLayout* layout, int editorWid
 
     main->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    qDebug() << "appWidth: " << editorWidth;
     if (editorWidth > 0)
     {
         main->setMinimumWidth(editorWidth);

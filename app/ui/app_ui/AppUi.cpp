@@ -34,16 +34,96 @@
 #include <QCoreApplication>
 #include <map>
 
-#include <windows.h>
-#include <shlobj.h> // SHGetKnownFolderPath
 #include <string>
 
-#include "client/VersionRepository.h"
+#include "../../clients/VersionClient/VersionRepository.h"
 #include "dialog/VersionUpdateDialog.h"
+#include "ManagedProcess/ManagedProcess.h"
+
+#ifdef _WIN32
+
+#include <windows.h>
+#include <shlobj.h> // SHGetKnownFolderPath
+
+#endif
 
 AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 {
-    // setting up default window size
+    // Init application views
+    initAppLayout();
+
+    // init app's file system
+    initAppContext();
+}
+
+AppUi::~AppUi()
+{
+    // When the MyApp object is destroyed, m_bridgeProcess's destructor
+    // will be called automatically, terminating the child process.
+    delete m_bridgeProcess;
+}
+
+void AppUi::onClicked() const
+{
+    drawer->toggle();
+    if (drawer->isVisible())
+    {
+        placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
+    }
+    else
+    {
+        placeHolderLayout->removeWidget(drawer.get());
+    }
+}
+
+void AppUi::onShowOutputButtonClicked() const
+{
+    outPutArea->toggle();
+    if (outPutArea->isVisible())
+    {
+        centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
+    }
+    else
+    {
+        centralWidgetLayout->removeWidget(outPutArea.get());
+    }
+}
+
+Editor* AppUi::getEditor() const
+{
+    return itoolsEditor.get();
+}
+
+PluginManager* AppUi::getLangPluginManager() const
+{
+    return pluginManager.get();
+}
+
+void AppUi::processStatusSlot(const QString& message, const int timeout) const
+{
+    statusBar->showMessage(message, timeout);
+}
+
+void AppUi::processResultSlot(const int exitCode, const QString& output, const QString& error) const
+{
+    outPutArea->show();
+
+    if (exitCode == 0)
+    {
+        outPutArea->log(output, error);
+
+        processStatusSlot(error.isEmpty() ? "Completed!" : "Completed with errors.");
+    }
+    else
+    {
+        processStatusSlot("Process failed!");
+        outPutArea->log("", error);
+    }
+}
+
+void AppUi::initAppLayout()
+{
+     // setting up default window size
     const auto windowConfig = Config::singleton().getWindow();
     resize(windowConfig->normalSize, windowConfig->minHeight);
     setMinimumSize(windowConfig->minWidth, windowConfig->minHeight);
@@ -149,14 +229,58 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     editorAndDrawerAreaPanel->setLayout(placeHolderLayout.get());
     centralWidgetLayout->addWidget(editorAndDrawerAreaPanel, 0, 2, 12, 12);
     centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
+}
 
-    configureAppContext();
+void AppUi::initAppContext()
+{
+    const std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "Buraq";
+
+    // app search_path for plugins
+    const std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
+    // Add required plugins
+    const std::map<std::string, std::string> plugins_{};
+
+    api_context = std::make_unique<buraq::buraq_api>();
+    api_context->searchPath = searchPath;
+    api_context->plugins = plugins_;
+    api_context->userDataPath = userDataPath / ".data";
+    api_context->userPath = userDataPath;
+
+    pluginManager = std::make_unique<PluginManager>(api_context.get());
+
+    // TBD
+    pluginManager->loadPluginsFromDirectory((searchPath / "plugins").string());
 
     // Schedule onWindowFullyLoaded to run after current event processing is done
-    QTimer::singleShot(0, this, &AppUi::onWindowFullyLoaded);
+    QTimer::singleShot(10000, this, &AppUi::onWindowFullyLoaded);
 }
 
 void AppUi::onWindowFullyLoaded()
+{
+    initPSLangSupport();
+
+    verifyApplicationVersion();
+}
+
+void AppUi::initPSLangSupport()
+{
+    const std::filesystem::path psLangSupportPath = api_context->searchPath / "PS.Bridge/Buraq.Bridge.exe";
+
+    qDebug() << "PSLang Support: " << psLangSupportPath.string();
+
+    processStatusSlot("PSLang Support..", 5000);
+
+    m_bridgeProcess = new ManagedProcess(psLangSupportPath);
+
+    if (!m_bridgeProcess->isRunning()) {
+        std::cerr << "Bridge process failed to start." << std::endl;
+        processStatusSlot("PowerShell Support Failed.", 5000);
+    }
+
+    processStatusSlot("PSLang Support Ready", 30000);
+}
+
+void AppUi::verifyApplicationVersion()
 {
     VersionRepository repo(api_context.get());
 
@@ -197,9 +321,8 @@ void AppUi::onWindowFullyLoaded()
                 std::cout << "The path is: " << sPath << std::endl;
 
                 launchUpdaterAndExit(
-                    api_context->searchPath / "updater.exe",
-                    installerExe,
-                    sPath);
+                    api_context->searchPath / "updater.exe", installerExe, sPath
+                );
 
                 // Free the memory allocated by SHGetKnownFolderPath
                 CoTaskMemFree(pszPath);
@@ -223,95 +346,16 @@ void AppUi::onWindowFullyLoaded()
     }
 }
 
-void AppUi::onClicked() const
-{
-    drawer->toggle();
-    if (drawer->isVisible())
-    {
-        placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
-    }
-    else
-    {
-        placeHolderLayout->removeWidget(drawer.get());
-    }
-}
-
-void AppUi::onShowOutputButtonClicked() const
-{
-    outPutArea->toggle();
-    if (outPutArea->isVisible())
-    {
-        centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
-    }
-    else
-    {
-        centralWidgetLayout->removeWidget(outPutArea.get());
-    }
-}
-
-Editor* AppUi::getEditor() const
-{
-    return itoolsEditor.get();
-}
-
-PluginManager* AppUi::getLangPluginManager() const
-{
-    return pluginManager.get();
-}
-
-void AppUi::processStatusSlot(const QString& message, const int timeout) const
-{
-    statusBar->showMessage(message, timeout);
-}
-
-void AppUi::processResultSlot(int exitCode, const QString& output, const QString& error) const
-{
-    outPutArea->show();
-
-    if (exitCode == 0)
-    {
-        outPutArea->log(output, error);
-
-        processStatusSlot(error.isEmpty() ? "Completed!" : "Completed with errors.");
-    }
-    else
-    {
-        processStatusSlot("Process failed!");
-        outPutArea->log("", error);
-    }
-}
-
-void AppUi::configureAppContext()
-{
-    const std::filesystem::path userDataPath = std::filesystem::temp_directory_path() / "Buraq";
-
-    // app search_path for plugins
-    const std::filesystem::path searchPath(QCoreApplication::applicationDirPath().toStdString());
-    // Add required plugins
-    const std::map<std::string, std::string> plugins_{
-        {"power_shell", searchPath.string() + "/libpowershell_plugin.dll"}
-    };
-
-    api_context = std::make_unique<buraq::buraq_api>();
-    api_context->searchPath = searchPath;
-    api_context->plugins = plugins_;
-    api_context->userDataPath = userDataPath / ".data";
-    api_context->userPath = userDataPath;
-
-    pluginManager = std::make_unique<PluginManager>(api_context.get());
-
-    // Load plugins from the specified directory
-    pluginManager->loadPlugin("power_shell");
-}
-
 EditorMargin* AppUi::getEditorMargin() const
 {
     return editorMargin.get();
 }
 
-void AppUi::launchUpdaterAndExit(const std::filesystem::path& updaterPath, const std::filesystem::path& packagePath,
-                                 const std::filesystem::path& installationPath)
-{
+void AppUi::launchUpdaterAndExit(
+    const std::filesystem::path& updaterPath,
+    const std::filesystem::path& packagePath,
+    const std::filesystem::path& installationPath
+) {
     std::string commandLine = "\"" + updaterPath.string() + "\"";
     commandLine += " \"" + packagePath.string() + "\"";
     commandLine += " \"" + installationPath.string() + "\"";

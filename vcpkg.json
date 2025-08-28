@@ -11,7 +11,8 @@
         "widgets",
         "sql",
         "sql-sqlite",
-        "png"
+        "png",
+        "network"
       ]
     },
     {

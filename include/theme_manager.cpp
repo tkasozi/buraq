@@ -17,7 +17,7 @@ ThemeManager& ThemeManager::instance()
     return manager;
 }
 
-void ThemeManager::setAppTheme(AppTheme theme)
+void ThemeManager::setAppTheme(const AppTheme theme)
 {
     // Important: Only apply stylesheet if it's a different theme
     if (m_currentTheme == theme && !qApp->styleSheet().isEmpty())
@@ -28,11 +28,12 @@ void ThemeManager::setAppTheme(AppTheme theme)
     QString stylePath;
     switch (theme)
     {
+    case LightTheme:
+        // TODO --fix light theme
+        // stylePath = ":/styles/light_theme.qss";
+        // break;
     case DarkTheme:
         stylePath = ":/styles/dark_theme.qss";
-        break;
-    case LightTheme:
-        stylePath = ":/styles/light_theme.qss";
         break;
     }
 

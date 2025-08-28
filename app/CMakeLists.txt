@@ -11,7 +11,7 @@ find_package(Qt6 REQUIRED COMPONENTS
         Sql
         Xml
         Svg
-        REQUIRED)
+        Network)
 find_package(Qt6SvgWidgets CONFIG REQUIRED)
 
 qt_standard_project_setup() # Recommended for standard Qt setup
@@ -86,8 +86,8 @@ set(ITOOLS_HEADERS
         app_version.h
         ${CMAKE_SOURCE_DIR}/include/network.cpp
         ${CMAKE_SOURCE_DIR}/include/network.h
-        client/VersionRepository.cpp
-        client/VersionRepository.h
+        clients/VersionClient/VersionRepository.cpp
+        clients/VersionClient/VersionRepository.h
         ui/dialog/VersionUpdateDialog.cpp
         ui/dialog/VersionUpdateDialog.h
         ../include/theme_manager.h
@@ -95,6 +95,9 @@ set(ITOOLS_HEADERS
         ../include/buraq.h
         database/db_conn.cpp
         ../include/buraq.cpp
+        clients/PSClient/PSClient.cpp
+        clients/PSClient/PSClient.h
+        ManagedProcess/ManagedProcess.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
@@ -130,9 +133,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         CURL::libcurl
         Boost::property_tree
         unofficial::sqlite3::sqlite3
+        Qt6::Network
 )
-
-set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
 
 # Conditionally add static linking flags for MinGW/GCC
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
@@ -169,6 +171,17 @@ endforeach ()
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/icons/workflow.ico "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+)
+
+set(MANAGED_LIBRARY_PUBLISH_DIR "${CMAKE_SOURCE_DIR}/CSharpManaged/bin/Release/net9.0/win-x64/publish")
+
+# After the build is complete, copy the ENTIRE contents of the publish
+# directory to the same directory as your final buraq.exe.
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${MANAGED_LIBRARY_PUBLISH_DIR}/" # Source: The entire publish folder
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/PS.Bridge"      # Destination: Where buraq.exe is
+        COMMENT "Copying all self-contained .NET components..."
 )
 
 if (WIN32)

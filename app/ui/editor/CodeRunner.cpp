@@ -1,4 +1,3 @@
-
 //
 // Created by talik on 5/28/2025.
 //
@@ -10,12 +9,11 @@
 #include "IconButton.h"
 #include "app_ui/AppUi.h"
 
-CodeRunner::CodeRunner(QWidget *appUi) : IconButton(nullptr),
+CodeRunner::CodeRunner(QWidget* appUi) : IconButton(nullptr),
                                          appUi(appUi),
-                                         workerThread(nullptr),
-                                         minion(nullptr)
+                                         m_workerThread(nullptr),
+                                         m_minion(nullptr)
 {
-
     setObjectName("CodeRunner");
     setIcon(QIcon(Config::singleton().getAppIcons()->executeIcon));
     // setFixedSize(32, 32);
@@ -29,100 +27,80 @@ CodeRunner::CodeRunner(QWidget *appUi) : IconButton(nullptr),
     CodeRunner::setupSignals();
 }
 
+// Call this once in your CodeRunner's constructor.
+void CodeRunner::setupWorker()
+{
+    // --- 1. Create and Connect Objects ---
+    m_psClient = new PSClient(this);
+    m_workerThread = new QThread(this);
+    m_minion = new Minion();
+    m_minion->moveToThread(m_workerThread);
+
+    // --- 2. Connect Signals and Slots ---
+
+    // Minion (worker thread) asks psClient (main thread) to execute a script.
+    connect(m_minion, &Minion::runScriptRequested, m_psClient, &PSClient::runScript);
+
+    // psClient (main thread) sends result back to CodeRunner (main thread).
+    connect(m_psClient, &PSClient::scriptResultReceived, this, &CodeRunner::handleTaskResults);
+
+    // Clean up the thread and worker when the thread's event loop finishes.
+    connect(m_workerThread, &QThread::finished, m_minion, &QObject::deleteLater);
+    connect(m_workerThread, &QThread::finished, m_workerThread, &QObject::deleteLater);
+
+    m_workerThread->start();
+}
+
+
+// This function is now much simpler. It just gets the script and signals the worker.
 void CodeRunner::runCode()
 {
-    if (workerThread && workerThread->isRunning())
+    if (!m_workerThread || !m_workerThread->isRunning())
     {
-        // Work is already in progress. Please stop current work first.;
-        return;
+        // If the thread isn't running, set it up.
+        setupWorker();
     }
 
-    this->setupWorkerThread();
-
-    std::function<QVariant()> task = [this]() -> QVariant
+    // --- Get the script text from the UI in the main thread ---
+    const auto appUi_ = dynamic_cast<AppUi*>(appUi);
+    if (appUi_ == nullptr || !appUi_->getEditor())
     {
-        const auto appUi_ = dynamic_cast<AppUi *>(appUi);
+        return; // Safety check
+    }
 
-        if (appUi_ == nullptr || !appUi_->getEditor())
-        {
-            // editor must be defined
-            return {};
-        }
+    QString script = appUi_->getEditor()->selectedText();
+    if (script.isEmpty())
+    {
+        script = appUi_->getEditor()->toPlainText();
+    }
 
-        // Run selected code
-        QString script = appUi_->getEditor()->selectedText();
-        if (script.isEmpty())
-        {
-            // run entire file
-            script = appUi_->getEditor()->toPlainText();
-        }
+    if (script.isEmpty())
+    {
+        return; // Nothing to run
+    }
 
-        if (script.isEmpty())
-        {
-            return {};
-        }
+    const auto cleanedScript = script.replace("\u2029", "\n");
 
-        // Removes Paragraph Separator (PS) character
-        const auto cleaned = script.replace("\u2029", "\n");
+    emit statusUpdate("Running code..");
 
-        if (!appUi_->getLangPluginManager())
-        {
-            // LangPluginManager must be defined
-            return {};
-        }
-        const ProcessedData processedData = appUi_->getLangPluginManager()->callPerformAction(
-            (void *)cleaned.toStdString().c_str());
-
-        return QVariant::fromValue(processedData.resultValue);
-    };
-
-    QMetaObject::invokeMethod(minion, "doWork", Qt::QueuedConnection, Q_ARG(const std::function<QVariant()>, task));
+    // --- Safely trigger the task on the worker thread via a signal ---
+    // The Minion's process slot should be connected to this signal.
+    // We assume Minion has a signal like `startProcessing(QString)`.
+    QMetaObject::invokeMethod(m_minion, "processScript", Qt::QueuedConnection, Q_ARG(QString, cleanedScript));
 }
 
-void CodeRunner::setupWorkerThread()
+void CodeRunner::handleTaskResults(const QVariant& result)
 {
-    workerThread = new QThread(this);
-    workerThread->setObjectName("CodeRunnerThread");
-
-    // 2. Create Minion (no parent initially, will be managed by thread lifecycle)
-    minion = new Minion();
-    // moves minion's work the workerThead
-    minion->moveToThread(workerThread);
-
-    // 4. Connect Signals and Slots
-    //    When thread starts, tell minion to start working
-    connect(workerThread, &QThread::started, minion, [this]()
-            { emit statusUpdate("Executing.."); });
-
-    // Connect minion signals to MainWindow slots
-    connect(minion, &Minion::progressUpdated, this, &CodeRunner::handleProgress);
-    connect(minion, &Minion::resultReady, this, &CodeRunner::handleTaskResults);
-    connect(minion, &Minion::workFinished, this, &CodeRunner::handleWorkerFinished, Qt::QueuedConnection);
-
-    // When the worker signals it's done with its task
-    connect(minion, &Minion::workFinished, workerThread,
-            &QThread::quit, Qt::QueuedConnection); // Tell thread to exit its event loop
-
-    // When the thread's event loop has finished (after quit())
-    connect(workerThread, &QThread::finished, minion, &QObject::deleteLater, Qt::QueuedConnection);
-    connect(workerThread, &QThread::finished, workerThread, &QObject::deleteLater,
-            Qt::QueuedConnection); // Self-delete thread object
-
-    // 5. Start the thread
-    workerThread->start();
-}
-
-void CodeRunner::handleTaskResults(const QVariant &result)
-{
-    if (result.isValid() && result.canConvert<std::wstring>())
+    // if (result.isValid() && result.canConvert<QString>())
+    if (const auto flag = result.canConvert<QString>(); flag && result.isValid())
     {
-        const auto data = result.value<std::wstring>();
-        QString error = "", resultString = QString::fromStdWString(data);
+        const auto resultString = result.value<QString>();
+        QString error = "";
         int statusCode = 0;
         if (!resultString.isEmpty() && resultString.contains("exception", Qt::CaseInsensitive))
         {
             error = resultString;
-            resultString.clear();
+            // resultString.clear();
             statusCode = 1;
         }
         emit updateOutputResult(statusCode, resultString, error);
@@ -140,10 +118,10 @@ void CodeRunner::handleProgress(int i)
 
 void CodeRunner::handleWorkerFinished()
 {
-    emit statusUpdate("Completed");
+    emit statusUpdate("Completed!");
 
-    workerThread = nullptr;
-    minion = nullptr;
+    m_workerThread = nullptr;
+    m_minion = nullptr;
 }
 
 CodeRunner::~CodeRunner()
@@ -152,14 +130,15 @@ CodeRunner::~CodeRunner()
     // editor pointer should be deleted elsewhere
     appUi = nullptr;
 
-    if (workerThread && workerThread->isRunning())
+    if (m_workerThread && m_workerThread->isRunning())
     {
-        workerThread->requestInterruption();
-        workerThread->quit(); // Ask event loop to quit
-        if (!workerThread->wait(5000))
-        {                              // Wait for max 5 seconds
-            workerThread->terminate(); // Force terminate (last resort)
-            workerThread->wait();      // Wait for termination
+        m_workerThread->requestInterruption();
+        m_workerThread->quit(); // Ask event loop to quit
+        if (!m_workerThread->wait(5000))
+        {
+            // Wait for max 5 seconds
+            m_workerThread->terminate(); // Force terminate (last resort)
+            m_workerThread->wait(); // Wait for termination
         }
     }
 }
@@ -169,7 +148,7 @@ void CodeRunner::setupSignals()
     // Signal to execute the code
     connect(this, &IconButton::clicked, this, &CodeRunner::runCode);
 
-    const auto appUi_ = dynamic_cast<AppUi *>(appUi);
+    const auto appUi_ = dynamic_cast<AppUi*>(appUi);
     // Signal to update status bar in AppUI component for the running process
     connect(this, &CodeRunner::statusUpdate, appUi_, &AppUi::processStatusSlot);
 

@@ -54,12 +54,11 @@ cmake-build-debug/
 cmake-build-release/
 Release/
 build/
-ManagedLibrary/bin/
-ManagedLibrary/obj/
-ManagedLibrary/publish/
-
-TestManagedApp/bin/
-TestManagedApp/obj/
+C/bin/
+CSharpManaged/bin/
+CSharpManaged/obj/
+CSharpManaged/publish/
+CSharpManaged/host_trace.txt
 
 .idea/
 

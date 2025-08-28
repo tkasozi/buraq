@@ -20,45 +20,40 @@ on:
         type: string
         description: 'Build configuration (Debug/Release)'
       vcpkg_triplet:
-        required: true
+        required: false
         type: string
         description: 'Vcpkg triplet for the target platform'
       generator:
-        required: true
+        required: false
         type: string
         description: 'Build generator'
       arch:
         required: true
         type: string
         description: 'Supported Arch'
+      system:
+        required: true
+        type: string
+        description: 'System build plus arch'
 
     secrets:
       GH_PACKAGES_TOKEN:
         required: true
         description: 'GitHub Packages PAT'
 
-    outputs:
-      # If your build logic produces outputs needed by the caller
-      build_success:
-        description: "Whether the build was successful"
-        value: ${{ jobs.build_component.outputs.build_successful }}
-      artifact_name:
-        description: "Name of the uploaded artifact"
-        value: ${{ jobs.build_component.outputs.artifact_name }}
 
 jobs:
   build_component:
     runs-on: ${{ inputs.os }}
     env:
       PROJECT_NAME: buraq
-      APP_EXE_NAME: "buraq-${{ inputs.os }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
+      APP_EXE_NAME: "buraq-${{ inputs.system }}-${{ github.event.release.tag_name || 'x.x.x-dev' }}"
       APP_VERSION: ${{ github.event.release.tag_name || 'x.x.x-dev' }} # Assuming your release tag follows a versioning scheme
       OUTPUT_DIR: ${{ github.workspace }}\buraq\Output
       APP_BINARY: ${{ github.workspace }}\buraq\build\build
 
     outputs:
       build_successful: ${{ steps.build_project_step.outcome == 'success' }}
-      artifact_name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
       executable_name: ${{ env.APP_EXE_NAME }}
 
     permissions:
@@ -103,7 +98,7 @@ jobs:
         run: |
           ls -alh
 
-          cd ManagedLibrary
+          cd CSharpManaged
 
           ./build.sh
 
@@ -246,14 +241,14 @@ jobs:
       - name: Create release archive
         uses: thedoctor0/zip-release@master
         with:
-          filename: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts.zip
+          filename: ${{ inputs.system }}-${{ inputs.build_type }}-build-artifacts.zip
           directory: ${{ env.OUTPUT_DIR }}
 
       - name: Upload Build Artifacts
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.os }}-${{ inputs.build_type }}-build-artifacts
+          name: ${{ inputs.system }}-${{ inputs.build_type }}-build-artifacts
           path: ${{ env.OUTPUT_DIR }}\setup-${{ env.APP_EXE_NAME }}.exe
           retention-days: 1
 

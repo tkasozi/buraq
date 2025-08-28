@@ -8,6 +8,9 @@
 #include <QWidget>
 #include "IconButton.h"
 #include "Minion.h"
+#include "../clients/PSClient/PSClient.h"
+
+class PSClient;
 
 class CodeRunner : public IconButton {
 
@@ -32,14 +35,17 @@ public:
 	~CodeRunner() override;
 
 private:
+
 	// should be managed elsewhere
 	QWidget *appUi;
 
 	// cleanup will be handled by  &QObject::deleteLater
-	QThread *workerThread;
-	Minion *minion;
 
-	void setupWorkerThread();
+	PSClient* m_psClient;
+	QThread *m_workerThread;
+	Minion *m_minion;
+
+	void setupWorker();
 
 	void setupSignals();
 };

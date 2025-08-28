@@ -40,7 +40,7 @@ public:
     // The std::unique_ptr members will automatically
     // delete their managed objects when AppUi is destroyed.
     // No manual delete, no manual nullptr.
-    ~AppUi();
+    ~AppUi() override;
 
     Editor* getEditor() const;
     EditorMargin* getEditorMargin() const;

@@ -5,6 +5,7 @@
 #define APP_UI_H
 
 #include <QStatusBar>
+#include <QThread>
 
 #include "ToolBarEventFilter.h"
 #include "CustomDrawer.h"
@@ -13,6 +14,8 @@
 #include "ToolBar.h"
 #include "PluginManager.h"
 #include "EditorMargin.h"
+
+class ManagedProcess;
 
 class AppUi final : public QMainWindow
 {
@@ -28,14 +31,16 @@ private slots:
     void onShowOutputButtonClicked() const;
 
     void onWindowFullyLoaded();
+    void initPSLangSupport();
 
 public:
+    void initBackgroundServices();
     explicit AppUi(QWidget* parent = nullptr);
 
     // The std::unique_ptr members will automatically
     // delete their managed objects when AppUi is destroyed.
     // No manual delete, no manual nullptr.
-    ~AppUi() override = default;
+    ~AppUi();
 
     Editor* getEditor() const;
     EditorMargin* getEditorMargin() const;
@@ -57,10 +62,21 @@ private:
     std::unique_ptr<QStatusBar> statusBar;
     std::unique_ptr<buraq::buraq_api> api_context;
 
+    // For running background services
+    ManagedProcess* m_bridgeProcess;
+
+    QThread *m_workerThread;
+    Minion *m_minion;
+
+    void initPSLangSupport() const;
+    void verifyApplicationVersion();
     void initAppLayout();
     void initAppContext();
-    static void launchUpdaterAndExit(const std::filesystem::path& updaterPath, const std::filesystem::path& packagePath,
-                                     const std::filesystem::path& installationPath);
+    static void launchUpdaterAndExit(
+        const std::filesystem::path& updaterPath,
+        const std::filesystem::path& packagePath,
+        const std::filesystem::path& installationPath
+    );
 };
 
 

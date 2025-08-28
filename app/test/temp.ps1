@@ -2,6 +2,7 @@
 #You can add your script code here.
 # For example:.
  
+ 
 $name="tkasozi & Nihlah & sumi"
 Write-Output "This is an example script by $name."
  
@@ -19,4 +20,5 @@ $idk = "what this is."
 if ("$idk") {
 Write-Output "This is an example script by $idk."
 }
+ 
  

@@ -97,6 +97,7 @@ set(ITOOLS_HEADERS
         ../include/buraq.cpp
         clients/PSClient/PSClient.cpp
         clients/PSClient/PSClient.h
+        ManagedProcess/ManagedProcess.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)
@@ -135,8 +136,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt6::Network
 )
 
-set(PLUGIN_BASE_OUTPUT_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
-
 # Conditionally add static linking flags for MinGW/GCC
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND WIN32)
     # Get the directory of the C++ compiler. In an MSYS2 MinGW setup,
@@ -172,6 +171,17 @@ endforeach ()
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/icons/workflow.ico "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+)
+
+set(MANAGED_LIBRARY_PUBLISH_DIR "${CMAKE_SOURCE_DIR}/CSharpManaged/bin/Release/net9.0/win-x64/publish")
+
+# After the build is complete, copy the ENTIRE contents of the publish
+# directory to the same directory as your final buraq.exe.
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${MANAGED_LIBRARY_PUBLISH_DIR}/" # Source: The entire publish folder
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/PS.Bridge"      # Destination: Where buraq.exe is
+        COMMENT "Copying all self-contained .NET components..."
 )
 
 if (WIN32)

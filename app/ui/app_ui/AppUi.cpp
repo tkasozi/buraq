@@ -38,17 +38,19 @@
 
 #include "../../clients/VersionClient/VersionRepository.h"
 #include "dialog/VersionUpdateDialog.h"
+#include "ManagedProcess/ManagedProcess.h"
 
 #ifdef _WIN32
 
 #include <windows.h>
 #include <shlobj.h> // SHGetKnownFolderPath
-#include <libloaderapi.h> // For AddDllDirectory
 
 #endif
 
 AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 {
+    initBackgroundServices();
+
     // Init application views
     initAppLayout();
 
@@ -56,71 +58,32 @@ AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
     initAppContext();
 }
 
-void AppUi::onWindowFullyLoaded()
+AppUi::~AppUi()
 {
-    VersionRepository repo(api_context.get());
+    // When the MyApp object is destroyed, m_bridgeProcess's destructor
+    // will be called automatically, terminating the child process.
+    delete m_bridgeProcess;
+}
 
-    if (const UpdateInfo update_info = repo.main_version_logic(); update_info.isConnFailure == false)
-    {
-        if (update_info.latestVersion.empty())
-        {
-            // No version was set
-            qDebug() << "app version is empty or already upto date!";
-            return;
-        }
-
-        VersionUpdateDialog versionUpdater(this);
-        versionUpdater.setWindowTitle(
-            "A new version " + QString::fromStdString(update_info.latestVersion) + " is available!");
-        versionUpdater.setContent(QString::fromStdString(update_info.releaseNotes));
-
-        if (versionUpdater.exec() == QDialog::Accepted)
-        {
-            const std::filesystem::path installerExe = repo.downloadNewVersion();
-
-            qDebug() << "AppUi.cpp";
-            qDebug() << installerExe.string();
-            qDebug() << (api_context->searchPath / "updater.exe").string();
-            qDebug() << api_context->searchPath.parent_path().string();
-            qDebug() << "ENDs AppUi.cpp";
-            // Get the path to the AppData\Local folder
-            PWSTR pszPath = NULL;
-            if (const HRESULT hr = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &pszPath); SUCCEEDED(hr))
-            {
-                // Convert the wide character string to a narrow character string (std::string)
-                std::wstring wsPath(pszPath);
-                std::string sPath(wsPath.begin(), wsPath.end());
-
-                sPath += "\\Programs\\Buraq";
-
-                // Print the resulting path
-                std::cout << "The path is: " << sPath << std::endl;
-
-                launchUpdaterAndExit(
-                    api_context->searchPath / "updater.exe",
-                    installerExe,
-                    sPath);
-
-                // Free the memory allocated by SHGetKnownFolderPath
-                CoTaskMemFree(pszPath);
-            }
-            else
-            {
-                std::cerr << "Failed to get the path." << std::endl;
-            }
-            processStatusSlot("Ready.", 2000);
-        }
-        else
-        {
-            // New version was rejected or modal was closed.
-            // do nothing
-        }
-    }
-    else if (update_info.isConnFailure)
-    {
-        qDebug() << "Update failed to connect to github repository.";
-        processStatusSlot("Failed to get updates. Check connection!", 10000);
-    }
+void AppUi::initBackgroundServices()
+{
+    // m_workerThread = new QThread(this);
+    // m_minion = new Minion();
+    // m_minion->moveToThread(m_workerThread);
+    //
+    // // --- 2. Connect Signals and Slots ---
+    //
+    // // Minion (worker thread) asks psClient (main thread) to execute a script.
+    // connect(m_minion, &Minion::runScriptRequested, m_psClient, &PSClient::runScript);
+    //
+    // // psClient (main thread) sends result back to CodeRunner (main thread).
+    // connect(m_psClient, &PSClient::scriptResultReceived, this, &CodeRunner::handleTaskResults);
+    //
+    // // Clean up the thread and worker when the thread's event loop finishes.
+    // connect(m_workerThread, &QThread::finished, m_minion, &QObject::deleteLater);
+    // connect(m_workerThread, &QThread::finished, m_workerThread, &QObject::deleteLater);
+    //
+    // m_workerThread->start();
 }
 
 void AppUi::onClicked() const
@@ -312,7 +275,98 @@ void AppUi::initAppContext()
     pluginManager->loadPluginsFromDirectory((searchPath / "plugins").string());
 
     // Schedule onWindowFullyLoaded to run after current event processing is done
-    QTimer::singleShot(0, this, &AppUi::onWindowFullyLoaded);
+    QTimer::singleShot(10000, this, &AppUi::onWindowFullyLoaded);
+}
+
+void AppUi::onWindowFullyLoaded()
+{
+    initPSLangSupport();
+
+    verifyApplicationVersion();
+}
+
+void AppUi::initPSLangSupport()
+{
+    const std::filesystem::path psLangSupportPath = api_context->searchPath / "PS.Bridge/Buraq.Bridge.exe";
+
+    qDebug() << "PSLang Support: " << psLangSupportPath.string();
+
+    processStatusSlot("PSLang Support..", 5000);
+
+    m_bridgeProcess = new ManagedProcess(psLangSupportPath);
+
+    if (!m_bridgeProcess->isRunning()) {
+        std::cerr << "Bridge process failed to start." << std::endl;
+        processStatusSlot("PowerShell Support Failed.", 5000);
+    }
+
+    processStatusSlot("PSLang Support Ready", 30000);
+}
+
+void AppUi::verifyApplicationVersion()
+{
+    VersionRepository repo(api_context.get());
+
+    if (const UpdateInfo update_info = repo.main_version_logic(); update_info.isConnFailure == false)
+    {
+        if (update_info.latestVersion.empty())
+        {
+            // No version was set
+            qDebug() << "app version is empty or already upto date!";
+            return;
+        }
+
+        VersionUpdateDialog versionUpdater(this);
+        versionUpdater.setWindowTitle(
+            "A new version " + QString::fromStdString(update_info.latestVersion) + " is available!");
+        versionUpdater.setContent(QString::fromStdString(update_info.releaseNotes));
+
+        if (versionUpdater.exec() == QDialog::Accepted)
+        {
+            const std::filesystem::path installerExe = repo.downloadNewVersion();
+
+            qDebug() << "AppUi.cpp";
+            qDebug() << installerExe.string();
+            qDebug() << (api_context->searchPath / "updater.exe").string();
+            qDebug() << api_context->searchPath.parent_path().string();
+            qDebug() << "ENDs AppUi.cpp";
+            // Get the path to the AppData\Local folder
+            PWSTR pszPath = NULL;
+            if (const HRESULT hr = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &pszPath); SUCCEEDED(hr))
+            {
+                // Convert the wide character string to a narrow character string (std::string)
+                std::wstring wsPath(pszPath);
+                std::string sPath(wsPath.begin(), wsPath.end());
+
+                sPath += "\\Programs\\Buraq";
+
+                // Print the resulting path
+                std::cout << "The path is: " << sPath << std::endl;
+
+                launchUpdaterAndExit(
+                    api_context->searchPath / "updater.exe", installerExe, sPath
+                );
+
+                // Free the memory allocated by SHGetKnownFolderPath
+                CoTaskMemFree(pszPath);
+            }
+            else
+            {
+                std::cerr << "Failed to get the path." << std::endl;
+            }
+            processStatusSlot("Ready.", 2000);
+        }
+        else
+        {
+            // New version was rejected or modal was closed.
+            // do nothing
+        }
+    }
+    else if (update_info.isConnFailure)
+    {
+        qDebug() << "Update failed to connect to github repository.";
+        processStatusSlot("Failed to get updates. Check connection!", 10000);
+    }
 }
 
 EditorMargin* AppUi::getEditorMargin() const
@@ -320,9 +374,11 @@ EditorMargin* AppUi::getEditorMargin() const
     return editorMargin.get();
 }
 
-void AppUi::launchUpdaterAndExit(const std::filesystem::path& updaterPath, const std::filesystem::path& packagePath,
-                                 const std::filesystem::path& installationPath)
-{
+void AppUi::launchUpdaterAndExit(
+    const std::filesystem::path& updaterPath,
+    const std::filesystem::path& packagePath,
+    const std::filesystem::path& installationPath
+) {
     std::string commandLine = "\"" + updaterPath.string() + "\"";
     commandLine += " \"" + packagePath.string() + "\"";
     commandLine += " \"" + installationPath.string() + "\"";

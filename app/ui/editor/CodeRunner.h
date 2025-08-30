@@ -5,14 +5,14 @@
 #ifndef CODERUNNER_H
 #define CODERUNNER_H
 
-#include <QWidget>
+#include <QPushButton>
 #include "IconButton.h"
 #include "Minion.h"
 #include "../clients/PSClient/PSClient.h"
 
 class PSClient;
 
-class CodeRunner : public IconButton {
+class CodeRunner final : public QPushButton {
 
 Q_OBJECT
 
@@ -31,7 +31,7 @@ signals:
 	void updateOutputResult(int exitCode, const QString &output, const QString &error);
 
 public:
-	explicit CodeRunner(QWidget *appUi);
+	explicit CodeRunner(QWidget *parent = nullptr);
 	~CodeRunner() override;
 
 private:

@@ -44,16 +44,17 @@ bool ToolBarEventFilter::eventFilter(QObject* obj, QEvent* e)
     case QEvent::MouseMove:
         if (isMouseBtnPressed && ui != nullptr)
         {
-            if (ui->width() != Config::singleton().getWindow()->normalSize)
-            {
-                // m_toolBar->updateMaxAndRestoreIconButton();
-            }
-
-            const auto pos = event->globalPosition().toPoint();
-
-            const QPoint newPos = toolBar->pos() + pos - dragStartPos;
-
-            ui->setGeometry(newPos.x(), newPos.y(), Config::singleton().getWindow()->normalSize, geo.height());
+            // TODO Needs to be reworked
+            // if (ui->width() != Config::singleton().getWindow()->normalSize)
+            // {
+            //     // m_toolBar->updateMaxAndRestoreIconButton();
+            // }
+            //
+            // const auto pos = event->globalPosition().toPoint();
+            //
+            // const QPoint newPos = toolBar->pos() + pos - dragStartPos;
+            //
+            // ui->setGeometry(newPos.x(), newPos.y(), Config::singleton().getWindow()->normalSize, geo.height());
 
             return true;
         }

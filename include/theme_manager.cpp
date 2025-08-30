@@ -30,8 +30,8 @@ void ThemeManager::setAppTheme(const AppTheme theme)
     {
     case LightTheme:
         // TODO --fix light theme
-        // stylePath = ":/styles/light_theme.qss";
-        // break;
+        stylePath = ":/styles/light_theme.qss";
+        break;
     case DarkTheme:
         stylePath = ":/styles/dark_theme.qss";
         break;

@@ -34,16 +34,16 @@
 
 #include <QTimer>
 #include <qcoreapplication.h>
+#include <QMouseEvent>
 
 #include "buraq.h"
-#include "Config.h"
 #include "PluginManager.h"
 #include "clients/VersionClient/VersionRepository.h"
 #include "dialog/VersionUpdateDialog.h"
 #include "frameless_window/FramelessWindow.h"
 #include "ManagedProcess/ManagedProcess.h"
 
-AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
+AppUi::AppUi(QObject* parent) : QObject(parent)
 {
     // Init application views
     initAppLayout();
@@ -61,13 +61,8 @@ AppUi::~AppUi()
 
 void AppUi::initAppLayout()
 {
-    // setting up default m_window size
-    const auto windowConfig = Config::singleton().getWindow();
-    this->resize(windowConfig->normalSize, windowConfig->minHeight);
-    this->setMinimumSize(windowConfig->normalSize, windowConfig->minHeight);
-
-    this->setWindowFlags(Qt::FramelessWindowHint);
-    m_framelessWindow = std::make_unique<FramelessWindow>(this);
+    m_framelessWindow = std::make_unique<FramelessWindow>(nullptr);
+    m_framelessWindow->show();
 
     // Signals
     connect(this, &AppUi::updateStatusBar, m_framelessWindow.get(), &FramelessWindow::processStatusSlot);
@@ -135,7 +130,7 @@ void AppUi::verifyApplicationVersion()
             return;
         }
 
-        VersionUpdateDialog versionUpdater(this);
+        VersionUpdateDialog versionUpdater(m_framelessWindow.get());
         versionUpdater.setWindowTitle(
             "A new version " + QString::fromStdString(update_info.latestVersion) + " is available!");
         versionUpdater.setContent(QString::fromStdString(update_info.releaseNotes));

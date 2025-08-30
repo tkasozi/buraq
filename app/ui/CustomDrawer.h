@@ -29,10 +29,11 @@
 
 
 #include <QWidget>
-#include <QToolButton>
 #include <QGridLayout>
 #include "editor/Editor.h"
 #include "FilePathLabel.h"
+
+class QPushButton;
 
 struct drawerState {
 	QWidget *activeFileLabel;
@@ -65,7 +66,7 @@ public:
 
 private:
 	Editor *editor;
-	std::unique_ptr<QToolButton> addFile;
+	std::unique_ptr<QPushButton> addFile;
 	std::unique_ptr<QVBoxLayout> pLayout;
 
 	struct drawerState state = {.activeFileLabel = nullptr};

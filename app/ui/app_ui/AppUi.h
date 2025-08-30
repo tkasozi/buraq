@@ -5,7 +5,7 @@
 #define APP_UI_H
 
 #include <filesystem>
-#include <QMainWindow>
+#include <QObject>
 
 namespace buraq
 {
@@ -14,6 +14,7 @@ namespace buraq
 
 class Minion;
 class QMainWindow;
+class QMouseEvent;
 class QThread;
 class EditorMargin;
 class ManagedProcess;
@@ -21,7 +22,7 @@ class FramelessWindow;
 class PluginManager;
 class ToolBar;
 
-class AppUi final : public QMainWindow
+class AppUi final : public QObject
 {
     Q_OBJECT
 
@@ -32,7 +33,7 @@ signals:
     void updateStatusBar(const QString&, int timeOut);
 
 public:
-    explicit AppUi(QWidget* parent = nullptr);
+    explicit AppUi(QObject* parent = nullptr);
 
     // The std::unique_ptr members will automatically
     // delete their managed objects when AppUi is destroyed.

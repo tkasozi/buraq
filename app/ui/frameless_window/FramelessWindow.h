@@ -5,6 +5,7 @@
 #ifndef FRAMELESS_WINDOW_H
 #define FRAMELESS_WINDOW_H
 
+#include <QMainWindow>
 #include <QWidget>
 
 namespace buraq
@@ -20,13 +21,12 @@ class QHBoxLayout;
 class QVBoxLayout;
 class CustomDrawer;
 class PluginManager;
-class IconButton;
 class OutputDisplay;
 class Editor;
 class EditorMargin;
 class ToolBar;
 
-class FramelessWindow final : public QWidget
+class FramelessWindow final : public QMainWindow
 {
     Q_OBJECT
 
@@ -39,7 +39,6 @@ public:
     [[nodiscard]] EditorMargin* getEditorMargin() const;
     [[nodiscard]] PluginManager* getLangPluginManager() const;
 
-protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
@@ -48,12 +47,10 @@ protected:
     // void paintEvent(QPaintEvent *event) override;
 
 public slots:
-    void handleMinimize();
-    void handleMaximizeRestore();
-    void handleClose();
     void processStatusSlot(const QString&, int timeout = 5000) const;
     void processResultSlot(int exitCode, const QString& output, const QString& error) const;
     void updateDrawer() const;
+    void closeWindowSlot();
 
 private:
     void initContentAreaLayout(QWidget* contentArea);
@@ -61,7 +58,6 @@ private:
     std::unique_ptr<PluginManager> pluginManager;
     std::unique_ptr<CustomDrawer> m_drawer;
     std::unique_ptr<QGridLayout> m_centralWidgetLayout;
-    std::unique_ptr<IconButton> m_folderButton;
     std::unique_ptr<OutputDisplay> m_outPutArea;
     std::unique_ptr<QGridLayout> m_placeHolderLayout;
     std::unique_ptr<Editor> m_itoolsEditor;
@@ -70,15 +66,22 @@ private:
     std::unique_ptr<buraq::buraq_api> api_context;
     std::unique_ptr<FramelessWindow> m_framelessWindow;
 
-    QStatusBar* m_statusBar;
+    std::unique_ptr<QPushButton> m_folderButton;
+    std::unique_ptr<QPushButton> m_outputButton;
+    std::unique_ptr<QPushButton> m_settingsButton;
 
-    QWidget* m_titleBar;
+    QStatusBar* m_statusBar{};
+
+    QWidget* m_titleBar{};
     QPushButton* m_minimizeButton;
     QPushButton* m_maximizeButton;
     QPushButton* m_closeButton;
 
     bool m_dragging;
     QPoint m_dragPosition; // To store the offset of the mouse click from the m_window's top-left
+
+signals:
+    void closeApp();
 };
 
 #endif //FRAMELESS_WINDOW_H

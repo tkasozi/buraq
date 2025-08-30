@@ -36,14 +36,14 @@ OutputDisplay::OutputDisplay(QWidget* window) : QWidget(window), m_window(window
     // TODO This will eventually become a tool bar
     const auto pMainLabel = new QLabel;
     pMainLabel->setFixedHeight(25);
-    pMainLabel->setText("Output:");
+    pMainLabel->setText("❯_");
 
     const auto layout = new QVBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
-    pMainLabel->setStyleSheet(
-        "color: #fff;"
-        "border-bottom: 1px solid #000;");
+    // pMainLabel->setStyleSheet(
+    //     "color: #fff;"
+    //     "border-bottom: 1px solid #000;");
     layout->addWidget(pMainLabel);
 
     main = std::make_unique<QPlainTextEdit>();

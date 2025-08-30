@@ -98,6 +98,8 @@ set(ITOOLS_HEADERS
         clients/PSClient/PSClient.cpp
         clients/PSClient/PSClient.h
         ManagedProcess/ManagedProcess.h
+        ui/settings/SettingsDialog.cpp
+        ui/settings/SettingsDialog.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)

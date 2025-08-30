@@ -70,16 +70,50 @@ QPushButton#TextButton, QToolButton#TextButton {
     border: none;
     color: #E0E0E0; /* Keep text color */
     padding: 0px; /* FIX: Adjust padding for flat icon buttons to fill 35x35 */
-    border-radius: 4px; /* Keep rounded corners */
-    min-width: 30px;           /* FIX: Reduced minimum width for text buttons */
-    min-height: 40px;          /* Ensure minimum height for all buttons */
-    font-weight: 500;
+    border-radius: 0px; /* Keep rounded corners */
 }
 QPushButton#TextButton:hover, QToolButton#TextButton:hover {
     background-color: rgba(255, 255, 255, 0.08); /* FIX: Subtle background on hover */
 }
 
-QToolButton#CodeRunner, QToolButton#CodeRunner:hover {
+/*Max, Min, Close Buttons*/
+
+#fileMenu {
+ border: none;
+ border-radius: 0px;
+}
+
+QPushButton#folderButton,
+QPushButton#outputConsoleButton,
+QPushButton#settingGearButton,
+QPushButton#AddFile,
+QPushButton#minimizeButton,
+QPushButton#fileMenuButton,
+QPushButton#maximizeButton,
+QPushButton#closeButton {
+        font-size: 12pt;
+        border-radius: 0px;
+        color: #FFFFFF;
+        border: none;
+        padding: 5px;
+}
+QPushButton#closeButton:hover {
+        background-color: #E5533D; /*         font-size: 16pt; A slightly darker tomato red */
+}
+QPushButton#closeButton:pressed {
+        background-color: #C2402B; /* An even darker red for the click */
+}
+/*--- END of Max, Min, Close Buttons*/
+
+
+QToolButton#CodeRunner  {
+    background-color: transparent;
+    border-radius: 0px;
+    color: #FFFFFF;
+    border: none;
+    padding: 5px;
+}
+QToolButton#CodeRunner:hover {
     background-color: transparent;
 }
 

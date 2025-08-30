@@ -11,14 +11,12 @@
 #include "app_ui/AppUi.h"
 #include "frameless_window/FramelessWindow.h"
 
-CodeRunner::CodeRunner(QWidget* appUi) : IconButton(nullptr),
-                                         m_window(appUi),
-                                         m_workerThread(nullptr),
-                                         m_minion(nullptr)
+CodeRunner::CodeRunner(QWidget* parent)
+    : QPushButton("{ }", parent), m_window(parent), m_workerThread(nullptr),
+      m_minion(nullptr)
 {
     setObjectName("CodeRunner");
-    setIcon(QIcon(Config::singleton().getAppIcons()->executeIcon));
-    // setFixedSize(32, 32);
+    setFixedSize(32, 23);
 
     // set tooltip for the run buttons
     setToolTip(

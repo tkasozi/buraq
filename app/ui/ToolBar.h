@@ -9,7 +9,7 @@
 #include <QMenu>
 #include <QPushButton> // Add this include
 
-class ToolBar : public QToolBar
+class ToolBar final : public QToolBar
 {
 	Q_OBJECT
 

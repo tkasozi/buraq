@@ -7,6 +7,7 @@
 #include "network.h"
 #include "database/db_conn.h"
 #include "theme_manager.h"
+#include "Utils.h"
 #include "clients/VersionClient/VersionRepository.h"
 #include "app_ui/AppUi.h"
 #include "utils/Config.h"

@@ -6,13 +6,15 @@
 #include <QMouseEvent>
 
 #include "ToolBarEventFilter.h"
+
+#include "Config.h"
 #include "app_ui/AppUi.h"
 #include "ToolBar.h"
 
 bool ToolBarEventFilter::eventFilter(QObject* obj, QEvent* e)
 {
-    auto* toolBar = dynamic_cast<ToolBar*>(obj);
-    auto* event = dynamic_cast<QMouseEvent*>(e);
+    const auto toolBar = dynamic_cast<ToolBar*>(obj);
+    const auto event = dynamic_cast<QMouseEvent*>(e);
 
     if (toolBar == nullptr || event == nullptr)
     {
@@ -25,7 +27,7 @@ bool ToolBarEventFilter::eventFilter(QObject* obj, QEvent* e)
     switch (event->type())
     {
     case QEvent::MouseButtonDblClick:
-        // toolBar->updateMaxAndRestoreIconButton();
+        // m_toolBar->updateMaxAndRestoreIconButton();
 
         return true;
     case QEvent::MouseButtonPress:
@@ -44,7 +46,7 @@ bool ToolBarEventFilter::eventFilter(QObject* obj, QEvent* e)
         {
             if (ui->width() != Config::singleton().getWindow()->normalSize)
             {
-                // toolBar->updateMaxAndRestoreIconButton();
+                // m_toolBar->updateMaxAndRestoreIconButton();
             }
 
             const auto pos = event->globalPosition().toPoint();

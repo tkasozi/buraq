@@ -24,28 +24,24 @@
 // Created by Talik Kasozi on 2/3/2024.
 //
 
-#include "AppUi.h"
-#include "ToolBar.h"
-#include "IconButton.h"
-#include "editor/Editor.h"
-#include "CustomDrawer.h"
-#include "EditorMargin.h"
-#include <filesystem> // Requires C++17. For older C++, use platform-specific directory iteration.
-#include <QCoreApplication>
-#include <map>
-
-#include <string>
-
-#include "../../clients/VersionClient/VersionRepository.h"
-#include "dialog/VersionUpdateDialog.h"
-#include "ManagedProcess/ManagedProcess.h"
-
 #ifdef _WIN32
 
 #include <windows.h>
 #include <shlobj.h> // SHGetKnownFolderPath
 
 #endif
+#include "AppUi.h"
+
+#include <QTimer>
+#include <qcoreapplication.h>
+
+#include "buraq.h"
+#include "Config.h"
+#include "PluginManager.h"
+#include "clients/VersionClient/VersionRepository.h"
+#include "dialog/VersionUpdateDialog.h"
+#include "frameless_window/FramelessWindow.h"
+#include "ManagedProcess/ManagedProcess.h"
 
 AppUi::AppUi(QWidget* parent) : QMainWindow(parent)
 {
@@ -63,172 +59,18 @@ AppUi::~AppUi()
     delete m_bridgeProcess;
 }
 
-void AppUi::onClicked() const
-{
-    drawer->toggle();
-    if (drawer->isVisible())
-    {
-        placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
-    }
-    else
-    {
-        placeHolderLayout->removeWidget(drawer.get());
-    }
-}
-
-void AppUi::onShowOutputButtonClicked() const
-{
-    outPutArea->toggle();
-    if (outPutArea->isVisible())
-    {
-        centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
-    }
-    else
-    {
-        centralWidgetLayout->removeWidget(outPutArea.get());
-    }
-}
-
-Editor* AppUi::getEditor() const
-{
-    return itoolsEditor.get();
-}
-
-PluginManager* AppUi::getLangPluginManager() const
-{
-    return pluginManager.get();
-}
-
-void AppUi::processStatusSlot(const QString& message, const int timeout) const
-{
-    statusBar->showMessage(message, timeout);
-}
-
-void AppUi::processResultSlot(const int exitCode, const QString& output, const QString& error) const
-{
-    outPutArea->show();
-
-    if (exitCode == 0)
-    {
-        outPutArea->log(output, error);
-
-        processStatusSlot(error.isEmpty() ? "Completed!" : "Completed with errors.");
-    }
-    else
-    {
-        processStatusSlot("Process failed!");
-        outPutArea->log("", error);
-    }
-}
-
 void AppUi::initAppLayout()
 {
-     // setting up default window size
+    // setting up default m_window size
     const auto windowConfig = Config::singleton().getWindow();
-    resize(windowConfig->normalSize, windowConfig->minHeight);
-    setMinimumSize(windowConfig->minWidth, windowConfig->minHeight);
+    this->resize(windowConfig->normalSize, windowConfig->minHeight);
+    this->setMinimumSize(windowConfig->normalSize, windowConfig->minHeight);
 
-    // Add Tool bar
-    toolBar = std::make_unique<ToolBar>(this);
-    // Add the File menu first
-    toolBar->addFileMenu();
+    this->setWindowFlags(Qt::FramelessWindowHint);
+    m_framelessWindow = std::make_unique<FramelessWindow>(this);
 
-    setMenuWidget(toolBar.get());
-
-    // Add Status bar
-    statusBar = std::make_unique<QStatusBar>(this);
-    statusBar->setObjectName("appStatusBar");
-    statusBar->setSizeGripEnabled(false);
-
-    setStatusBar(statusBar.get());
-
-    // Setting window title and docking icon
-    setWindowTitle(UpdateInfo().currentVersion.data());
-    setWindowIcon(Config::singleton().getAppLogo());
-
-    // Add CentralWidget
-    auto* centralWidget = new QWidget;
-    setCentralWidget(centralWidget);
-
-    // Add layout to centralWidget
-    centralWidgetLayout = std::make_unique<QGridLayout>();
-    centralWidgetLayout->setSpacing(0);
-    centralWidgetLayout->setContentsMargins(0, 0, 0, 0);
-    centralWidget->setLayout(centralWidgetLayout.get());
-
-    // Add control panel to the central widget.
-    auto* centralWidgetLayout2 = new QGridLayout;
-    centralWidgetLayout2->setSpacing(0);
-    centralWidgetLayout2->setContentsMargins(0, 0, 0, 0);
-
-    const auto centralWidgetControlPanel = new QWidget;
-    centralWidgetControlPanel->setObjectName("ControlToolBar");
-
-    centralWidgetControlPanel->setFixedWidth(64);
-    centralWidgetControlPanel->setLayout(centralWidgetLayout2);
-
-    // panel A
-    auto* layoutA = new QVBoxLayout;
-    layoutA->setSpacing(1);
-    layoutA->setContentsMargins(0, 0, 0, 0);
-
-    auto* centralWidgetControlPanelA = new QWidget;
-    centralWidgetControlPanelA->setLayout(layoutA);
-
-    centralWidgetLayout2->addWidget(centralWidgetControlPanelA, 0, 0, 1, 12, Qt::AlignJustify);
-
-    const auto appIcons = Config::singleton().getAppIcons();
-    folderButton = std::make_unique<IconButton>(appIcons->folderIcon);
-
-    layoutA->addWidget(folderButton.get());
-
-    // Good, to be placed in panel B
-    auto* layoutB = new QVBoxLayout;
-    layoutB->setSpacing(8);
-
-    auto* centralWidgetControlPanelB = new QWidget;
-    centralWidgetControlPanelB->setLayout(layoutB);
-    centralWidgetControlPanelB->setContentsMargins(16, 0, 0, 8);
-
-    centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 12, 12, Qt::AlignBottom);
-
-    const auto outputButton = new IconButton(appIcons->terminalIcon);
-    connect(outputButton, &IconButton::clicked, this, &AppUi::onShowOutputButtonClicked);
-    layoutB->addWidget(outputButton);
-
-    const auto settingsButton = new IconButton(appIcons->settingsIcon);
-    layoutB->addWidget(settingsButton);
-
-    // add to central widget
-    centralWidgetLayout->addWidget(centralWidgetControlPanel, 0, 0, 12, 1);
-
-    // Component
-    connect(folderButton.get(), &IconButton::clicked, this, &AppUi::onClicked);
-
-    // layout c
-    layoutB->setSpacing(0);
-    layoutB->setContentsMargins(0, 0, 0, 0);
-
-    // Editor helper component.
-    itoolsEditor = std::make_unique<Editor>(this);
-    // Handles file nav
-    drawer = std::make_unique<CustomDrawer>(itoolsEditor.get());
-    // This where the output_display generated after executing the script will be displayed
-    outPutArea = std::make_unique<OutputDisplay>(this);
-
-    placeHolderLayout = std::make_unique<QGridLayout>();
-    placeHolderLayout->setSpacing(0);
-    placeHolderLayout->setContentsMargins(0, 0, 0, 0);
-
-    placeHolderLayout->addWidget(drawer.get(), 0, 1, 12, 1, Qt::AlignmentFlag::AlignTop);
-    // placeHolderLayout->addWidget(editorMargin.get(), 0, 2, 12, 1, Qt::AlignmentFlag::AlignTop);
-    placeHolderLayout->addWidget(itoolsEditor.get(), 0, 3, 12, 1);
-
-    // add main content area
-    const auto editorAndDrawerAreaPanel = new QWidget;
-    editorAndDrawerAreaPanel->setLayout(placeHolderLayout.get());
-    centralWidgetLayout->addWidget(editorAndDrawerAreaPanel, 0, 2, 12, 12);
-    centralWidgetLayout->addWidget(outPutArea.get(), 6, 2, 6, 12);
+    // Signals
+    connect(this, &AppUi::updateStatusBar, m_framelessWindow.get(), &FramelessWindow::processStatusSlot);
 }
 
 void AppUi::initAppContext()
@@ -268,16 +110,16 @@ void AppUi::initPSLangSupport()
 
     qDebug() << "PSLang Support: " << psLangSupportPath.string();
 
-    processStatusSlot("PSLang Support..", 5000);
+    emit updateStatusBar("PSLang Support..", 5000);
 
     m_bridgeProcess = new ManagedProcess(psLangSupportPath);
 
     if (!m_bridgeProcess->isRunning()) {
         std::cerr << "Bridge process failed to start." << std::endl;
-        processStatusSlot("PowerShell Support Failed.", 5000);
+        emit updateStatusBar("PowerShell Support Failed.", 5000);
     }
 
-    processStatusSlot("PSLang Support Ready", 30000);
+    emit updateStatusBar("PSLang Support Ready", 30000);
 }
 
 void AppUi::verifyApplicationVersion()
@@ -331,7 +173,7 @@ void AppUi::verifyApplicationVersion()
             {
                 std::cerr << "Failed to get the path." << std::endl;
             }
-            processStatusSlot("Ready.", 2000);
+            emit updateStatusBar("Ready.", 2000);
         }
         else
         {
@@ -342,13 +184,8 @@ void AppUi::verifyApplicationVersion()
     else if (update_info.isConnFailure)
     {
         qDebug() << "Update failed to connect to github repository.";
-        processStatusSlot("Failed to get updates. Check connection!", 10000);
+        emit updateStatusBar("Failed to get updates. Check connection!", 10000);
     }
-}
-
-EditorMargin* AppUi::getEditorMargin() const
-{
-    return editorMargin.get();
 }
 
 void AppUi::launchUpdaterAndExit(

@@ -37,11 +37,11 @@ public:
 private:
 
 	// should be managed elsewhere
-	QWidget *appUi;
+	QWidget *m_window;
 
 	// cleanup will be handled by  &QObject::deleteLater
 
-	PSClient* m_psClient;
+	PSClient* m_psClient{};
 	QThread *m_workerThread;
 	Minion *m_minion;
 

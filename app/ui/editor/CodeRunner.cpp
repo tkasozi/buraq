@@ -6,11 +6,13 @@
 #include "CodeRunner.h"
 #include <QThread>
 #include "CustomLabel.h"
+#include "Editor.h"
 #include "IconButton.h"
 #include "app_ui/AppUi.h"
+#include "frameless_window/FramelessWindow.h"
 
 CodeRunner::CodeRunner(QWidget* appUi) : IconButton(nullptr),
-                                         appUi(appUi),
+                                         m_window(appUi),
                                          m_workerThread(nullptr),
                                          m_minion(nullptr)
 {
@@ -62,16 +64,16 @@ void CodeRunner::runCode()
     }
 
     // --- Get the script text from the UI in the main thread ---
-    const auto appUi_ = dynamic_cast<AppUi*>(appUi);
-    if (appUi_ == nullptr || !appUi_->getEditor())
+    const auto window_ = dynamic_cast<FramelessWindow*>(m_window);
+    if (window_ == nullptr || !window_->getEditor())
     {
         return; // Safety check
     }
 
-    QString script = appUi_->getEditor()->selectedText();
+    QString script = window_->getEditor()->selectedText();
     if (script.isEmpty())
     {
-        script = appUi_->getEditor()->toPlainText();
+        script = window_->getEditor()->toPlainText();
     }
 
     if (script.isEmpty())
@@ -128,7 +130,7 @@ CodeRunner::~CodeRunner()
 {
     // smart pointers are deleted automatically
     // editor pointer should be deleted elsewhere
-    appUi = nullptr;
+    m_window = nullptr;
 
     if (m_workerThread && m_workerThread->isRunning())
     {
@@ -148,10 +150,10 @@ void CodeRunner::setupSignals()
     // Signal to execute the code
     connect(this, &IconButton::clicked, this, &CodeRunner::runCode);
 
-    const auto appUi_ = dynamic_cast<AppUi*>(appUi);
+    const auto window = dynamic_cast<FramelessWindow*>(m_window);
     // Signal to update status bar in AppUI component for the running process
-    connect(this, &CodeRunner::statusUpdate, appUi_, &AppUi::processStatusSlot);
+    connect(this, &CodeRunner::statusUpdate, window, &FramelessWindow::processStatusSlot);
 
     // Signal to update the out component in AppUI component for the completed process
-    connect(this, &CodeRunner::updateOutputResult, appUi_, &AppUi::processResultSlot);
+    connect(this, &CodeRunner::updateOutputResult, window, &FramelessWindow::processResultSlot);
 }

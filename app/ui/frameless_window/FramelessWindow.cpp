@@ -4,27 +4,31 @@
 
 #include "FramelessWindow.h"
 
-#include <QPushButton>
-#include <QHBoxLayout>
 #include <QStatusBar>
 #include <QVBoxLayout>
-#include <QMouseEvent>
-#include <QLabel> // For an example title
 
 #include "app_version.h"
 #include "Config.h"
-#include "ToolBarEventFilter.h"
+#include "../Filters/Toolbar/ToolBarEvent.h"
 #include "CustomDrawer.h"
 #include "IconButton.h"
 #include "output_display/OutputDisplay.h"
 #include "ToolBar.h"
 #include "PluginManager.h"
 #include "app_ui/AppUi.h"
-#include "settings/SettingsDialog.h"
+#include "Filters/ThemeManager/ThemeManager.h"
+#include "../settings/Dialog/SettingsDialog.h"
 
-FramelessWindow::FramelessWindow(QWidget* parent)
-    : QMainWindow(parent), m_statusBar(new QStatusBar(this)), m_dragging(false)
+// Installs themes, custom events, window size
+void FramelessWindow::init()
 {
+    // Initialize the ThemeManager instance
+    this->installEventFilter(&themeManager);
+
+    // Allow events on the
+    const auto toolbarEvent = new ToolBarEvent(m_toolBar.get());
+    this->installEventFilter(toolbarEvent);
+
     // Set the m_window flag to remove the default frame
     this->setWindowFlags(Qt::FramelessWindowHint);
     // allow the m_window to be transparent if you have rounded corners.
@@ -33,10 +37,17 @@ FramelessWindow::FramelessWindow(QWidget* parent)
     // setting up default m_window size
     const auto windowConfig = Config::singleton().getWindow();
     this->setMinimumSize(windowConfig->normalSize, windowConfig->minHeight);
+}
+
+FramelessWindow::FramelessWindow(QWidget* parent)
+    : QMainWindow(parent), themeManager(ThemeManager::instance()), m_toolBar(std::make_unique<ToolBar>(this)), m_statusBar(new QStatusBar(this)),
+      m_dragging(false)
+{
+    init();
 
     // Create a central widget to hold the main layout.
     // QMainWindow requires a central widget to manage content.
-    QWidget *centralWidget = new QWidget(this);
+    QWidget* centralWidget = new QWidget(this);
 
     // Main vertical layout for the whole m_window
     const auto mainLayout = new QVBoxLayout(centralWidget); // Apply layout to the central widget
@@ -77,7 +88,6 @@ FramelessWindow::FramelessWindow(QWidget* parent)
     mainLayout->addWidget(m_titleBar);
 
     // Add Tool bar
-    m_toolBar = std::make_unique<ToolBar>(this); // constructor init list
     m_toolBar->setFixedHeight(35);
     // Add the File menu first
     m_toolBar->addFileMenu();
@@ -115,7 +125,7 @@ FramelessWindow::FramelessWindow(QWidget* parent)
     connect(this, &FramelessWindow::closeApp, this, &FramelessWindow::close);
 
     // Show maximized view by default
-    this->showMaximized();
+    this->showNormal();
 }
 
 FramelessWindow::~FramelessWindow() = default;

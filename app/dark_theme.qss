@@ -107,11 +107,11 @@ QPushButton#closeButton:pressed {
 
 
 QToolButton#CodeRunner  {
+    font-size: 10pt;
     background-color: transparent;
     border-radius: 0px;
     color: #FFFFFF;
     border: none;
-    padding: 5px;
 }
 QToolButton#CodeRunner:hover {
     background-color: transparent;

@@ -16,7 +16,6 @@ CodeRunner::CodeRunner(QWidget* parent)
       m_minion(nullptr)
 {
     setObjectName("CodeRunner");
-    setFixedSize(32, 23);
 
     // set tooltip for the run buttons
     setToolTip(

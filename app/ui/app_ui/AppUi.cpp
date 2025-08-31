@@ -31,20 +31,51 @@
 
 #endif
 #include "AppUi.h"
+#include "AppUi.h"
 
 #include <QTimer>
 #include <qcoreapplication.h>
 #include <QMouseEvent>
+#include <QSqlError>
 
 #include "buraq.h"
+#include "Config.h"
 #include "PluginManager.h"
+#include "Utils.h"
 #include "clients/VersionClient/VersionRepository.h"
+#include "database/db_conn.h"
 #include "dialog/VersionUpdateDialog.h"
 #include "frameless_window/FramelessWindow.h"
 #include "ManagedProcess/ManagedProcess.h"
 
 AppUi::AppUi(QObject* parent) : QObject(parent)
 {
+    // Load configuration settings
+    Config::singleton();
+
+    // Ensure the singleton (and curl_global_init) is created before threads,
+    // though Meyers singleton handles this.
+    Network::singleton(); // Initialize network singleton if not already.
+
+    using file_utils::file_log;
+    if (!database::db_conn())
+    {
+        file_log("db_conn() EXIT_FAILURE..");
+        // failed to connect to the database
+        // return EXIT_FAILURE;
+    }
+
+    // Initialize the database:
+    if (const QSqlError err = database::init_db(); err.type() != QSqlError::NoError)
+    {
+        file_log("Error executing initializing db:" + err.text().toStdString());
+        // return EXIT_FAILURE;
+    }
+
+    // user's home dir should be the default location when the app starts.
+    // In the later release, save user's last dir/path
+    std::filesystem::current_path(ItoolsNS::get_user_home_directory());
+
     // Init application views
     initAppLayout();
 
@@ -109,7 +140,8 @@ void AppUi::initPSLangSupport()
 
     m_bridgeProcess = new ManagedProcess(psLangSupportPath);
 
-    if (!m_bridgeProcess->isRunning()) {
+    if (!m_bridgeProcess->isRunning())
+    {
         std::cerr << "Bridge process failed to start." << std::endl;
         emit updateStatusBar("PowerShell Support Failed.", 5000);
     }
@@ -187,7 +219,8 @@ void AppUi::launchUpdaterAndExit(
     const std::filesystem::path& updaterPath,
     const std::filesystem::path& packagePath,
     const std::filesystem::path& installationPath
-) {
+)
+{
     std::string commandLine = "\"" + updaterPath.string() + "\"";
     commandLine += " \"" + packagePath.string() + "\"";
     commandLine += " \"" + installationPath.string() + "\"";

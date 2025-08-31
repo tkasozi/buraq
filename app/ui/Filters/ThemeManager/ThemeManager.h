@@ -9,15 +9,17 @@
 #include <QEvent>
 
 enum AppTheme {
-    LightTheme,
-    DarkTheme
+    Light,
+    Dark,
+    SystemDefault,
 };
 
-class ThemeManager : public QObject
+class ThemeManager final : public QObject
 {
     Q_OBJECT
 public:
     static ThemeManager& instance();
+    void updateStyleSheet(AppTheme theme, const QString& stylePath);
 
     void setAppTheme(AppTheme theme);
     AppTheme currentTheme() const { return m_currentTheme; }

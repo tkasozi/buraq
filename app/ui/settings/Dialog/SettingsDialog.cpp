@@ -2,7 +2,7 @@
 // Created by talik on 8/30/2025.
 //
 
-#include "settingsdialog.h"
+#include "SettingsDialog.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QTabWidget>
@@ -15,12 +15,16 @@
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QGroupBox>
+#include <qsettings.h>
 
 #include "Config.h"
+#include "settings/SettingManager/SettingsManager.h"
+#include "settings/UserSettings.h"
 
 SettingsDialog::SettingsDialog(QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent), settingsManager(new SettingsManager()), themeManager(ThemeManager::instance())
 {
+    userPreference = settingsManager->loadSettings();
     setWindowTitle("Settings");
 
     // --- Main Tab Widget ---
@@ -31,6 +35,10 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
     // --- Bottom Button Box (OK, Cancel, Apply) ---
     m_buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply, this);
+    m_buttonBox->button(QDialogButtonBox::Ok)->setObjectName("OkButtonBox");
+    m_buttonBox->button(QDialogButtonBox::Apply)->setObjectName("ApplyButtonBox");
+    m_buttonBox->button(QDialogButtonBox::Cancel)->setObjectName("CancelButtonBox");
+
     connect(m_buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::accept);
     connect(m_buttonBox, &QDialogButtonBox::rejected, this, &SettingsDialog::reject);
     connect(m_buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &SettingsDialog::applyChanges);
@@ -48,19 +56,20 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
 SettingsDialog::~SettingsDialog() = default;
 
-void SettingsDialog::applyChanges()
+void SettingsDialog::applyChanges() const
 {
-    // In a real application, you would save the settings here.
-    // For example, using QSettings.
-    qDebug() << "Apply button clicked. Settings would be saved here.";
+    settingsManager->saveSettings(userPreference);
 
-    // Example of how you might retrieve a value:
-    // QComboBox* themeCombo = findChild<QComboBox*>("themeComboBox");
-    // if(themeCombo) {
-    //     QString selectedTheme = themeCombo->currentText();
-    //     QSettings settings;
-    //     settings.setValue("theme", selectedTheme);
-    // }
+    // update the UI
+    themeManager.setAppTheme(userPreference.theme);
+}
+
+void SettingsDialog::setTheme(const int index)
+{
+    if(index >= 0 && index < 3) {
+        qDebug() << "ThemeManager::loadSettings index = " << index;
+        userPreference.theme = static_cast<AppTheme>(index);
+    }
 }
 
 QWidget* SettingsDialog::createAppearancePage()
@@ -76,6 +85,9 @@ QWidget* SettingsDialog::createAppearancePage()
     themeComboBox->setObjectName("themeComboBox"); // For retrieving the value later
     themeComboBox->addItems({"Light", "Dark", "System Default"});
     themeLayout->addRow(new QLabel("Application Theme:", this), themeComboBox);
+    qDebug() << "userPreference.theme: " << userPreference.theme;
+    themeComboBox->setCurrentIndex(userPreference.theme);
+    connect(themeComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::setTheme);
 
     layout->addWidget(themeGroup);
 
@@ -132,6 +144,7 @@ QWidget* SettingsDialog::createAccountPage()
     QFormLayout *layout = new QFormLayout(pageWidget);
 
     QLineEdit *apiKeyLineEdit = new QLineEdit(this);
+    apiKeyLineEdit->setDisabled(true);
     apiKeyLineEdit->setPlaceholderText("Enter your API key");
     apiKeyLineEdit->setEchoMode(QLineEdit::Password);
 

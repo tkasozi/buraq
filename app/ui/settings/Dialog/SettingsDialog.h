@@ -7,25 +7,35 @@
 
 #include <QDialog>
 
+#include "settings/UserSettings.h"
+
 // Forward declarations for Qt classes to speed up compilation
 class QTabWidget;
 class QDialogButtonBox;
 class QListWidget;
 class QStackedWidget;
+class SettingsManager;
 
 class SettingsDialog final : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit SettingsDialog(QWidget *parent = nullptr);
+    explicit SettingsDialog(QWidget* parent = nullptr);
     ~SettingsDialog() override;
+
+signals:
+    void applySettingChanges();
 
 private slots:
     // Slot to handle saving the settings
-    void applyChanges();
+    void applyChanges() const;
+    void setTheme(const int index);
 
 private:
+    SettingsManager* settingsManager;
+    UserSettings userPreference;
+    ThemeManager &themeManager;
     // Helper functions to create each page of the settings dialog
     QWidget* createAppearancePage();
     QWidget* createEditorPage();

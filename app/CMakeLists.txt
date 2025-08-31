@@ -32,7 +32,7 @@ set(ITOOLS_MAIN_SOURCES
 
 set(ITOOLS_UI_SOURCES
         ui/app_ui/AppUi.cpp
-        ui/ToolBarEventFilter.cpp
+        ui/Filters/Toolbar/ToolBarEvent.cpp
         ui/ToolBar.cpp
         ui/editor/Editor.cpp
         ui/CustomDrawer.cpp
@@ -62,7 +62,7 @@ set(ITOOLS_HEADERS
         PluginManager.h
         FileObject.h
         ui/app_ui/AppUi.h
-        ui/ToolBarEventFilter.h
+        ui/Filters/Toolbar/ToolBarEvent.h
         ui/ToolButton.h
         ui/ToolBar.h
         ui/IconButton.h
@@ -90,16 +90,19 @@ set(ITOOLS_HEADERS
         clients/VersionClient/VersionRepository.h
         ui/dialog/VersionUpdateDialog.cpp
         ui/dialog/VersionUpdateDialog.h
-        ../include/theme_manager.h
-        ../include/theme_manager.cpp
+        ui/Filters/ThemeManager/ThemeManager.h
+        ui/Filters/ThemeManager/ThemeManager.cpp
         ../include/buraq.h
         database/db_conn.cpp
         ../include/buraq.cpp
         clients/PSClient/PSClient.cpp
         clients/PSClient/PSClient.h
         ManagedProcess/ManagedProcess.h
-        ui/settings/SettingsDialog.cpp
-        ui/settings/SettingsDialog.h
+        ui/settings/Dialog/SettingsDialog.cpp
+        ui/settings/Dialog/SettingsDialog.h
+        ui/settings/UserSettings.h
+        ui/settings/SettingManager/SettingsManager.cpp
+        ui/settings/SettingManager/SettingsManager.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)

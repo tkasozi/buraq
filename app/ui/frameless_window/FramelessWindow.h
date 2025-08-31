@@ -25,12 +25,14 @@ class OutputDisplay;
 class Editor;
 class EditorMargin;
 class ToolBar;
+class ThemeManager;
 
 class FramelessWindow final : public QMainWindow
 {
     Q_OBJECT
 
 public:
+    void init();
     explicit FramelessWindow(QWidget* parent = nullptr);
     ~FramelessWindow() override;
 
@@ -54,6 +56,8 @@ public slots:
 
 private:
     void initContentAreaLayout(QWidget* contentArea);
+
+    ThemeManager& themeManager;
 
     std::unique_ptr<PluginManager> pluginManager;
     std::unique_ptr<CustomDrawer> m_drawer;

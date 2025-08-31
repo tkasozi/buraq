@@ -3,22 +3,25 @@
 #define TOOLBAR_H
 
 #include <QToolBar>
-#include <QAction>
-#include <QIcon>
-#include <QDebug>
-#include <QMenu>
-#include <QPushButton> // Add this include
 
-class ToolBar : public QToolBar
+struct IWindow;
+class QWidget;
+class QMenu;
+class QIcon;
+class QAction;
+class QPushButton;
+
+class ToolBar final : public QToolBar
 {
 	Q_OBJECT
 
 public:
 	explicit ToolBar(const QString &title, QWidget *parent = nullptr);
-	explicit ToolBar(QWidget *parent);
+	explicit ToolBar(QWidget *parent = nullptr);
 
 	void addCustomAction(const QString &text, const QIcon &icon = QIcon());
 	void addFileMenu();
+	QWidget* m_window;
 
 	signals:
 		void customActionTriggered();
@@ -38,6 +41,7 @@ private slots:
 private:
 	QAction *m_customAction;
 	QMenu *m_fileMenu;
+    QPushButton* m_fileMenuButton;
 };
 
 #endif // TOOLBAR_H

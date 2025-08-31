@@ -31,19 +31,19 @@
 
 void init_main_out_area(QPlainTextEdit*, QVBoxLayout*, int);
 
-OutputDisplay::OutputDisplay(QWidget* appUi) : QWidget(appUi), appUi(appUi)
+OutputDisplay::OutputDisplay(QWidget* window) : QWidget(window), m_window(window)
 {
     // TODO This will eventually become a tool bar
     const auto pMainLabel = new QLabel;
     pMainLabel->setFixedHeight(25);
-    pMainLabel->setText("Output:");
+    pMainLabel->setText("❯_");
 
     const auto layout = new QVBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
-    pMainLabel->setStyleSheet(
-        "color: #fff;"
-        "border-bottom: 1px solid #000;");
+    // pMainLabel->setStyleSheet(
+    //     "color: #fff;"
+    //     "border-bottom: 1px solid #000;");
     layout->addWidget(pMainLabel);
 
     main = std::make_unique<QPlainTextEdit>();
@@ -94,9 +94,9 @@ void OutputDisplay::toggle()
     }
 }
 
-void OutputDisplay::log(const QString& strOutput, const QString& errorOutput)
+void OutputDisplay::log(const QString& output, const QString& errorOutput) const
 {
-    QStringList list = strOutput.split("\\u2029");
+    QStringList list = output.split("\\u2029");
     QStringList errorsList = errorOutput.split("\\u2029");
 
     QLabel* error = createLabel(errorOutput, "error");

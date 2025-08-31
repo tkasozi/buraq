@@ -1,10 +1,10 @@
 /*
  * Material Design Light Theme for Qt Widgets
  * Primary: #2196F3 (Blue 500)
- * Accent: #00BCD4 (Cyan 500)
- * Background: #F5F5F5 (Grey 100)
- * Surface: #FFFFFF (White)
- * Text: #212121 (Grey 900)
+ * Accent: #E5533D (Tomato Red for close button)
+ * Background: #F5F5F5 (Very Light Gray)
+ * Surface: #FFFFFF (White for elevation)
+ * Text: #212121 (Almost Black)
  */
 
 /* General Application Colors & Typography */
@@ -17,82 +17,115 @@ QMainWindow, QWidget, QDialog {
 
 /* Selection Colors (for text, list items, etc.) */
 QAbstractItemView {
-    selection-background-color: #BBDEFB; /* Light Blue 100 */
-    selection-color: #212121;
+    selection-background-color: #2196F3; /* Primary Blue for selection */
+    selection-color: #FFFFFF;
 }
 QAbstractItemView::item:selected {
-    background-color: #BBDEFB; /* Light Blue 100 */
-    color: #212121;
+    background-color: #2196F3; /* Primary Blue for selection */
+    color: #FFFFFF;
 }
 
 /* Buttons (QPushButton, QToolButton) */
 QPushButton, QToolButton {
-    background-color: transparent; /* No default background */
+    background-color: transparent;
     color: #212121;            /* Dark text */
-    border: none;              /* Flat design */
+    border: none;
     border-radius: 4px;
-    padding: 8px 16px;         /* Generous padding for text buttons */
-    min-width: 60px;           /* Minimum width for text buttons */
-    min-height: 35px;          /* Ensure minimum height for all buttons */
-    font-weight: 500;
-    text-transform: uppercase;
 }
 QPushButton:hover, QToolButton:hover {
-    background-color: rgba(0, 0, 0, 0.08); /* Subtle background on hover */
+    background-color: rgba(0, 0, 0, 0.05); /* Subtle dark background on hover */
 }
 QPushButton:pressed, QToolButton:pressed {
-    background-color: rgba(0, 0, 0, 0.15); /* More opaque background when pressed */
+    background-color: rgba(0, 0, 0, 0.1); /* More opaque background when pressed */
 }
 QPushButton:flat, QToolButton:flat {
-    background-color: rgba(0, 0, 0, 0.05); /* Subtle default background for flat buttons */
+    background-color: transparent;
     border: none;
-    color: #212121; /* Dark text */
-    padding: 0px; /* Adjust padding for flat icon buttons to fill 35x35 */
-    border-radius: 4px; /* Keep rounded corners */
-    min-width: 35px; /* Ensure square size for icon buttons */
-    min-height: 35px; /* Ensure square size for icon buttons */
+    color: #212121; /* Dark text color */
+    padding: 0px;
+    border-radius: 4px;
 }
 QPushButton:flat:hover, QToolButton:flat:hover {
-    background-color: rgba(0, 0, 0, 0.1); /* Slightly more opaque on hover */
+    background-color: rgba(0, 0, 0, 0.08); /* Slightly more opaque on hover */
     border-radius: 4px;
 }
 QPushButton:flat:pressed, QToolButton:flat:pressed {
-    background-color: rgba(0, 0, 0, 0.15); /* Even more opaque when pressed */
+    background-color: rgba(0, 0, 0, 0.12); /* Even more opaque when pressed */
 }
 
 /* Primary Action Buttons */
 QPushButton#PrimaryButton, QToolButton#PrimaryButton { /* Use objectName("PrimaryButton") in C++ */
     background-color: #2196F3; /* Primary Blue */
-    color: #FFFFFF;            /* White text */
+    color: #FFFFFF;
 }
 QPushButton#PrimaryButton:hover, QToolButton#PrimaryButton:hover {
-    background-color: #1976D2; /* Darker blue on hover */
+    background-color: #1E88E5; /* Slightly lighter blue on hover for light theme */
 }
 QPushButton#PrimaryButton:pressed, QToolButton#PrimaryButton:pressed {
-    background-color: #1565C0; /* Even darker blue when pressed */
+    background-color: #1976D2; /* Darker blue when pressed */
 }
 
 QPushButton#TextButton, QToolButton#TextButton {
     background-color: transparent;
     border: none;
-    color: #212121; /* Dark text */
+    color: #212121; /* Dark text color */
     padding: 0px;
-    border-radius: 4px;
-    min-width: 30px;
-    min-height: 40px;
-    font-weight: 500;
+    border-radius: 0px;
 }
 QPushButton#TextButton:hover, QToolButton#TextButton:hover {
-    background-color: rgba(0, 0, 0, 0.08); /* Subtle background on hover */
+    background-color: rgba(0, 0, 0, 0.05); /* Subtle background on hover */
+}
+
+/*Max, Min, Close Buttons*/
+
+#fileMenu {
+ border: none;
+ border-radius: 0px;
+}
+
+QPushButton#folderButton,
+QPushButton#outputConsoleButton,
+QPushButton#settingGearButton,
+QPushButton#AddFile,
+QPushButton#minimizeButton,
+QPushButton#fileMenuButton,
+QPushButton#maximizeButton,
+QPushButton#closeButton {
+        font-size: 12pt;
+        border-radius: 0px;
+        color: #212121; /* Dark text */
+        border: none;
+        padding: 5px;
+}
+QPushButton#closeButton:hover {
+        background-color: #E5533D; /* A slightly darker tomato red */
+        color: #FFFFFF; /* White text on hover for close button */
+}
+QPushButton#closeButton:pressed {
+        background-color: #C2402B; /* An even darker red for the click */
+        color: #FFFFFF; /* White text on press for close button */
+}
+/*--- END of Max, Min, Close Buttons*/
+
+
+QToolButton#CodeRunner  {
+    font-size: 10pt;
+    background-color: transparent;
+    border-radius: 0px;
+    color: #212121; /* Dark text */
+    border: none;
+}
+QToolButton#CodeRunner:hover {
+    background-color: transparent;
 }
 
 /* Labels */
 QLabel {
-    color: #212121; /* Default text color for labels */
+    color: #212121;
     padding: 2px;
 }
 QLabel:hover {
-    background-color: rgba(0, 0, 0, 0.05); /* Subtle background on hover */
+    background-color: rgba(0, 0, 0, 0.03); /* Very subtle background on hover */
     border-radius: 2px;
 }
 QLabel#HeaderLabel {
@@ -106,29 +139,29 @@ QLabel#HeaderLabel:hover {
 }
 
 /* Text Editors & Input Fields */
-QPlainTextEdit, QTextEdit, QLineEdit {
+QPlainTextEdit, QTextEdit, QLineEdit, QWidget#EditorMargin {
     background-color: #FFFFFF; /* White surface */
     color: #212121;
-    border: 1px solid #BDBDBD; /* Light gray border */
-    border-radius: 4px;
+    border: 1px solid #DCDCDC; /* Light gray border */
+    border-radius: 0px;
     padding: 0px;
 }
-QPlainTextEdit:focus, QTextEdit:focus, QLineEdit:focus {
+QPlainTextEdit:focus, QTextEdit:focus, QLineEdit:focus, QWidget#Editor:focus, QWidget#EditorMargin:focus {
     border: 1px solid #2196F3; /* Primary blue border on focus */
 }
 QPlainTextEdit::placeholder, QLineEdit::placeholder {
-    color: #757575;
+    color: #9E9E9E; /* Medium gray for placeholder text */
 }
 
 /* Toolbars */
 QToolBar {
     background-color: #FFFFFF; /* White toolbar background */
-    border-bottom: 1px solid #E0E0E0; /* Subtle separator */
+    border-bottom: 1px solid #DCDCDC;
     padding: 2px;
     spacing: 5px;
 }
 QToolBar::separator {
-    background-color: #E0E0E0;
+    background-color: #E0E0E0; /* Light gray separator */
     width: 1px;
     margin: 4px 5px;
 }
@@ -137,28 +170,28 @@ QToolBar::separator {
 QMenuBar {
     background-color: #FFFFFF;
     color: #212121;
-    border-bottom: 1px solid #E0E0E0;
+    border-bottom: 1px solid #DCDCDC;
 }
 QMenuBar::item {
     padding: 6px 10px;
     background-color: transparent;
 }
 QMenuBar::item:selected {
-    background-color: #F5F5F5; /* Matches main background */
+    background-color: #E0E0E0; /* Light gray selection */
 }
 
 QMenu {
     background-color: #FFFFFF; /* White menu background */
     color: #212121;
-    border: 1px solid #E0E0E0;
+    border: 1px solid #DCDCDC;
     min-width: 300px;
 }
 QMenu::item {
     padding: 8px 20px 8px 10px;
 }
 QMenu::item:selected {
-    background-color: #E3F2FD; /* Light Blue 50 */
-    color: #212121;
+    background-color: #2196F3; /* Primary Blue */
+    color: #FFFFFF;
 }
 QMenu::separator {
     height: 1px;
@@ -169,25 +202,25 @@ QMenu::separator {
 /* Status Bar */
 QStatusBar {
     background-color: #FFFFFF;
-    color: #757575; /* Subtle text color */
-    border-top: 1px solid #E0E0E0;
+    color: #616161; /* Medium-dark gray text */
+    border-top: 1px solid #DCDCDC;
 }
 
 /* Scroll Bars */
 QScrollBar:vertical, QScrollBar:horizontal {
-    border: 1px solid #E0E0E0;
+    border: 1px solid #DCDCDC;
     background: #F5F5F5;
     width: 12px; /* vertical */
     height: 12px; /* horizontal */
     margin: 0px 0px 0px 0px;
 }
 QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
-    background: #B0B0B0; /* Gray handle */
+    background: #C0C0C0; /* Medium gray handle */
     min-height: 20px;
     border-radius: 5px;
 }
 QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover {
-    background: #A0A0A0;
+    background: #A0A0A0; /* Darker gray handle on hover */
 }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical,
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {

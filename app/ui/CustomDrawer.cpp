@@ -71,7 +71,10 @@ CustomDrawer::CustomDrawer(Editor* editor) : QWidget(editor), editor(editor)
 
     // 5. Create the "addFile" button.
     // addFile is a unique_ptr member variable, so we initialize it.
-    addFile = std::make_unique<IconButton>(QIcon(Config::singleton().getAppIcons()->addFileIcon));
+    addFile = std::make_unique<QPushButton>("📄", this);
+    addFile->setObjectName("AddFile");
+    addFile->setFixedSize(25, headerPanel->height());
+
     // Connect its clicked signal to your slot.
     connect(addFile.get(), &IconButton::clicked, this, &CustomDrawer::onAddButtonClicked);
 

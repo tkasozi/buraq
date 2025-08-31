@@ -6,7 +6,7 @@
 #include <QPainter>
 #include <QTextBlock>
 
-EditorMargin::EditorMargin(QWidget* appUi, QWidget* parent) : CommonWidget(parent), appUi(appUi)
+EditorMargin::EditorMargin(QWidget* windowPtr, QWidget* parent) : CommonWidget(parent), windowPtr(windowPtr)
 {
     setFixedWidth(82); // The EditorMargin itself has a fixed width
 
@@ -45,7 +45,7 @@ EditorMargin::EditorMargin(QWidget* appUi, QWidget* parent) : CommonWidget(paren
     action_layout->setSpacing(0);
     action_layout->setContentsMargins(0, 0, 0, 0);
 
-    codeRunner = std::make_unique<CodeRunner>(appUi); // Assuming CodeRunner is a QWidget or QWidget-derived
+    codeRunner = std::make_unique<CodeRunner>(windowPtr); // Assuming CodeRunner is a QWidget or QWidget-derived
     action_layout->addWidget(codeRunner.get());
 
     // Then, add a stretchable space after it

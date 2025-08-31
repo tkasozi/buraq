@@ -15,7 +15,7 @@ Q_OBJECT
 public:
 	explicit LineNumberAreaWidget(QWidget *parent = nullptr);
 
-	// Call this when the editor's state changes to provide data for painting
+	// Call this when the editor's m_state changes to provide data for painting
 	void updateEditorState(const buraq::EditorState &state);
 
 protected:

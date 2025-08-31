@@ -4,70 +4,56 @@
 #ifndef APP_UI_H
 #define APP_UI_H
 
-#include <QStatusBar>
-#include <QThread>
+#include <filesystem>
+#include <QObject>
 
-#include "ToolBarEventFilter.h"
-#include "CustomDrawer.h"
-#include "IconButton.h"
-#include "output_display/OutputDisplay.h"
-#include "ToolBar.h"
-#include "PluginManager.h"
-#include "EditorMargin.h"
+namespace buraq
+{
+    struct buraq_api;
+}
 
+class Minion;
+class QMainWindow;
+class QMouseEvent;
+class QThread;
+class EditorMargin;
 class ManagedProcess;
+class FramelessWindow;
+class PluginManager;
+class ToolBar;
 
-class AppUi final : public QMainWindow
+class AppUi final : public QObject
 {
     Q_OBJECT
 
-public slots:
-    void processStatusSlot(const QString&, int timeout = 5000) const;
-    void processResultSlot(int exitCode, const QString& output, const QString& error) const;
-
 private slots:
-    void onClicked() const;
-
-    void onShowOutputButtonClicked() const;
-
     void onWindowFullyLoaded();
-    void initPSLangSupport();
+
+signals:
+    void updateStatusBar(const QString&, int timeOut);
 
 public:
-    explicit AppUi(QWidget* parent = nullptr);
+    explicit AppUi(QObject* parent = nullptr);
 
     // The std::unique_ptr members will automatically
     // delete their managed objects when AppUi is destroyed.
     // No manual delete, no manual nullptr.
     ~AppUi() override;
 
-    Editor* getEditor() const;
-    EditorMargin* getEditorMargin() const;
-
-    PluginManager* getLangPluginManager() const;
-
-    buraq::buraq_api* get_api_context() const { return api_context.get(); };
+    [[nodiscard]] buraq::buraq_api* get_api_context() const { return api_context.get(); };
 
 private:
     std::unique_ptr<PluginManager> pluginManager;
-    std::unique_ptr<CustomDrawer> drawer;
-    std::unique_ptr<QGridLayout> centralWidgetLayout;
-    std::unique_ptr<IconButton> folderButton;
-    std::unique_ptr<OutputDisplay> outPutArea;
-    std::unique_ptr<QGridLayout> placeHolderLayout;
-    std::unique_ptr<Editor> itoolsEditor;
-    std::unique_ptr<EditorMargin> editorMargin;
-    std::unique_ptr<ToolBar> toolBar;
-    std::unique_ptr<QStatusBar> statusBar;
     std::unique_ptr<buraq::buraq_api> api_context;
+    std::unique_ptr<FramelessWindow> m_framelessWindow;
 
     // For running background services
-    ManagedProcess* m_bridgeProcess;
+    ManagedProcess* m_bridgeProcess{};
 
-    QThread *m_workerThread;
-    Minion *m_minion;
+    QThread *m_workerThread{};
+    Minion *m_minion{};
 
-    void initPSLangSupport() const;
+    void initPSLangSupport();
     void verifyApplicationVersion();
     void initAppLayout();
     void initAppContext();

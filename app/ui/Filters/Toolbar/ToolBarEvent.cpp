@@ -5,35 +5,38 @@
 #include <QEvent>
 #include <QMouseEvent>
 
-#include "ToolBarEventFilter.h"
-#include "app_ui/AppUi.h"
-#include "ToolBar.h"
+#include "ToolBarEvent.h"
 
-bool ToolBarEventFilter::eventFilter(QObject* obj, QEvent* e)
+#include "Config.h"
+#include "../../app_ui/AppUi.h"
+#include "../../ToolBar.h"
+#include "frameless_window/FramelessWindow.h"
+
+bool ToolBarEvent::eventFilter(QObject* obj, QEvent* event)
 {
-    auto* toolBar = dynamic_cast<ToolBar*>(obj);
-    auto* event = dynamic_cast<QMouseEvent*>(e);
+    const auto toolBar = dynamic_cast<ToolBar*>(obj);
+    const auto _event = dynamic_cast<QMouseEvent*>(event);
 
     if (toolBar == nullptr || event == nullptr)
     {
         return false; // Pass event to the object's normal handlers
     }
 
-    auto* ui = dynamic_cast<AppUi*>(obj->parent());
-    auto geo = toolBar->geometry();
+    auto* ui = dynamic_cast<FramelessWindow*>(obj->parent());
+    const auto geo = toolBar->geometry();
 
     switch (event->type())
     {
     case QEvent::MouseButtonDblClick:
-        // toolBar->updateMaxAndRestoreIconButton();
+        // m_toolBar->updateMaxAndRestoreIconButton();
 
         return true;
     case QEvent::MouseButtonPress:
 
-        if (event->button() == Qt::LeftButton)
+        if (_event->button() == Qt::LeftButton)
         {
             isMouseBtnPressed = true;
-            this->dragStartPos = event->pos();
+            this->dragStartPos = _event->pos();
 
             return true;
         }
@@ -47,7 +50,7 @@ bool ToolBarEventFilter::eventFilter(QObject* obj, QEvent* e)
                 // toolBar->updateMaxAndRestoreIconButton();
             }
 
-            const auto pos = event->globalPosition().toPoint();
+            const auto pos = _event->globalPosition().toPoint();
 
             const QPoint newPos = toolBar->pos() + pos - dragStartPos;
 
@@ -63,15 +66,15 @@ bool ToolBarEventFilter::eventFilter(QObject* obj, QEvent* e)
 
         return true;
     default:
-        return QObject::eventFilter(obj, e);
+        return QObject::eventFilter(obj, event);
     }
 }
 
-ToolBarEventFilter::ToolBarEventFilter(QObject* parent)
+ToolBarEvent::ToolBarEvent(QObject* parent)
     : QObject(parent),
       dragStartPos(0, 0),
       isMouseBtnPressed(false)
 {
 }
 
-ToolBarEventFilter::~ToolBarEventFilter() = default;
+ToolBarEvent::~ToolBarEvent() = default;

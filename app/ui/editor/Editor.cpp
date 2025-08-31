@@ -19,6 +19,7 @@
 
 #include "EditorMargin.h"
 #include "app_ui/AppUi.h"
+#include "frameless_window/FramelessWindow.h"
 
 #define string_equals(keyText, key) \
 (std::equal(keyText.begin(), keyText.end(), key));
@@ -43,11 +44,11 @@ static QRegularExpression variablesRegex(
 
 /**
  *
- * @param appUi The pointer to the main app.
+ * @param window The pointer to the main app.
  */
-Editor::Editor(QWidget* appUi)
-    : QWidget(appUi), // FIX: Editor now inherits QWidget
-      appUi(appUi)
+Editor::Editor(QWidget* window)
+    : QWidget(window), // FIX: Editor now inherits QWidget
+      m_window(window)
 {
     setObjectName("Editor");
 
@@ -59,10 +60,10 @@ Editor::Editor(QWidget* appUi)
 
     // 2. Create the EditorMargin instance.
     // Parent it to 'this' (Editor).
-    editorMargin = std::make_unique<EditorMargin>(appUi, this);
+    m_editorMargin = std::make_unique<EditorMargin>(window, this);
 
     // FIX: Set the editor for the margin so it can synchronize
-    editorMargin->setEditor(m_plainTextEdit.get());
+    m_editorMargin->setEditor(m_plainTextEdit.get());
 
     // 3. Set up the main horizontal layout for the Editor container.
     const auto main_layout = new QHBoxLayout(this); // 'this' (Editor) takes ownership of the layout
@@ -90,10 +91,10 @@ Editor::Editor(QWidget* appUi)
     // You'll need to define setupSignals() to connect the scrollbars etc.
     // Example connections (assuming EditorMargin has onEditorScrolled and updateMarginWidth slots)
     connect(m_plainTextEdit->verticalScrollBar(), &QScrollBar::valueChanged,
-            editorMargin.get(), &EditorMargin::onEditorScrolled);
-    connect(m_plainTextEdit->document(), &QTextDocument::contentsChange, editorMargin.get(), [this]()
+            m_editorMargin.get(), &EditorMargin::onEditorScrolled);
+    connect(m_plainTextEdit->document(), &QTextDocument::contentsChange, m_editorMargin.get(), [this]()
     {
-        editorMargin.get()->updateMarginWidth(state);
+        m_editorMargin.get()->updateMarginWidth(m_state);
     }); // Also update on text changes
 
     // Call your existing setupSignals() if it does more than just this.
@@ -102,7 +103,7 @@ Editor::Editor(QWidget* appUi)
     // 4. Add widgets to the layout.
     // The order determines left-to-right placement.
     // Use release() to transfer ownership from unique_ptr to the layout.
-    main_layout->addWidget(editorMargin.get()); // Add margin to the left
+    main_layout->addWidget(m_editorMargin.get()); // Add margin to the left
     main_layout->addWidget(m_plainTextEdit.get()); // Add QPlainTextEdit to the right
 
     // Any other signals from Editor that need to come from m_plainTextEdit
@@ -121,30 +122,30 @@ void Editor::highlightCurrentLine()
 
         selection.format.setBackground(lineColor);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-        state.hasText = currentFile.isEmpty();
-        state.isBlockValid = false;
-        state.isSelected = false;
-        state.blockCount = textEdit->blockCount();
+        m_state.hasText = m_currentFile.isEmpty();
+        m_state.isBlockValid = false;
+        m_state.isSelected = false;
+        m_state.blockCount = textEdit->blockCount();
 
         const auto text_cursor = textEdit->textCursor();
         selection.cursor = text_cursor;
         extraSelections.append(selection);
-        state.blockNumber = state.cursorBlockNumber = text_cursor.blockNumber();
-        state.lineHeight = fontMetrics().height();
+        m_state.blockNumber = m_state.cursorBlockNumber = text_cursor.blockNumber();
+        m_state.lineHeight = fontMetrics().height();
 
-        state.currentLineHeight = textEdit->cursorRect().height();
+        m_state.currentLineHeight = textEdit->cursorRect().height();
 
         if (selection.cursor.hasSelection())
         {
-            state.isSelected = true;
-            state.selectedBlockNumbers.insert(selection.cursor.block().blockNumber());
+            m_state.isSelected = true;
+            m_state.selectedBlockNumbers.insert(selection.cursor.block().blockNumber());
         }
         else
         {
-            state.selectedBlockNumbers.clear();
+            m_state.selectedBlockNumbers.clear();
         }
 
-        emit lineNumberAreaPaintEventSignal(state);
+        emit lineNumberAreaPaintEventSignal(m_state);
 
         textEdit->setExtraSelections(extraSelections);
     }
@@ -229,7 +230,7 @@ void Editor::openAndParseFile(const QString& filePath, QFile::OpenModeFlag modeF
 {
     if (modeFlag != QFile::ReadOnly)
     {
-        this->currentFile = filePath;
+        this->m_currentFile = filePath;
     }
 
     try
@@ -265,8 +266,8 @@ void Editor::setupSignals()
     connect(this, &Editor::readyToSaveEvent, this, &Editor::autoSave);
 
     // Update status bar in AppUI component
-    const auto appUi_ = dynamic_cast<AppUi*>(appUi);
-    connect(this, &Editor::statusUpdate, appUi_, &AppUi::processStatusSlot);
+    const auto appUi_ = dynamic_cast<FramelessWindow*>(m_window);
+    connect(this, &Editor::statusUpdate, appUi_, &FramelessWindow::processStatusSlot);
 
     // Signal to update status bar in AppUI component for the running process
     connect(this, &Editor::lineNumberAreaPaintEventSignal, appUi_->getEditorMargin(), &EditorMargin::updateState);
@@ -276,11 +277,11 @@ void Editor::autoSave()
 
 {
     // auto save works only if the file had been saved before
-    // therefore currentFile should have been set
-    if (!currentFile.isEmpty())
+    // therefore m_currentFile should have been set
+    if (!m_currentFile.isEmpty())
     {
         // Open the file for writing
-        QFile file(currentFile);
+        QFile file(m_currentFile);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         {
             emit statusUpdate(file.errorString());
@@ -323,9 +324,9 @@ void Editor::keyReleaseEvent(QKeyEvent* e)
     }
 
     const QString currentText = toPlainText();
-    // Analyze the difference between previousText and currentText to identify deletions
+    // Analyze the difference between m_previousText and currentText to identify deletions
 
-    if (const auto deletedLength = previousText.size() - currentText.size(); isBackSpaceKey && deletedLength > 0)
+    if (const auto deletedLength = m_previousText.size() - currentText.size(); isBackSpaceKey && deletedLength > 0)
     {
         emit inlineSyntaxtHighlightingEvent();
     }
@@ -393,7 +394,7 @@ void Editor::documentSyntaxHighlighting()
 
 void Editor::keyPressEvent(QKeyEvent* e)
 {
-    previousText = toPlainText();
+    m_previousText = toPlainText();
 
     // m_plainTextEdit->keyPressEvent(e);
 }

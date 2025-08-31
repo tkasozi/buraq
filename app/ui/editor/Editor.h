@@ -40,7 +40,7 @@ signals:
     void lineNumberAreaPaintEventSignal(const buraq::EditorState& state);
 
 public:
-    explicit Editor(QWidget* appUi = nullptr);
+    explicit Editor(QWidget* window = nullptr);
 
     ~Editor() override = default;
 
@@ -61,13 +61,13 @@ private slots:
 
 private:
     std::unique_ptr<QPlainTextEdit> m_plainTextEdit; // FIX: Internal QPlainTextEdit
-    std::unique_ptr<EditorMargin> editorMargin; // Your margin widget
-    QWidget* appUi;
-    QStack<QString> history;
-    QString currentFile;
-    QString previousText;
-    QTimer autoSaveTimer;
-    buraq::EditorState state;
+    std::unique_ptr<EditorMargin> m_editorMargin; // Your margin widget
+    QWidget* m_window;
+    QStack<QString> m_history;
+    QString m_currentFile;
+    QString m_previousText;
+    QTimer m_autoSaveTimer;
+    buraq::EditorState m_state;
 
     static QString convertTextToHtml(QString&);
     static QString convertRhsTextToHtml(const QString&);

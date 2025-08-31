@@ -22,12 +22,12 @@ public slots:
 
 public:
 
-	explicit EditorMargin(QWidget *appUi, QWidget *parent = nullptr);
+	explicit EditorMargin(QWidget *windowPtr, QWidget *parent = nullptr);
 	void setEditor(QPlainTextEdit *editor) { m_editor = editor; }
 	~EditorMargin() override = default;
 
 private:
-	QWidget *appUi;
+	QWidget *windowPtr;
 	std::unique_ptr<CodeRunner> codeRunner;
 	std::unique_ptr<LineNumberAreaWidget> line_numbers_widget;
 	QPlainTextEdit *m_editor{}; // Pointer to the associated editor

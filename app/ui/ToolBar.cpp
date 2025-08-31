@@ -1,45 +1,16 @@
 // toolbar.cpp
-#include "toolbar.h"
 #include <QMessageBox>
 #include <QByteArray>
 #include <QBuffer>
 #include <QPixmap>
+#include <QMenu>
 #include <QPushButton> // Required for QPushButton
-
-// --- Base64 encoded PNG icon data (16x16 pixel placeholders) ---
-// ... (icon data remains the same) ...
-// Green 'N' for New
-const char* ICON_NEW_BASE64 =
-    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAP0lEQVR42mNkYGD4z0AFIwMDw0/AwPAXlAwMDL8jYGBgYGBgYGBgAAAtEw/5/17+P+f/x8YGBgYGBgAAAEcBQH/tq2IAAAAAElFTkSuQmCC";
-// Blue 'O' for Open
-const char* ICON_OPEN_BASE64 =
-    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAP0lEQVR42mNkYGD4z0AFIwMDw0/AwPAXlAwMDL8jYGBgYGBgYGBgAAAtEw/5/17+P+f/x8YGBgYGBgAAAEcBQH/tq2IAAAAAElFTgRUQmCC";
-// Yellow 'S' for Save
-const char* ICON_SAVE_BASE64 =
-    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAP0lEQVR42mNkYGD4z0AFIwMDw0/AwPAXlAwMDL8jYGBgYGBgYGBgAAAtEw/5/17+P+f/x8YGBgYGBgAAAEcBQH/tq2IAAAAAElFTkSuQmCC";
-// Red 'X' for Exit
-const char* ICON_EXIT_BASE64 =
-    "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAP0lEQVR42mNkYGD4z0AFIwMDw0/AwPAXlAwMDL8jYGBgYGBgYGBgAAAtEw/5/17+P+f/x8YGBgYGBgAAAEcBQH/tq2IAAAAAElFTkSuQmCC";
-// Orange 'F' for File Menu
-const char* ICON_FILE_MENU_BASE64 = "iVBORw0KGgoAAAANsXwAAAABJRU5ErkJggg==";
-// Purple 'P' for Print
-const char* ICON_PRINT_BASE64 = "iVBORw0KGgoAAAANsXwAAAABJRU5ErkJggg==";
-// Gray 'H' for Help
-const char* ICON_HELP_BASE64 = "iVBORw0KGgoAAAANsXwAAAABJRU5ErkJggg==";
-
-
-// Helper function to create QIcon from Base64 data
-QIcon createIconFromBase64(const char* base64Data)
-{
-    QByteArray imageData = QByteArray::fromBase64(base64Data);
-    QPixmap pixmap;
-    pixmap.loadFromData(imageData, "PNG"); // Specify PNG format
-    return QIcon(pixmap);
-}
+#include "toolbar.h"
+#include "frameless_window/FramelessWindow.h"
 
 // Constructor with title
 ToolBar::ToolBar(const QString& title, QWidget* parent)
-    : QToolBar(title, parent)
+    : QToolBar(title, parent), m_window(parent)
 {
     m_customAction = nullptr;
     m_fileMenu = nullptr;
@@ -85,12 +56,13 @@ void ToolBar::addFileMenu()
         return;
     }
 
-    m_fileMenu = new QMenu("File", this); // The QMenu itself still exists
+    m_fileMenu = new QMenu(this); // The QMenu itself still exists
+    m_fileMenu->setObjectName("fileMenu");
 
-    QAction* newAction = new QAction(createIconFromBase64(ICON_NEW_BASE64), "New", this);
-    QAction* openAction = new QAction(createIconFromBase64(ICON_OPEN_BASE64), "Open...", this);
-    QAction* saveAction = new QAction(createIconFromBase64(ICON_SAVE_BASE64), "Save", this);
-    QAction* exitAction = new QAction(createIconFromBase64(ICON_EXIT_BASE64), "Exit", this);
+    QAction* newAction = new QAction("New", this);
+    QAction* openAction = new QAction("Open", this);
+    QAction* saveAction = new QAction("Save", this);
+    QAction* exitAction = new QAction("Exit", this);
 
     m_fileMenu->addAction(newAction);
     m_fileMenu->addAction(openAction);
@@ -100,20 +72,24 @@ void ToolBar::addFileMenu()
 
     // --- START CHANGES FOR QPushButton ---
     // Create a QPushButton to act as the menu trigger
-    const auto fileMenuButton = new QPushButton("File", this);
-    fileMenuButton->setObjectName("TextButton");
+    m_fileMenuButton = new QPushButton("☰", this);
+    m_fileMenuButton->setObjectName("fileMenuButton");
+    m_fileMenuButton->setFixedSize(40, height());
 
     // Add the button to the toolbar. By default, it will be on the left if added first.
-    addWidget(fileMenuButton);
+    addWidget(m_fileMenuButton);
 
     // Connect the button's clicked signal to a slot that shows the menu
-    connect(fileMenuButton, &QPushButton::clicked, this, &ToolBar::onFileMenuButtonClicked);
+    connect(m_fileMenuButton, &QPushButton::clicked, this, &ToolBar::onFileMenuButtonClicked);
     // --- END CHANGES FOR QPushButton ---
 
     connect(newAction, &QAction::triggered, this, &ToolBar::onNewFile);
     connect(openAction, &QAction::triggered, this, &ToolBar::onOpenFile);
     connect(saveAction, &QAction::triggered, this, &ToolBar::onSaveFile);
-    connect(exitAction, &QAction::triggered, this, &ToolBar::onExit);
+    if (const auto window = dynamic_cast<FramelessWindow*>(m_window); window != nullptr) // FIX ME
+    {
+        connect(exitAction, &QAction::triggered, window, &FramelessWindow::closeWindowSlot);
+    }
 
     qDebug() << "File menu successfully added to toolbar.";
 }

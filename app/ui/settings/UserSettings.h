@@ -13,8 +13,8 @@
 
 // A simple struct to hold all application preferences
 struct UserSettings {
-    AppTheme theme;
-    QSize windowSize = QSize(1280, 720);
+    AppTheme theme = Dark;
+    QSize windowSize = QSize(2100, 720);
     QPoint windowPosition = QPoint(100, 100);
     bool wordWrapEnabled = true;
     int editorFontSize = 11;

@@ -8,6 +8,9 @@
 #include <QMainWindow>
 #include <QWidget>
 
+#include "settings/UserSettings.h"
+#include "settings/SettingManager/SettingsManager.h"
+
 namespace buraq
 {
     struct buraq_api;
@@ -41,9 +44,9 @@ public:
     [[nodiscard]] EditorMargin* getEditorMargin() const;
     [[nodiscard]] PluginManager* getLangPluginManager() const;
 
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseMoveEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
     // Optional: If you need to draw a custom border or background for the whole m_window
     // void paintEvent(QPaintEvent *event) override;
@@ -53,8 +56,16 @@ public slots:
     void processResultSlot(int exitCode, const QString& output, const QString& error) const;
     void updateDrawer() const;
     void closeWindowSlot();
+    void showMaximizeOrRestoreSlot();
+    void windowDrag(QMouseEvent* event);
 
 private:
+    // Helper function to update the cursor shape based on position
+    void updateCursorShape(const QPoint &pos);
+
+    // Helper function to calculate which edges the mouse is on
+    Qt::Edges calculateEdges(const QPoint &pos, int margin) const;
+
     void initContentAreaLayout(QWidget* contentArea);
 
     ThemeManager& themeManager;
@@ -67,6 +78,7 @@ private:
     std::unique_ptr<Editor> m_itoolsEditor;
     std::unique_ptr<EditorMargin> editorMargin;
     std::unique_ptr<ToolBar> m_toolBar;
+    std::unique_ptr<QWidget> m_titleBar;
     std::unique_ptr<buraq::buraq_api> api_context;
     std::unique_ptr<FramelessWindow> m_framelessWindow;
 
@@ -76,12 +88,17 @@ private:
 
     QStatusBar* m_statusBar{};
 
-    QWidget* m_titleBar{};
     QPushButton* m_minimizeButton;
     QPushButton* m_maximizeButton;
     QPushButton* m_closeButton;
 
-    bool m_dragging;
+    SettingsManager settingsManager{};
+    UserSettings userPreferences;
+
+    bool m_resizing = false;
+    bool m_dragging = false;
+    Qt::Edges m_resizeEdges;
+    int m_resizeMargin = 5; // The pixel margin to detect resizing
     QPoint m_dragPosition; // To store the offset of the mouse click from the m_window's top-left
 
 signals:

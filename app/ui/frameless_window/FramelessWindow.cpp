@@ -18,16 +18,48 @@
 #include "app_ui/AppUi.h"
 #include "Filters/ThemeManager/ThemeManager.h"
 #include "../settings/Dialog/SettingsDialog.h"
+#include "settings/SettingManager/SettingsManager.h"
 
-// Installs themes, custom events, window size
+#include <QIcon>
+#include <QPixmap>
+#include <QPainter>
+#include <QFont>
+
+// Helper function to create a QIcon from a text character
+QIcon createIconFromCharacter(const QString &character, const QWidget* parentWidget, const int size = 64)
+{
+    // Create a square, transparent pixmap to draw on
+    QPixmap pixmap(size, size);
+    pixmap.fill(Qt::transparent);
+
+    // Use QPainter to draw the character
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing); // For smooth edges
+
+    // Configure the font
+    QFont font;
+    font.setPointSize(size * 0.6); // Adjust font size relative to pixmap size
+    font.setBold(true);
+    painter.setFont(font);
+
+    const QColor textColor = parentWidget->palette().color(QPalette::WindowText);
+
+    // Set the character color
+    painter.setPen(textColor);
+
+    // Draw the character centered on the pixmap
+    painter.drawText(pixmap.rect(), Qt::AlignLeft, character);
+
+    // The painter is automatically finished when it goes out of scope
+
+    return QIcon(pixmap);
+}
+
+// Install themes, custom events, window size
 void FramelessWindow::init()
 {
     // Initialize the ThemeManager instance
     this->installEventFilter(&themeManager);
-
-    // Allow events on the
-    const auto toolbarEvent = new ToolBarEvent(m_toolBar.get());
-    this->installEventFilter(toolbarEvent);
 
     // Set the m_window flag to remove the default frame
     this->setWindowFlags(Qt::FramelessWindowHint);
@@ -35,13 +67,24 @@ void FramelessWindow::init()
     this->setAttribute(Qt::WA_TranslucentBackground);
 
     // setting up default m_window size
-    const auto windowConfig = Config::singleton().getWindow();
-    this->setMinimumSize(windowConfig->normalSize, windowConfig->minHeight);
+    this->resize(userPreferences.windowSize);
+    this->move(userPreferences.windowPosition);
+
+    // Generate the icon at runtime
+    const QIcon lightningIcon = createIconFromCharacter("⌁", this);
+
+    // Set it as the window icon
+    this->setWindowIcon(lightningIcon);
 }
 
 FramelessWindow::FramelessWindow(QWidget* parent)
-    : QMainWindow(parent), themeManager(ThemeManager::instance()), m_toolBar(std::make_unique<ToolBar>(this)), m_statusBar(new QStatusBar(this)),
-      m_dragging(false)
+    : QMainWindow(parent),
+      themeManager(ThemeManager::instance()),
+      m_toolBar(std::make_unique<ToolBar>(this)),
+      m_titleBar(std::make_unique<QWidget>(this)),
+      m_statusBar(new QStatusBar(this)),
+      userPreferences(settingsManager.loadSettings()),
+      m_dragPosition(QPoint(0, 0))
 {
     init();
 
@@ -55,29 +98,48 @@ FramelessWindow::FramelessWindow(QWidget* parent)
     mainLayout->setSpacing(0);
 
     // Custom Title Bar
-    m_titleBar = new QWidget(this);
-    m_titleBar->setFixedHeight(35); // Set your desired title bar height
-    m_titleBar->setObjectName("customTitleBar"); // For styling
+    const auto m_titleBar_ = m_titleBar.get();
+    const auto toolbarEvents = new ToolBarEvent(m_titleBar_);
+    m_titleBar_->installEventFilter(toolbarEvents);
+    m_titleBar_->setFixedHeight(35); // Set your desired title bar height
+    m_titleBar_->setObjectName("customTitleBar"); // For styling
 
-    const auto titleBarLayout = new QHBoxLayout(m_titleBar);
+    const auto titleBarLayout = new QHBoxLayout(m_titleBar_);
     titleBarLayout->setContentsMargins(0, 0, 0, 0);
     titleBarLayout->setSpacing(0);
 
-    const auto titleText = new QLabel(m_titleBar);
+    const auto titleText = new QLabel(m_titleBar_);
+    titleText->setFixedWidth(width());
     titleText->setObjectName("titleText");
 
-    m_minimizeButton = new QPushButton("—", m_titleBar); // Underscore for minimize
+    // 1. Enable Rich Text rendering on the QLabel
+    titleText->setTextFormat(Qt::RichText);
+
+    qDebug() << "curr theme: " << themeManager.currentTheme();
+
+    // 2. Construct the HTML string
+    const QString titleHtml = QString(
+        "<div style='display: flex; width: %2px; justify-content: space-between;'>" // Make the main part bold
+        "<span style='font-size: 14pt;'>&nbsp;⌁</span>" // Icon with some space
+        "<span style='font-size: 12pt; color: #AAAAAA;'>&nbsp; %1</span>" // Version number, smaller and lighter
+        "</div>"
+    ).arg(UpdateInfo().currentVersion.data(), titleText->width());
+
+    // 3. Set the HTML content
+    titleText->setText(titleHtml);
+
+    m_minimizeButton = new QPushButton("—", m_titleBar_); // Underscore for minimize
     m_minimizeButton->setObjectName("minimizeButton"); // For specific styling
 
-    m_maximizeButton = new QPushButton("☐", m_titleBar); // Square for maximize/restore
+    m_maximizeButton = new QPushButton("☐", m_titleBar_); // Square for maximize/restore
     m_maximizeButton->setObjectName("maximizeButton"); // For specific styling
 
-    m_closeButton = new QPushButton("✕", m_titleBar); // X for close
+    m_closeButton = new QPushButton("✕", m_titleBar_); // X for close
     m_closeButton->setObjectName("closeButton"); // For specific styling
 
-    m_minimizeButton->setFixedSize(40, m_titleBar->height());
-    m_maximizeButton->setFixedSize(40, m_titleBar->height());
-    m_closeButton->setFixedSize(40, m_titleBar->height());
+    m_minimizeButton->setFixedSize(40, m_titleBar_->height());
+    m_maximizeButton->setFixedSize(40, m_titleBar_->height());
+    m_closeButton->setFixedSize(40, m_titleBar_->height());
 
     titleBarLayout->addWidget(titleText);
     titleBarLayout->addStretch();
@@ -85,7 +147,7 @@ FramelessWindow::FramelessWindow(QWidget* parent)
     titleBarLayout->addWidget(m_maximizeButton);
     titleBarLayout->addWidget(m_closeButton);
 
-    mainLayout->addWidget(m_titleBar);
+    mainLayout->addWidget(m_titleBar_);
 
     // Add Tool bar
     m_toolBar->setFixedHeight(35);
@@ -107,66 +169,103 @@ FramelessWindow::FramelessWindow(QWidget* parent)
     setStatusBar(m_statusBar); // Use QMainWindow's dedicated function for the status bar
 
     // Connections
-    connect(m_maximizeButton, &QPushButton::clicked, this, [this]
-    {
-        if (this->isMaximized())
-        {
-            this->showNormal();
-            m_maximizeButton->setText("☐"); // Restore symbol
-        }
-        else
-        {
-            this->showMaximized();
-            m_maximizeButton->setText("❐"); // Actual maximize symbol (might need specific font or icon)
-        }
-    });
+    connect(m_maximizeButton, &QPushButton::clicked, this, &FramelessWindow::showMaximizeOrRestoreSlot);
     connect(m_minimizeButton, &QPushButton::clicked, this, &FramelessWindow::showMinimized);
     connect(m_closeButton, &QPushButton::clicked, this, &FramelessWindow::close);
     connect(this, &FramelessWindow::closeApp, this, &FramelessWindow::close);
-
-    // Show maximized view by default
-    this->showNormal();
+    connect(toolbarEvents, &ToolBarEvent::showMaximizedOrRestore, this, &FramelessWindow::showMaximizeOrRestoreSlot);
+    connect(toolbarEvents, &ToolBarEvent::dragWindow, this, &FramelessWindow::windowDrag);
 }
 
-FramelessWindow::~FramelessWindow() = default;
+// smart pointers will be cleaned up by std::unique_ptr
+FramelessWindow::~FramelessWindow()
+{
+    // save the last window size & position
+    userPreferences.windowSize = this->size();
+    userPreferences.windowPosition = m_dragPosition;
+    settingsManager.saveSettings(userPreferences);
+};
+
+void FramelessWindow::windowDrag(QMouseEvent* event)
+{
+    m_dragPosition = event->globalPosition().toPoint();
+    move(m_dragPosition);
+    event->accept();
+}
+
+
+Qt::Edges FramelessWindow::calculateEdges(const QPoint &pos, const int margin) const
+{
+    Qt::Edges edges;
+    if (pos.x() < margin) edges |= Qt::LeftEdge;
+    if (pos.x() > width() - margin) edges |= Qt::RightEdge;
+    if (pos.y() < margin) edges |= Qt::TopEdge;
+    if (pos.y() > height() - margin) edges |= Qt::BottomEdge;
+    return edges;
+}
+
+void FramelessWindow::updateCursorShape(const QPoint &pos)
+{
+    if (m_resizing)
+        return;
+
+    m_resizeEdges = calculateEdges(pos, m_resizeMargin);
+
+    if (m_resizeEdges == (Qt::TopEdge | Qt::LeftEdge) || m_resizeEdges == (Qt::BottomEdge | Qt::RightEdge))
+        setCursor(Qt::SizeFDiagCursor);
+    else if (m_resizeEdges == (Qt::TopEdge | Qt::RightEdge) || m_resizeEdges == (Qt::BottomEdge | Qt::LeftEdge))
+        setCursor(Qt::SizeBDiagCursor);
+    else if (m_resizeEdges & (Qt::LeftEdge | Qt::RightEdge))
+        setCursor(Qt::SizeHorCursor);
+    else if (m_resizeEdges & (Qt::TopEdge | Qt::BottomEdge))
+        setCursor(Qt::SizeVerCursor);
+    else
+        setCursor(Qt::ArrowCursor);
+}
 
 void FramelessWindow::mousePressEvent(QMouseEvent* event)
 {
-    // Check if the press is on the title bar area (but not on the buttons)
-    if (event->button() == Qt::LeftButton && m_titleBar->geometry().contains(event->pos()))
+    if (event->button() == Qt::LeftButton)
     {
-        // Check if the click was on any of the buttons
-        bool onButton = false;
-        for (const QPushButton* btn : {m_minimizeButton, m_maximizeButton, m_closeButton})
+        if (m_resizeEdges != 0)
         {
-            if (btn->geometry().contains(m_titleBar->mapFromParent(event->pos())))
-            {
-                onButton = true;
-                break;
-            }
-        }
-        if (!onButton)
-        {
-            m_dragging = true;
-            m_dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
+            m_resizing = true;
+            m_dragPosition = event->globalPosition().toPoint();
             event->accept();
             return;
         }
     }
-    QMainWindow::mousePressEvent(event); // Pass on to base class
+    QMainWindow::mousePressEvent(event);
 }
 
 void FramelessWindow::mouseMoveEvent(QMouseEvent* event)
 {
-    if (m_dragging && (event->buttons() & Qt::LeftButton))
+    if (m_resizing)
+    {
+        const QPoint currentPos = event->globalPosition().toPoint();
+        const QPoint delta = currentPos - m_dragPosition;
+        QRect newGeometry = geometry();
+
+        if (m_resizeEdges & Qt::LeftEdge) newGeometry.setLeft(newGeometry.left() + delta.x());
+        if (m_resizeEdges & Qt::RightEdge) newGeometry.setRight(newGeometry.right() + delta.x());
+        if (m_resizeEdges & Qt::TopEdge) newGeometry.setTop(newGeometry.top() + delta.y());
+        if (m_resizeEdges & Qt::BottomEdge) newGeometry.setBottom(newGeometry.bottom() + delta.y());
+
+        if(newGeometry.width() < minimumWidth()) newGeometry.setLeft(geometry().left());
+        if(newGeometry.height() < minimumHeight()) newGeometry.setTop(geometry().top());
+
+        setGeometry(newGeometry);
+        m_dragPosition = currentPos;
+    }
+    else if (m_dragging)
     {
         move(event->globalPosition().toPoint() - m_dragPosition);
-        event->accept();
     }
     else
     {
-        QMainWindow::mouseMoveEvent(event);
+        updateCursorShape(event->pos());
     }
+    QMainWindow::mouseMoveEvent(event);
 }
 
 void FramelessWindow::mouseReleaseEvent(QMouseEvent* event)
@@ -174,6 +273,8 @@ void FramelessWindow::mouseReleaseEvent(QMouseEvent* event)
     if (event->button() == Qt::LeftButton)
     {
         m_dragging = false;
+        m_resizing = false;
+        setCursor(Qt::ArrowCursor);
     }
     QMainWindow::mouseReleaseEvent(event);
 }
@@ -183,6 +284,20 @@ void FramelessWindow::closeWindowSlot()
     emit closeApp();
 }
 
+void FramelessWindow::showMaximizeOrRestoreSlot()
+{
+    if (this->isMaximized())
+    {
+        this->showNormal();
+        m_maximizeButton->setText("☐"); // Restore symbol
+    }
+    else
+    {
+        this->showMaximized();
+        m_maximizeButton->setText("❐"); // Actual maximize symbol (might need specific font or icon)
+    }
+}
+
 void FramelessWindow::initContentAreaLayout(QWidget* contentArea)
 {
     // Add layout to centralWidget
@@ -190,9 +305,9 @@ void FramelessWindow::initContentAreaLayout(QWidget* contentArea)
     m_centralWidgetLayout->setSpacing(0);
     m_centralWidgetLayout->setContentsMargins(0, 0, 0, 0);
 
-    // Setting m_window title and docking icon
-    setWindowTitle(UpdateInfo().currentVersion.data());
-    setWindowIcon(Config::singleton().getAppLogo());
+    // // Setting m_window title and docking icon TODO---remove?
+    // setWindowTitle(UpdateInfo().currentVersion.data());
+    // setWindowIcon(Config::singleton().getAppLogo());
 
     // Add control panel to the central widget.
     const auto centralWidgetControlPanel = new QWidget(contentArea);
@@ -214,8 +329,6 @@ void FramelessWindow::initContentAreaLayout(QWidget* contentArea)
 
     centralWidgetLayout2->addWidget(centralWidgetControlPanelA, 0, 0, 1, 12, Qt::AlignTop);
 
-    // const auto appIcons = Config::singleton().getAppIcons();
-
     m_folderButton = std::make_unique<QPushButton>("🗀", this);
     m_folderButton->setObjectName("folderButton");
     m_folderButton->setFixedSize(40, 40);
@@ -227,7 +340,6 @@ void FramelessWindow::initContentAreaLayout(QWidget* contentArea)
     auto* layoutB = new QVBoxLayout(centralWidgetControlPanelB);
     layoutB->setSpacing(8);
     layoutB->setContentsMargins(16, 0, 0, 8);
-
 
     centralWidgetLayout2->addWidget(centralWidgetControlPanelB, 11, 0, 1, 1, Qt::AlignBottom);
 

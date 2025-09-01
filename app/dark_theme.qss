@@ -31,6 +31,8 @@ QPushButton, QToolButton {
     color: #FFFFFF;            /* White text */
     border: none;              /* Flat design */
     border-radius: 4px;
+    padding: 8px 24px;
+    font-size: 10pt;
 }
 QPushButton:hover, QToolButton:hover {
     background-color: rgba(255, 255, 255, 0.08); /* FIX: Subtle background on hover */
@@ -106,25 +108,25 @@ QPushButton#closeButton:pressed {
 /*--- END of Max, Min, Close Buttons*/
 
 
-QToolButton#CodeRunner  {
-    font-size: 10pt;
+QPushButton#CodeRunner  {
     background-color: transparent;
     border-radius: 0px;
     color: #FFFFFF;
     border: none;
+    padding: 0px;
 }
-QToolButton#CodeRunner:hover {
+QPushButton#CodeRunner:hover {
     background-color: transparent;
 }
 
 /* Labels */
-QLabel {
+QLabel#HeaderLabel {
     color: #E0E0E0; /* Default text color for labels */
     /* font-weight: normal; */
     /* font-size: 9pt; */
     padding: 2px;
 }
-QLabel:hover { /* NEW: Hover effect for QLabel */
+QLabel#HeaderLabel:hover { /* NEW: Hover effect for QLabel */
     background-color: rgba(255, 255, 255, 0.05); /* Subtle background on hover */
     border-radius: 2px; /* Slight rounding on hover */
 }

@@ -92,7 +92,8 @@ QPushButton#AddFile,
 QPushButton#minimizeButton,
 QPushButton#fileMenuButton,
 QPushButton#maximizeButton,
-QPushButton#closeButton {
+QPushButton#closeButton,
+QPushButton#settingGearButton  {
         font-size: 12pt;
         border-radius: 0px;
         color: #212121; /* Dark text */
@@ -106,6 +107,11 @@ QPushButton#closeButton:hover {
 QPushButton#closeButton:pressed {
         background-color: #C2402B; /* An even darker red for the click */
         color: #FFFFFF; /* White text on press for close button */
+}
+
+QPushButton#settingGearButton {
+  font-size: 18pt;
+  font-weight: 900;
 }
 /*--- END of Max, Min, Close Buttons*/
 

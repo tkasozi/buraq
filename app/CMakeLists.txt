@@ -104,6 +104,10 @@ set(ITOOLS_HEADERS
         ui/settings/UserSettings.h
         ui/settings/SettingManager/SettingsManager.cpp
         ui/settings/SettingManager/SettingsManager.h
+        ui/DraggableWidget/DraggableWidget.cpp
+        ui/DraggableWidget/DraggableWidget.h
+        utils/Frame/Frame.cpp
+        utils/Frame/Frame.h
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND WIN32)

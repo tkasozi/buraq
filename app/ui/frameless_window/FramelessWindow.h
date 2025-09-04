@@ -29,6 +29,7 @@ class Editor;
 class EditorMargin;
 class ToolBar;
 class ThemeManager;
+class Frame;
 
 class FramelessWindow final : public QMainWindow
 {
@@ -42,14 +43,7 @@ public:
     [[nodiscard]] Editor* getEditor() const;
     void onShowOutputButtonClicked() const;
     [[nodiscard]] EditorMargin* getEditorMargin() const;
-    [[nodiscard]] PluginManager* getLangPluginManager() const;
-
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-
-    // Optional: If you need to draw a custom border or background for the whole m_window
-    // void paintEvent(QPaintEvent *event) override;
+    [[nodiscard]] PluginManager* getLangPluginManager() const;;
 
 public slots:
     void processStatusSlot(const QString&, int timeout = 5000) const;
@@ -57,14 +51,8 @@ public slots:
     void updateDrawer() const;
     void closeWindowSlot();
     void showMaximizeOrRestoreSlot();
-    void windowDrag(QMouseEvent* event);
 
 private:
-    // Helper function to update the cursor shape based on position
-    void updateCursorShape(const QPoint &pos);
-
-    // Helper function to calculate which edges the mouse is on
-    Qt::Edges calculateEdges(const QPoint &pos, int margin) const;
 
     void initContentAreaLayout(QWidget* contentArea);
 
@@ -75,22 +63,21 @@ private:
     std::unique_ptr<QGridLayout> m_centralWidgetLayout;
     std::unique_ptr<OutputDisplay> m_outPutArea;
     std::unique_ptr<QGridLayout> m_placeHolderLayout;
-    std::unique_ptr<Editor> m_itoolsEditor;
+    std::unique_ptr<Editor> m_editor;
     std::unique_ptr<EditorMargin> editorMargin;
     std::unique_ptr<ToolBar> m_toolBar;
-    std::unique_ptr<QWidget> m_titleBar;
     std::unique_ptr<buraq::buraq_api> api_context;
-    std::unique_ptr<FramelessWindow> m_framelessWindow;
+    std::unique_ptr<Frame> m_Frame;
 
     std::unique_ptr<QPushButton> m_folderButton;
     std::unique_ptr<QPushButton> m_outputButton;
     std::unique_ptr<QPushButton> m_settingsButton;
+    std::unique_ptr<QPushButton> m_minimizeButton;
+    std::unique_ptr<QPushButton> m_maximizeButton;
+    std::unique_ptr<QPushButton> m_closeButton;
 
     QStatusBar* m_statusBar{};
 
-    QPushButton* m_minimizeButton;
-    QPushButton* m_maximizeButton;
-    QPushButton* m_closeButton;
 
     SettingsManager settingsManager{};
     UserSettings userPreferences;

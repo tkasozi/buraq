@@ -11,13 +11,20 @@
 
 #include "Filters/ThemeManager/ThemeManager.h"
 
+struct SettingsDialogPreference
+{
+    QSize windowSize = QSize(1200, 720);
+};
+
 // A simple struct to hold all application preferences
-struct UserSettings {
+struct UserSettings
+{
     AppTheme theme = Dark;
-    QSize windowSize = QSize(2100, 720);
+    QSize windowSize = QSize(1200, 720);
     QPoint windowPosition = QPoint(100, 100);
     bool wordWrapEnabled = true;
     int editorFontSize = 11;
+    SettingsDialogPreference settingsDialog;
 };
 
 #endif // USERSETTINGS_H

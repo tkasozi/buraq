@@ -8,11 +8,24 @@
  */
 
 /* General Application Colors & Typography */
-QMainWindow, QWidget, QDialog {
-    background-color: #232323; /* Dark background */
+QWidget, QDialog {
+    background-color: transparent;
     color: #E0E0E0;            /* Light text */
     font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
     font-size: 10pt;
+}
+
+QWidget#Frame {
+  background-color: #232323; /* Dark background */
+  border: 1px solid #00BCD4;
+}
+
+QWidget#leftPanel {
+  background-color: #333333; /* Dark background */
+}
+
+QWidget#rightPanel {
+  background-color: #333333; /* Dark background */
 }
 
 /* Selection Colors (for text, list items, etc.) */
@@ -92,7 +105,8 @@ QPushButton#AddFile,
 QPushButton#minimizeButton,
 QPushButton#fileMenuButton,
 QPushButton#maximizeButton,
-QPushButton#closeButton {
+QPushButton#closeButton,
+QPushButton#settingGearButton {
         font-size: 12pt;
         border-radius: 0px;
         color: #FFFFFF;
@@ -104,6 +118,11 @@ QPushButton#closeButton:hover {
 }
 QPushButton#closeButton:pressed {
         background-color: #C2402B; /* An even darker red for the click */
+}
+
+QPushButton#settingGearButton {
+  font-size: 18pt;
+  font-weight: 900;
 }
 /*--- END of Max, Min, Close Buttons*/
 
